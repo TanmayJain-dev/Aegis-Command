@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
-import { Shield, Target, AlertTriangle, Search, Activity, Terminal, Video, Radio, Globe, Map as MapIcon, X, CheckCircle, Crosshair, ChevronRight } from "lucide-react";
+import { Shield, Target, AlertTriangle, Search, Activity, Terminal, Video, Radio, Globe, Map as MapIcon, X, CheckCircle, Crosshair, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 import dynamic from "next/dynamic";
 
 const MapComponent = dynamic(() => import("../components/Map"), { ssr: false });
@@ -21,9 +21,14 @@ export default function AegisDashboard() {
   const [intelMode, setIntelMode] = useState<IntelMode>("SIGINT");
   const [mapCoordinates, setMapCoordinates] = useState<[number, number] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Default muted is good for military feeds
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
+  
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const videoContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetch("/detections.json")
@@ -129,11 +134,41 @@ export default function AegisDashboard() {
     }
   };
 
+  const togglePlay = () => {
+    if (videoRef.current) {
+      if (isPlaying) {
+        videoRef.current.pause();
+      } else {
+        videoRef.current.play();
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
+  const toggleMute = () => {
+    if (videoRef.current) {
+      videoRef.current.muted = !isMuted;
+      setIsMuted(!isMuted);
+    }
+  };
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      videoContainerRef.current?.requestFullscreen().catch(err => {
+        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
+      });
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
+
   const handleSearch = async (searchQuery: string = query) => {
     if (!searchQuery) return;
     setLoading(true);
     try {
-      const res = await fetch("http://localhost:8000/api/intel/search", {
+      const res = await fetch("/api/intel/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query: searchQuery }),
@@ -276,40 +311,34 @@ export default function AegisDashboard() {
             ))}
           </div>
 
-          <div className="relative flex-1 w-full rounded border border-slate-800 bg-black overflow-hidden group shadow-2xl">
-            {/* Universal Military Optics HUD */}
+          {/* Universal Military Optics HUD */}
+          <div 
+            ref={videoContainerRef} 
+            className="relative flex-1 w-full rounded border border-slate-800 bg-black overflow-hidden group shadow-2xl"
+          >
+            {/* Aesthetic Overlays */}
             <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-4">
-               <div className="flex justify-between items-start text-[10px] text-emerald-500/70 font-bold tracking-widest drop-shadow-md">
+               <div className="flex justify-between items-start text-[10px] text-emerald-200 font-bold tracking-widest drop-shadow-[0_0_15px_rgba(0,0,0,0.85)] bg-slate-950/25 border border-emerald-500/20 rounded-xl px-3 py-2">
                  <div className="flex flex-col gap-1">
-                   <span>REC <span className="text-red-500 animate-pulse">●</span></span>
-                   <span>T-MINUS: 00:00:00</span>
-                   <span>FPS: 59.94</span>
+                   <span className={isPlaying ? "text-red-400 animate-pulse" : "text-slate-300"}>REC <span className={isPlaying ? "text-red-400 animate-pulse" : "text-slate-300"}>●</span></span>
+                   <span className="text-slate-300">T-MINUS: 00:00:00</span>
+                   <span className="text-slate-300">FPS: 59.94</span>
                  </div>
                  <div className="flex flex-col items-end gap-1 text-right">
-                   <span>FEED ENCRYPTION: AES-256</span>
-                   <span>SRC: {videoSource}</span>
-                   <span>STATUS: <span className="text-emerald-400">LIVE</span></span>
+                   <span className="text-slate-300">FEED ENCRYPTION: AES-256</span>
+                   <span className="text-slate-300">SRC: {videoSource}</span>
+                   <span className="text-emerald-300">STATUS: <span className="text-emerald-300 font-bold">LIVE</span></span>
                  </div>
                </div>
 
-               {/* Center Crosshair */}
                <div className="absolute inset-0 flex items-center justify-center">
-                  <Crosshair className="text-emerald-500/20 w-32 h-32 stroke-[0.5]" />
+                  <Crosshair className="text-emerald-400/55 w-32 h-32 stroke-[0.75]" />
                </div>
                
-               {/* Corner Brackets */}
-               <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-emerald-500/30"></div>
-               <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-emerald-500/30"></div>
-               <div className="absolute bottom-4 left-4 w-8 h-8 border-b-2 border-l-2 border-emerald-500/30"></div>
-               <div className="absolute bottom-4 right-4 w-8 h-8 border-b-2 border-r-2 border-emerald-500/30"></div>
-
-               <div className="flex justify-between items-end text-[10px] text-emerald-500/70 font-bold tracking-widest drop-shadow-md">
-                 <div className="flex items-center gap-2">
-                   <div className="w-24 h-1 bg-slate-800 overflow-hidden"><div className="w-2/3 h-full bg-emerald-500/50"></div></div>
-                   <span>SIG STRENGTH</span>
-                 </div>
-                 <span>ZOOM: 1.0x</span>
-               </div>
+               <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-emerald-400/60"></div>
+               <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-emerald-400/60"></div>
+               <div className="absolute bottom-12 left-4 w-8 h-8 border-b-2 border-l-2 border-emerald-400/60"></div>
+               <div className="absolute bottom-12 right-4 w-8 h-8 border-b-2 border-r-2 border-emerald-400/60"></div>
             </div>
 
             {/* Video Player */}
@@ -317,16 +346,48 @@ export default function AegisDashboard() {
               ref={videoRef}
               src="/drone_feed.mp4" 
               className="absolute inset-0 w-full h-full object-contain filter contrast-125 brightness-90 grayscale-[20%]"
-              controls
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
               onCanPlay={(e) => setDuration(e.currentTarget.duration)}
+              muted={isMuted}
+              onClick={togglePlay}
             />
+            
             {/* Canvas overlay for YOLO Boxes */}
             <canvas 
               ref={canvasRef}
               className="absolute inset-0 pointer-events-none z-20"
             />
+
+            {/* CUSTOM MILITARY MEDIA CONTROLS */}
+            <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-black/95 to-transparent z-30 flex items-end px-4 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center justify-between w-full text-emerald-300/90">
+                
+                {/* Play & Audio */}
+                <div className="flex items-center gap-4">
+                  <button onClick={togglePlay} className="hover:text-emerald-300 transition-colors">
+                    {isPlaying ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
+                  </button>
+                  <button onClick={toggleMute} className="hover:text-emerald-300 transition-colors">
+                    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
+                  </button>
+                </div>
+
+                {/* Center Audio Visualizer Fake */}
+                <div className="flex items-center gap-1">
+                   <div className="w-1 h-3 bg-emerald-500/40 animate-pulse"></div>
+                   <div className="w-1 h-2 bg-emerald-500/40 animate-pulse delay-75"></div>
+                   <div className="w-1 h-4 bg-emerald-500/40 animate-pulse delay-150"></div>
+                   <div className="w-1 h-2 bg-emerald-500/40 animate-pulse delay-75"></div>
+                </div>
+
+                {/* Fullscreen Toggle */}
+                <button onClick={toggleFullscreen} className="hover:text-emerald-300 transition-colors z-40">
+                  {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
+                </button>
+
+              </div>
+            </div>
           </div>
 
           {/* Threat Radar */}
@@ -338,7 +399,6 @@ export default function AegisDashboard() {
             {duration > 0 && detections && Object.entries(detections).map(([time, threats]: [string, any]) => {
               if (threats && threats.length > 0) {
                 const leftPercentage = (parseFloat(time) / duration) * 100;
-                // Only render if it's a valid percentage
                 if (leftPercentage >= 0 && leftPercentage <= 100) {
                   return (
                     <div 
