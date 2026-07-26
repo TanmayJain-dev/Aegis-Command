@@ -3,3 +3,5 @@ uvicorn
 faiss-cpu
 sentence-transformers
 pydantic
+groq
+python-dotenv
