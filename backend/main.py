@@ -36,6 +36,10 @@ intel_data = []
 @app.on_event("startup")
 async def startup_event():
     global intel_data, index
+    if index.ntotal > 0:
+        print("FAISS index already populated. Skipping re-indexing.")
+        return
+
     print("Loading Mock Intel Data...")
     try:
         with open("mock_intel.json", "r") as f:

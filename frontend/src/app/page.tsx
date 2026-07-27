@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { Shield, Target, AlertTriangle, Search, Activity, Terminal, Video, Radio, Globe, Map as MapIcon, X, CheckCircle, Crosshair, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 import dynamic from "next/dynamic";
 
@@ -21,11 +21,11 @@ export default function AegisDashboard() {
   const [intelMode, setIntelMode] = useState<IntelMode>("SIGINT");
   const [mapCoordinates, setMapCoordinates] = useState<[number, number] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); // Default muted is good for military feeds
+  const [isMuted, setIsMuted] = useState(true); 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
@@ -37,11 +37,18 @@ export default function AegisDashboard() {
       .catch((err) => console.error("Error loading detections:", err));
   }, []);
 
+  // CACHE: Pre-sort the detection keys for O(log N) Binary Search
+  const detectionKeys = useMemo(() => {
+    if (!detections) return [];
+    return Object.keys(detections).sort((a, b) => parseFloat(a) - parseFloat(b));
+  }, [detections]);
+
+  // Sync Video timestamp with Canvas drawing via Binary Search
   const handleTimeUpdate = () => {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     
-    if (!video || !canvas || !detections || Object.keys(detections).length === 0) return;
+    if (!video || !canvas || !detections || detectionKeys.length === 0) return;
     if (video.videoWidth === 0 || video.videoHeight === 0) return;
 
     const ctx = canvas.getContext("2d");
@@ -55,14 +62,33 @@ export default function AegisDashboard() {
     const scaleY = canvas.height / video.videoHeight;
     const currentTime = video.currentTime;
     
-    const closestTime = Object.keys(detections).reduce((prev, curr) => {
-      return Math.abs(parseFloat(curr) - currentTime) < Math.abs(parseFloat(prev) - currentTime)
-        ? curr
-        : prev;
-    }, Object.keys(detections)[0]);
+    // O(log N) BINARY SEARCH FOR CLOSEST TIME
+    let left = 0;
+    let right = detectionKeys.length - 1;
+    let closestKey = detectionKeys[0];
+    let minDiff = Infinity;
 
-    if (Math.abs(parseFloat(closestTime) - currentTime) < 0.5) {
-      const activeThreats = detections[closestTime];
+    while (left <= right) {
+      const mid = Math.floor((left + right) / 2);
+      const midTime = parseFloat(detectionKeys[mid]);
+      const diff = Math.abs(midTime - currentTime);
+
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestKey = detectionKeys[mid];
+      }
+
+      if (midTime === currentTime) {
+        break; 
+      } else if (midTime < currentTime) {
+        left = mid + 1;
+      } else {
+        right = mid - 1;
+      }
+    }
+
+    if (minDiff < 0.5) {
+      const activeThreats = detections[closestKey];
       
       if (activeThreats && Array.isArray(activeThreats)) {
         activeThreats.forEach((threat: any) => {
@@ -78,29 +104,10 @@ export default function AegisDashboard() {
           ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
 
           // Corner accents
-          ctx.beginPath();
-          ctx.moveTo(scaledX, scaledY + 10);
-          ctx.lineTo(scaledX, scaledY);
-          ctx.lineTo(scaledX + 10, scaledY);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(scaledX + scaledWidth - 10, scaledY);
-          ctx.lineTo(scaledX + scaledWidth, scaledY);
-          ctx.lineTo(scaledX + scaledWidth, scaledY + 10);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(scaledX, scaledY + scaledHeight - 10);
-          ctx.lineTo(scaledX, scaledY + scaledHeight);
-          ctx.lineTo(scaledX + 10, scaledY + scaledHeight);
-          ctx.stroke();
-
-          ctx.beginPath();
-          ctx.moveTo(scaledX + scaledWidth - 10, scaledY + scaledHeight);
-          ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight);
-          ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight - 10);
-          ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(scaledX, scaledY + 10); ctx.lineTo(scaledX, scaledY); ctx.lineTo(scaledX + 10, scaledY); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(scaledX + scaledWidth - 10, scaledY); ctx.lineTo(scaledX + scaledWidth, scaledY); ctx.lineTo(scaledX + scaledWidth, scaledY + 10); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(scaledX, scaledY + scaledHeight - 10); ctx.lineTo(scaledX, scaledY + scaledHeight); ctx.lineTo(scaledX + 10, scaledY + scaledHeight); ctx.stroke();
+          ctx.beginPath(); ctx.moveTo(scaledX + scaledWidth - 10, scaledY + scaledHeight); ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight); ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight - 10); ctx.stroke();
 
           ctx.fillStyle = "rgba(239, 68, 68, 0.2)";
           ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
@@ -118,12 +125,6 @@ export default function AegisDashboard() {
           }
         });
       }
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
     }
   };
 
@@ -177,22 +178,20 @@ export default function AegisDashboard() {
       if (data.status === "success" && data.data && data.data.length > 0) {
         setIntelData(data.data[0]);
         setAiSummary(data.ai_summary || "AI processing unavailable.");
-        // Randomize coordinates for dummy map panning
+        // We will pass real backend coordinates here eventually, but for now we pan to a random proxy coordinate in the UI
         const randomLat = 28.6139 + (Math.random() - 0.5) * 0.1;
         const randomLng = 77.2090 + (Math.random() - 0.5) * 0.1;
         setMapCoordinates([randomLat, randomLng]);
       } else {
-        // Fallback for demo
-        setIntelData({ transcript: "Simulated response for: " + searchQuery, id: "DEMO-01", location: "Sector 7" });
-        setAiSummary("Simulated AI summary based on RAG context.");
-        setMapCoordinates([28.62, 77.21]);
+        setIntelData(null);
+        setAiSummary("No relevant intel found for this query.");
+        setMapCoordinates(null);
       }
     } catch (error) {
       console.error("Search failed:", error);
-      // Fallback data when backend isn't actually running
-      setIntelData({ transcript: "Simulated fallback response for: " + searchQuery, id: "FALLBACK-01", location: "Sector X" });
-      setAiSummary("Simulated AI summary due to backend connection failure.");
-      setMapCoordinates([28.5, 77.1]);
+      setIntelData(null);
+      setAiSummary("CONNECTION ERROR: Unable to reach Intelligence Database (Port 8000).");
+      setMapCoordinates(null);
     }
     setLoading(false);
   };
@@ -228,7 +227,7 @@ export default function AegisDashboard() {
 
             <div>
               <div className="text-slate-500 text-xs mb-2 uppercase tracking-wider">Raw Transcript / Data</div>
-              <div className="bg-black/50 border border-slate-800 p-4 rounded text-slate-300 font-mono text-xs max-h-32 overflow-y-auto">
+              <div className="bg-black/50 border border-slate-800 p-4 rounded text-slate-300 font-mono text-xs max-h-32 overflow-y-auto custom-scrollbar">
                 {intelData?.transcript || "No transcript available."}
               </div>
             </div>
@@ -316,29 +315,29 @@ export default function AegisDashboard() {
             ref={videoContainerRef} 
             className="relative flex-1 w-full rounded border border-slate-800 bg-black overflow-hidden group shadow-2xl"
           >
-            {/* Aesthetic Overlays */}
+            {/* Aesthetic Overlays with Enhanced Contrast */}
             <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-4">
-               <div className="flex justify-between items-start text-[10px] text-emerald-200 font-bold tracking-widest drop-shadow-[0_0_15px_rgba(0,0,0,0.85)] bg-slate-950/25 border border-emerald-500/20 rounded-xl px-3 py-2">
-                 <div className="flex flex-col gap-1">
-                   <span className={isPlaying ? "text-red-400 animate-pulse" : "text-slate-300"}>REC <span className={isPlaying ? "text-red-400 animate-pulse" : "text-slate-300"}>●</span></span>
-                   <span className="text-slate-300">T-MINUS: 00:00:00</span>
-                   <span className="text-slate-300">FPS: 59.94</span>
+               <div className="flex justify-between items-start text-[10px] text-emerald-400 font-bold tracking-widest drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]">
+                 <div className="flex flex-col gap-1 bg-black/30 p-2 rounded backdrop-blur-sm border border-emerald-500/20">
+                   <span>REC <span className={isPlaying ? "text-red-500 animate-pulse drop-shadow-[0_0_5px_rgba(239,68,68,0.8)]" : "text-slate-500"}>●</span></span>
+                   <span>T-MINUS: 00:00:00</span>
+                   <span>FPS: 59.94</span>
                  </div>
-                 <div className="flex flex-col items-end gap-1 text-right">
-                   <span className="text-slate-300">FEED ENCRYPTION: AES-256</span>
-                   <span className="text-slate-300">SRC: {videoSource}</span>
-                   <span className="text-emerald-300">STATUS: <span className="text-emerald-300 font-bold">LIVE</span></span>
+                 <div className="flex flex-col items-end gap-1 text-right bg-black/30 p-2 rounded backdrop-blur-sm border border-emerald-500/20">
+                   <span>FEED ENCRYPTION: AES-256</span>
+                   <span>SRC: {videoSource}</span>
+                   <span>STATUS: <span className="text-emerald-400 drop-shadow-[0_0_5px_rgba(52,211,153,0.8)]">LIVE</span></span>
                  </div>
                </div>
 
                <div className="absolute inset-0 flex items-center justify-center">
-                  <Crosshair className="text-emerald-400/55 w-32 h-32 stroke-[0.75]" />
+                  <Crosshair className="text-emerald-400/60 w-32 h-32 stroke-1 drop-shadow-[0_0_8px_rgba(52,211,153,0.4)]" />
                </div>
                
-               <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-emerald-400/60"></div>
-               <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-emerald-400/60"></div>
-               <div className="absolute bottom-12 left-4 w-8 h-8 border-b-2 border-l-2 border-emerald-400/60"></div>
-               <div className="absolute bottom-12 right-4 w-8 h-8 border-b-2 border-r-2 border-emerald-400/60"></div>
+               <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-emerald-400/80 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
+               <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-emerald-400/80 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
+               <div className="absolute bottom-12 left-4 w-8 h-8 border-b-2 border-l-2 border-emerald-400/80 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
+               <div className="absolute bottom-12 right-4 w-8 h-8 border-b-2 border-r-2 border-emerald-400/80 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
             </div>
 
             {/* Video Player */}
@@ -360,10 +359,8 @@ export default function AegisDashboard() {
             />
 
             {/* CUSTOM MILITARY MEDIA CONTROLS */}
-            <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-black/95 to-transparent z-30 flex items-end px-4 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="flex items-center justify-between w-full text-emerald-300/90">
-                
-                {/* Play & Audio */}
+            <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-black/90 to-transparent z-30 flex items-end px-4 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex items-center justify-between w-full text-emerald-500/80">
                 <div className="flex items-center gap-4">
                   <button onClick={togglePlay} className="hover:text-emerald-300 transition-colors">
                     {isPlaying ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
@@ -372,20 +369,15 @@ export default function AegisDashboard() {
                     {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
                   </button>
                 </div>
-
-                {/* Center Audio Visualizer Fake */}
                 <div className="flex items-center gap-1">
                    <div className="w-1 h-3 bg-emerald-500/40 animate-pulse"></div>
                    <div className="w-1 h-2 bg-emerald-500/40 animate-pulse delay-75"></div>
                    <div className="w-1 h-4 bg-emerald-500/40 animate-pulse delay-150"></div>
                    <div className="w-1 h-2 bg-emerald-500/40 animate-pulse delay-75"></div>
                 </div>
-
-                {/* Fullscreen Toggle */}
                 <button onClick={toggleFullscreen} className="hover:text-emerald-300 transition-colors z-40">
                   {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
                 </button>
-
               </div>
             </div>
           </div>
@@ -501,7 +493,7 @@ export default function AegisDashboard() {
                 ) : (
                   <div className="flex-1 flex flex-col items-center justify-center text-slate-600 border border-dashed border-slate-800 rounded bg-black/20 gap-3">
                     <Radio size={32} className="opacity-50" />
-                    <span className="text-xs uppercase tracking-widest">Awaiting Query Input</span>
+                    <span className="text-xs uppercase tracking-widest">{aiSummary || "Awaiting Query Input"}</span>
                   </div>
                 )}
               </div>
@@ -510,7 +502,7 @@ export default function AegisDashboard() {
                 <div className="p-2 border-b border-slate-800 flex items-center gap-2 text-[10px] text-blue-400 bg-blue-950/20">
                   <Activity size={12} className="animate-pulse" /> LIVE CHATTER ANALYSIS
                 </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
                   {[
                     { src: "Telegram / Unknown", time: "2m ago", text: "Movement spotted near Sector 4 checkpoints. Prepare the cargo.", threat: "HIGH" },
                     { src: "DarkWeb Forum", time: "15m ago", text: "Looking for blindspots in perimeter CCTV-04.", threat: "MED" },
