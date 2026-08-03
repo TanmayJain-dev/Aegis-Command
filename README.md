@@ -1,83 +1,77 @@
 # Aegis Command
+
 Threat Intelligence Network
 
-**HackerRank Infinity Hacks 2026 — Defence Track**
+HackerRank Infinity Hacks 2026 — Defence Track
 
-Aegis Command is a unified threat intelligence dashboard built for fast, high-stakes decision-making. It combines pre-processed UAV footage, computer vision detections, and a retrieval-augmented intelligence layer to turn fragmented battlefield data into something commanders can act on immediately.
+Aegis Command is a lightweight intelligence dashboard built for fast decision-making. It brings together UAV detections, text-based intelligence, and AI-generated summaries in one place so operators can understand what is happening without jumping between tools.
 
-![Next.js](https://img.shields.io/badge/Next.js-14-black?style=for-the-badge&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js-14-0a0a0a?style=for-the-badge&logo=next.js)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi)
 ![FAISS](https://img.shields.io/badge/Meta_FAISS-Vector_DB-0467DF?style=for-the-badge&logo=meta)
-![Groq](https://img.shields.io/badge/Groq-Llama_3-F55036?style=for-the-badge)
-![YOLOv8](https://img.shields.io/badge/YOLOv8-Vision_AI-00FFFF?style=for-the-badge)
+![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker)
 
----
+## What it does
 
-## Core Features
+The system takes in several streams of information and turns them into something usable on a single operational view:
 
-- **Low-latency threat overlay:** UAV footage is pre-processed with YOLOv8, and the detected coordinates are mapped into a fast lookup structure so the frontend can render bounding boxes smoothly in the browser.
-- **Intelligence search at speed:** The system searches through a large corpus of intercepted communications using FAISS-powered vector indexing, enabling fast retrieval of relevant reports.
-- **Tactical summaries:** The backend can generate short, actionable summaries from retrieved intelligence using Groq-powered language models.
-- **Interactive timeline and map:** Threats can be explored through a synchronized timeline and a geospatial view, helping operators move from raw data to context quickly.
+- UAV footage is processed through a vision pipeline to identify objects and extract structured detections.
+- Intercepted communications are indexed and searched so relevant evidence can be retrieved quickly.
+- A language model is used to generate concise summaries grounded in the retrieved data.
 
----
+The result is a dashboard that helps surface patterns, context, and likely next steps without requiring a long manual review.
 
-## Core Team
+## How it works
 
-- **[Tanmay Jain](https://github.com/TanmayJain-dev)** — Tech Lead, full-stack architecture, RAG NLP, and command interface design
-- **[Aryan Garg](https://github.com/Aryangarg372)** — Computer vision pipeline and YOLOv8-based detection workflow
-- **[Rishabh]** — Product strategy, presentation, and storytelling
+The project is split into three main parts:
 
----
+1. Vision processing
+   - YOLO-based detection is used to extract visual targets from UAV data.
+   - The output is converted into structured JSON that can be consumed by the frontend.
 
-## System Architecture
+2. Intelligence retrieval
+   - Text data is indexed and searched using FAISS to find relevant messages and evidence.
+   - The retrieval layer helps connect raw intelligence to spatial and contextual information.
 
-Aegis Command is built as a decoupled frontend-backend system:
+3. User-facing dashboard
+   - A Next.js frontend renders the detections and retrieved context in a responsive interface.
+   - The backend serves the data and coordinates the summarization flow.
 
-1. **Intelligence Backend (Port 8000):** Powered by Python, FastAPI, and Hugging Face SentenceTransformers. It indexes mock intelligence reports into FAISS and supports AI-generated tactical summaries.
-2. **Command Interface (Port 3000):** A Next.js UI that handles video playback, threat overlays, timeline navigation, and geospatial visualization.
+## Stack
 
----
+- Frontend: Next.js
+- Backend: FastAPI
+- Vector search: FAISS
+- Vision: YOLO-based processing
+- Containerization: Docker Compose
 
-## Run Locally
+## Running locally
 
-Run the backend and frontend in separate terminals.
-
-### 1. Intelligence Backend (Port 8000)
-
-```bash
-cd backend
-python -m venv venv
-
-# Windows: venv\Scripts\activate
-# Linux/Mac: source venv/bin/activate
-
-pip install -r requirements.txt
-```
-
-Create a `.env` file inside the backend folder and add your Groq API key:
+1. Create a `.env` file in the `backend/` directory with your Groq API key:
 
 ```env
 GROQ_API_KEY=gsk_your_api_key_here
 ```
 
-Start the server:
+2. Start the full stack from the project root:
 
 ```bash
-uvicorn main:app --reload --port 8000
+docker compose up --build
 ```
 
-### 2. Command Interface (Port 3000)
+3. Open the application:
 
-Make sure `drone_feed.mp4` and `detections.json` are present in the frontend/public directory before starting.
+- Frontend: http://localhost:3000
+- API docs: http://localhost:8000/docs
 
-```bash
-cd frontend
-npm install
-npm run dev
+## Project structure
+
+```text
+backend/     FastAPI service and intelligence processing
+frontend/    Next.js dashboard UI
+vision/      Detection pipeline and preprocessing scripts
 ```
 
-Once both services are running, open http://localhost:3000 in your browser.
+## Notes
 
-Click play on the video feed to begin the automated threat detection loop.
-
+The project is designed to feel practical rather than purely experimental. The focus is on making the flow from raw data to usable insight feel clear, quick, and easy to follow.
