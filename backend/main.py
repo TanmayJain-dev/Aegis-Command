@@ -9,11 +9,8 @@ from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 from groq import Groq
 
-# Load environment variables
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-
-# Initialize Groq Client
 groq_client = Groq(api_key=GROQ_API_KEY)
 
 app = FastAPI()
@@ -36,6 +33,11 @@ intel_data = []
 @app.on_event("startup")
 async def startup_event():
     global intel_data, index
+    
+    # FIX: Prevent duplicate indexing on reload
+    if index.ntotal > 0:
+        index.reset()
+        
     print("Loading Mock Intel Data...")
     try:
         with open("mock_intel.json", "r") as f:
@@ -43,7 +45,6 @@ async def startup_event():
         
         transcripts = [item["transcript"] for item in intel_data]
         embeddings = model.encode(transcripts).astype('float32')
-        
         index.add(embeddings)
         print(f"Successfully indexed {index.ntotal} reports into FAISS.")
     except Exception as e:
@@ -54,48 +55,59 @@ class SearchQuery(BaseModel):
 
 @app.post("/api/intel/search")
 async def search_intel(req: SearchQuery):
-    # 1. Embed and Search FAISS
     query_vector = model.encode([req.query]).astype('float32')
-    k = 1 
-    distances, indices = index.search(query_vector, k)
-    match_index = indices[0][0]
     
-    if match_index != -1 and match_index < len(intel_data):
-        matched_report = intel_data[match_index]
-        transcript = matched_report["transcript"]
-        
-        # 2. Generate Tactical Summary using Groq (Llama-3)
-        try:
-            chat_completion = groq_client.chat.completions.create(
-                messages=[
-                    {
-                        "role": "system",
-                        "content": "You are Aegis AI, a high-level military intelligence analyst. Read the intercepted report and provide a sharp, 2-sentence tactical summary of the threat, including location and recommended action. Keep it highly professional and concise."
-                    },
-                    {
-                        "role": "user",
-                        "content": f"Intercepted Intel: {transcript}"
-                    }
-                ],
-                model="llama3-8b-8192",
-                temperature=0.3,
-            )
-            ai_summary = chat_completion.choices[0].message.content
-        except Exception as e:
-            print(f"Groq API Error: {e}")
-            ai_summary = "AI processing unavailable. Refer to raw transcript."
+    # Retrieve TOP 3 matches instead of 1
+    k = 3 
+    distances, indices = index.search(query_vector, k)
+    
+    retrieved_reports = []
+    context_blocks = []
+    
+    for i, idx in enumerate(indices[0]):
+        if idx != -1 and idx < len(intel_data):
+            report = intel_data[idx]
+            retrieved_reports.append({
+                "id": report["id"],
+                "score": float(distances[0][i]),
+                "location": report["location"],
+                "lat": report.get("lat", 28.6139), # Fallback just in case
+                "lng": report.get("lng", 77.2090),
+                "transcript": report["transcript"]
+            })
+            context_blocks.append(f"[Evidence ID: {report['id']}] {report['transcript']}")
+            
+    if not retrieved_reports:
+        return {"status": "error", "message": "No relevant intel found."}
 
-        # 3. Return Combined Payload
-        return {
-            "status": "success",
-            "ai_summary": ai_summary,
-            "data": [
+    # Generate Grounded Tactical Summary
+    combined_context = "\n".join(context_blocks)
+    try:
+        chat_completion = groq_client.chat.completions.create(
+            messages=[
                 {
-                    "id": matched_report["id"],
-                    "score": float(distances[0][0]),
-                    "location": matched_report["location"],
-                    "transcript": transcript
+                    "role": "system",
+                    "content": "You are Aegis AI, a military intelligence analyst. Base your summary ONLY on the provided evidence. Cite the Evidence ID. Format: 'Threat detected. Evidence: [ID]. Action: [Recommendation].'"
+                },
+                {
+                    "role": "user",
+                    "content": f"Intercepted Intel Context:\n{combined_context}\n\nQuery: {req.query}"
                 }
-            ]
-        }
-    return {"status": "error", "message": "No relevant intel found."}
+            ],
+            model="llama-3.1-8b-instant", # UPGRADED MODEL
+            temperature=0.2,
+        )
+        ai_summary = chat_completion.choices[0].message.content
+    except Exception as e:
+        print(f"Groq API Error: {e}")
+        ai_summary = "AI processing unavailable. Refer to raw transcripts."
+
+    return {
+        "status": "success",
+        "ai_summary": ai_summary,
+        "data": retrieved_reports
+    }
+
+@app.get("/api/health")
+def health_check():
+    return {"status": "Aegis Backend Operational", "faiss_index_size": index.ntotal}
