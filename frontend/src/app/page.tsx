@@ -109,12 +109,19 @@ export default function AegisDashboard() {
           ctx.fillStyle = "rgba(6, 182, 212, 0.15)";
           ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
 
+          const hasTrackingInfo = threat.id && threat.direction && threat.direction !== "-";
+          const labelHeight = hasTrackingInfo ? 34 : 20;
+
           ctx.fillStyle = "#06b6d4";
-          ctx.fillRect(scaledX, scaledY - 20, 100, 20);
+          ctx.fillRect(scaledX, scaledY - labelHeight, 140, labelHeight);
 
           ctx.fillStyle = "#0a0a0a"; // Dark text on cyan background
           ctx.font = "bold 10px monospace";
-          ctx.fillText(`[${threat.class.toUpperCase()}] ${(threat.confidence * 100).toFixed(1)}%`, scaledX + 4, scaledY - 6);
+          ctx.fillText(`[${threat.class.toUpperCase()}] ${(threat.confidence * 100).toFixed(1)}%`, scaledX + 4, scaledY - (hasTrackingInfo ? 20 : 6));
+
+          if (hasTrackingInfo) {
+            ctx.fillText(`${threat.id} · ${threat.direction} · ${threat.speed_kmh}km/h`, scaledX + 4, scaledY - 6);
+          }
 
           if (threat.class === "truck" && !intelData && !loading) {
             setQuery("truck");
