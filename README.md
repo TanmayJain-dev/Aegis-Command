@@ -15,6 +15,55 @@ Built by **Tanmay Jain · Aryan Garg · Rishabh Bansal**
 >
 > Instead of asking an operator to manually correlate video detections, intercepted intelligence and historical incidents, Aegis connects those signals into a single real-time decision-support workflow.
 
+## See the system
+
+### Command Center
+
+<p align="center">
+  <img src="assets/screenshots/dashboard.svg" alt="Aegis Command tactical dashboard" width="100%" />
+</p>
+
+The interface brings the major operating surfaces together: live/replay video telemetry, a tactical map, intelligence retrieval and the threat timeline.
+
+### Visual walkthrough
+
+<table>
+<tr>
+<td width="50%" align="center">
+  <img src="assets/screenshots/video-feed.svg" alt="Aegis video feed with object detection overlay" width="100%" />
+  <br/><b>01 · Video & Detection</b><br/>
+  <sub>Structured vision telemetry rendered directly over the surveillance feed.</sub>
+</td>
+<td width="50%" align="center">
+  <img src="assets/screenshots/tactical-map.svg" alt="Aegis tactical map" width="100%" />
+  <br/><b>02 · Tactical Map</b><br/>
+  <sub>Detection events projected into a bounded operational view.</sub>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+  <img src="assets/screenshots/intel-feed.svg" alt="Aegis intelligence and RAG feed" width="100%" />
+  <br/><b>03 · Intelligence Retrieval</b><br/>
+  <sub>Semantic matches and evidence context surfaced alongside the event.</sub>
+</td>
+<td width="50%" align="center">
+  <img src="assets/architecture.svg" alt="Aegis system architecture" width="100%" />
+  <br/><b>04 · System Architecture</b><br/>
+  <sub>How perception, retrieval, reasoning and operator interaction connect.</sub>
+</td>
+</tr>
+</table>
+
+## Demo video
+
+<p align="center">
+  <img src="assets/demo-video-placeholder.svg" alt="Aegis demo video placeholder" width="100%" />
+</p>
+
+<!-- When a hosted demo is available, replace the placeholder above with a linked thumbnail or embedded player. -->
+
+---
+
 ## Why Aegis?
 
 Surveillance systems generate data faster than humans can correlate it.
@@ -49,10 +98,6 @@ VIDEO / SENSOR INPUT
           ▼
       OPERATOR
 ```
-
-<p align="center">
-  <img src="assets/architecture.svg" alt="Aegis Command architecture" width="100%" />
-</p>
 
 ---
 
