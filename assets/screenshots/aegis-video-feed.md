@@ -1,0 +1,1 @@
+The video feed screenshot is generated from the actual Aegis Command UI supplied by the project author.
