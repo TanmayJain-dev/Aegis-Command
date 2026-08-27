@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 590" width="1200" height="590">
+<defs>
+  <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0d1117"/><stop offset="1" stop-color="#111827"/></linearGradient>
+  <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#58a6ff"/></marker>
+  <style>
+    .box{fill:#161b22;stroke:#30363d;stroke-width:1.2}.title{fill:#f0f6fc;font:700 16px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}.body{fill:#8b949e;font:12px -apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}.mono{fill:#79c0ff;font:600 11px monospace}.line{stroke:#58a6ff;stroke-width:1.6;marker-end:url(#arrow);fill:none}.dash{stroke:#3fb950;stroke-width:1.2;stroke-dasharray:5 5;fill:none}.label{fill:#6e7681;font:10px monospace}
+  </style>
+</defs>
+<rect x="1" y="1" width="1198" height="588" rx="18" fill="url(#bg)" stroke="#30363d"/>
+<text x="32" y="42" class="mono">AEGIS / SYSTEM ARCHITECTURE</text><text x="32" y="69" class="title" font-size="23">Edge telemetry → threat fusion → grounded operator response</text>
+
+<rect x="32" y="105" width="245" height="128" rx="12" class="box"/><text x="52" y="134" class="title">01 · Edge Vision</text><text x="52" y="157" class="body">YOLOv8 inference</text><text x="52" y="177" class="body">ByteTrack / detections</text><text x="52" y="197" class="body">class · confidence · box · speed</text>
+
+<rect x="320" y="105" width="245" height="128" rx="12" class="box"/><text x="340" y="134" class="title">02 · Threat Gateway</text><text x="340" y="157" class="body">Next.js operator console</text><text x="340" y="177" class="body">Canvas threat rendering</text><text x="340" y="197" class="body">WebSocket event transport</text>
+
+<rect x="608" y="105" width="245" height="128" rx="12" class="box"/><text x="628" y="134" class="title">03 · Intelligence Engine</text><text x="628" y="157" class="body">FastAPI + SentenceTransformers</text><text x="628" y="177" class="body">384-d embeddings + FAISS</text><text x="628" y="197" class="body">top-k evidence retrieval</text>
+
+<rect x="896" y="105" width="245" height="128" rx="12" class="box"/><text x="916" y="134" class="title">04 · Grounded Reasoning</text><text x="916" y="157" class="body">Groq / Llama 3.1</text><text x="916" y="177" class="body">evidence-constrained summary</text><text x="916" y="197" class="body">action + source IDs</text>
+
+<path d="M277 169H312" class="line"/><path d="M565 169H600" class="line"/><path d="M853 169H888" class="line"/>
+<text x="280" y="156" class="label">telemetry</text><text x="567" y="156" class="label">WS / REST</text><text x="855" y="156" class="label">context</text>
+
+<rect x="177" y="302" width="260" height="112" rx="12" class="box"/><text x="199" y="331" class="title">Incident Memory</text><text x="199" y="354" class="body">Persistent threat assessments</text><text x="199" y="374" class="body">history · severity · recommendation</text><text x="199" y="394" class="body">operator review state</text>
+
+<rect x="470" y="302" width="260" height="112" rx="12" class="box"/><text x="492" y="331" class="title">Intel Corpus</text><text x="492" y="354" class="body">1,250+ intercepted records</text><text x="492" y="374" class="body">FAISS vector index</text><text x="492" y="394" class="body">INTEL-ID grounded evidence</text>
+
+<rect x="763" y="302" width="260" height="112" rx="12" class="box"/><text x="785" y="331" class="title">Operator Surface</text><text x="785" y="354" class="body">tactical map · video · alerts</text><text x="785" y="374" class="body">incident history · summaries</text><text x="785" y="394" class="body">low-latency visual feedback</text>
+
+<path d="M730 233V260H893V295" class="line"/><text x="742" y="254" class="label">retrieved evidence</text>
+<path d="M730 233V260H307V295" class="dash"/><text x="333" y="254" class="label">assessment memory</text>
+<path d="M437 358H460" class="line"/><path d="M750 358H753" class="line"/>
+
+<rect x="32" y="474" width="1109" height="76" rx="12" fill="#0d1117" stroke="#21262d"/>
+<text x="54" y="502" class="mono">DESIGN CONSTRAINTS</text><text x="210" y="502" class="body">Bandwidth-aware edge inference</text><text x="460" y="502" class="body">·</text><text x="480" y="502" class="body">binary-search telemetry lookup</text><text x="735" y="502" class="body">·</text><text x="754" y="502" class="body">evidence-grounded generation</text><text x="54" y="528" class="body">The UI receives compact telemetry instead of continuously streaming raw vision data.</text>
+</svg>
