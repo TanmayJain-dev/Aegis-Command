@@ -202,7 +202,7 @@ docker compose up --build
 
 ## Project Context
 
-Aegis Command was built for **HackerRank Infinity Hacks 2026**, where the team finished **#14 out of 2,000+ global participants**.
+Aegis Command was built for **HackerRank Infinity Hacks 2026**, where the team finished **#14 out of 6,000+ global participants**.
 
 The project focused on the problem of **information fragmentation**: surveillance, intelligence and historical context often exist in separate interfaces, forcing a human operator to perform the correlation manually.
 
