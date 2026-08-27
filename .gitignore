@@ -9,11 +9,35 @@ env/
 backend/incidents.db
 
 # Node & Next.js
+node_modules/
 frontend/node_modules/
+.next/
 frontend/.next/
+out/
 frontend/out/
+build/
 frontend/build/
 npm-debug.log*
+
+# Model weights and generated artifacts
+*.pt
+*.pth
+*.onnx
+*.tar.gz
+
+# Local media / generated detection assets
+*.mp4
+*.webm
+*.avi
+
+# Temporary Aegis repair snapshots
+.aegis-*/
+
+# Local repair scripts and one-off hotfixes
+hotfix.py
+aegis_*_fix*.sh
+aegis_*_stabilize.sh
+reset_aegis.sh
 
 # OS Files
 .DS_Store
