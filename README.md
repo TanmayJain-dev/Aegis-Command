@@ -20,7 +20,7 @@ Built by **Tanmay Jain · Aryan Garg · Rishabh Bansal**
 ### Command Center
 
 <p align="center">
-  <img src="assets/screenshots/dashboard.svg" alt="Aegis Command tactical dashboard" width="100%" />
+  <img src="assets/screenshots/dashboard.jpg" alt="Aegis Command tactical dashboard" width="100%" />
 </p>
 
 The interface brings the major operating surfaces together: live/replay video telemetry, a tactical map, intelligence retrieval and the threat timeline.
@@ -30,19 +30,19 @@ The interface brings the major operating surfaces together: live/replay video te
 <table>
 <tr>
 <td width="50%" align="center">
-  <img src="assets/screenshots/video-feed.svg" alt="Aegis video feed with object detection overlay" width="100%" />
+  <img src="assets/screenshots/video-feed.jpg" alt="Aegis video feed with object detection overlay" width="100%" />
   <br/><b>01 · Video & Detection</b><br/>
   <sub>Structured vision telemetry rendered directly over the surveillance feed.</sub>
 </td>
 <td width="50%" align="center">
-  <img src="assets/screenshots/tactical-map.svg" alt="Aegis tactical map" width="100%" />
+  <img src="assets/screenshots/tactical-map.jpg" alt="Aegis tactical map" width="100%" />
   <br/><b>02 · Tactical Map</b><br/>
   <sub>Detection events projected into a bounded operational view.</sub>
 </td>
 </tr>
 <tr>
 <td width="50%" align="center">
-  <img src="assets/screenshots/intel-feed.svg" alt="Aegis intelligence and RAG feed" width="100%" />
+  <img src="assets/screenshots/intel-feed.jpg" alt="Aegis intelligence and RAG feed" width="100%" />
   <br/><b>03 · Intelligence Retrieval</b><br/>
   <sub>Semantic matches and evidence context surfaced alongside the event.</sub>
 </td>
@@ -98,6 +98,54 @@ VIDEO / SENSOR INPUT
           ▼
       OPERATOR
 ```
+
+---
+
+## The Operator Experience
+
+Aegis is designed around a single operator workflow: **detect → correlate → retrieve → assess**.
+
+### Command Center
+
+<p align="center">
+  <img src="assets/screenshots/dashboard.jpg" alt="Aegis Command operational dashboard" width="100%" />
+</p>
+
+The command center brings together the video feed, detection telemetry, tactical map, intelligence context and operator state.
+
+### Video Intelligence
+
+<p align="center">
+  <img src="assets/screenshots/video-feed.jpg" alt="Aegis Command computer vision video feed" width="100%" />
+</p>
+
+The vision layer turns the drone replay into structured detection telemetry that can feed the downstream threat workflow.
+
+### Tactical Map
+
+<p align="center">
+  <img src="assets/screenshots/tactical-map.jpg" alt="Aegis Command tactical map" width="100%" />
+</p>
+
+Detections are projected into the bounded tactical area so spatial context can be evaluated alongside the underlying video event.
+
+### Intelligence Feed
+
+<p align="center">
+  <img src="assets/screenshots/intel-feed.jpg" alt="Aegis Command intelligence feed" width="100%" />
+</p>
+
+Relevant intelligence is surfaced alongside the detected event so the reasoning layer can ground its assessment in retrieved evidence.
+
+---
+
+## Demo
+
+<p align="center">
+  <img src="assets/demo-video-placeholder.svg" alt="Aegis Command demo video placeholder" width="100%" />
+</p>
+
+> 🎥 A full product walkthrough can be dropped into this section later.
 
 ---
 
