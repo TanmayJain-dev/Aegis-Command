@@ -54,14 +54,6 @@ The dashboard combines replay video, detection telemetry, tactical mapping, inte
 </tr>
 </table>
 
-## Demo
-
-<p align="center">
-  <img src="assets/demo-video-placeholder.svg" alt="Aegis Command demo video placeholder" width="100%" />
-</p>
-
-> 🎥 A full walkthrough will be added here after the recording is finalized.
-
 ---
 
 ## Why Aegis?
@@ -188,6 +180,13 @@ Aegis-Command/
 │   └── package.json
 │
 ├── vision/
+│   ├── vision_engine.py
+│   ├── yolo_extractor.py
+│   ├── ingest_target.py
+│   ├── viewer.html
+│   ├── requirements.txt
+│   └── README.md
+│
 ├── docs/
 ├── docker-compose.yml
 └── README.md
@@ -197,28 +196,98 @@ Aegis-Command/
 
 ## Running Locally
 
-### Prerequisites
+### Recommended: Docker Compose
+
+The root `docker-compose.yml` starts the **FastAPI backend** and **Next.js frontend**. The dashboard already contains the canonical replay video and detection timeline, so the basic demo does not require starting the separate vision microservice.
+
+#### 1. Prerequisites
+
+Install:
 
 - Git
 - Docker Engine
 - Docker Compose
-- A Groq API key for the reasoning layer
 
-### Quick start
+You also need a Groq API key for the reasoning layer.
+
+#### 2. Clone the repository
 
 ```bash
 git clone https://github.com/TanmayJain-dev/Aegis-Command.git
 cd Aegis-Command
+```
 
+#### 3. Configure the backend
+
+```bash
 cp backend/.env.example backend/.env
-# Add your GROQ_API_KEY to backend/.env
+```
 
+Open `backend/.env` and add your API key:
+
+```env
+GROQ_API_KEY=your_key_here
+```
+
+Do not commit `backend/.env`.
+
+#### 4. Start Aegis
+
+```bash
 docker compose up --build
 ```
 
-Open the frontend at **http://localhost:3000**. The FastAPI backend is exposed on **http://localhost:8000**.
+Wait for both services to start, then open:
 
-The demo replay and its matching detection timeline are already included in the repository. The ingestion workflow can regenerate the pair when a different source video is used.
+- **Frontend:** http://localhost:3000
+- **Backend:** http://localhost:8000
+
+The frontend talks to the backend through the configured Next.js API/WebSocket rewrites.
+
+#### 5. Stop the stack
+
+```bash
+docker compose down
+```
+
+### Frontend-only development
+
+For UI work, you can run the Next.js app directly:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Then open **http://localhost:3000**.
+
+The frontend's dependencies are isolated under `frontend/`; there is intentionally no Node package manifest at the repository root.
+
+### Vision pipeline
+
+The optional vision module lives under `vision/` and contains the ingestion utility used to regenerate the replay video and detection timeline.
+
+Install its dependencies:
+
+```bash
+cd vision
+python -m venv .venv
+```
+
+Activate the environment, then:
+
+```bash
+pip install -r requirements.txt
+```
+
+From the repository root, a replacement video can be processed with:
+
+```bash
+python vision/ingest_target.py path/to/video.mp4
+```
+
+That utility updates `frontend/public/drone_feed.mp4` and `frontend/public/detections.json` together. Because the canonical replay already ships with the repository, this step is only needed when regenerating the demo data.
 
 ---
 
