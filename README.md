@@ -1,7 +1,7 @@
 <div align="center">
 
 # AEGIS COMMAND
-### Autonomous Threat Intelligence & Tactical Decision Support
+### AI-Assisted Tactical Intelligence & Decision Support
 
 **Computer Vision · Retrieval-Augmented Intelligence · Real-Time Telemetry · Operator Decision Support**
 
@@ -13,97 +13,11 @@ Built by **Tanmay Jain · Aryan Garg · Rishabh Bansal**
 
 > **Aegis Command turns fragmented surveillance signals into an evidence-grounded operational picture.**
 >
-> Instead of asking an operator to manually correlate video detections, intercepted intelligence and historical incidents, Aegis connects those signals into a single real-time decision-support workflow.
-
-## See the system
-
-### Command Center
-
-<p align="center">
-  <img src="assets/screenshots/dashboard.jpg" alt="Aegis Command tactical dashboard" width="100%" />
-</p>
-
-The interface brings the major operating surfaces together: live/replay video telemetry, a tactical map, intelligence retrieval and the threat timeline.
-
-### Visual walkthrough
-
-<table>
-<tr>
-<td width="50%" align="center">
-  <img src="assets/screenshots/video-feed.jpg" alt="Aegis video feed with object detection overlay" width="100%" />
-  <br/><b>01 · Video & Detection</b><br/>
-  <sub>Structured vision telemetry rendered directly over the surveillance feed.</sub>
-</td>
-<td width="50%" align="center">
-  <img src="assets/screenshots/tactical-map.jpg" alt="Aegis tactical map" width="100%" />
-  <br/><b>02 · Tactical Map</b><br/>
-  <sub>Detection events projected into a bounded operational view.</sub>
-</td>
-</tr>
-<tr>
-<td width="50%" align="center">
-  <img src="assets/screenshots/intel-feed.jpg" alt="Aegis intelligence and RAG feed" width="100%" />
-  <br/><b>03 · Intelligence Retrieval</b><br/>
-  <sub>Semantic matches and evidence context surfaced alongside the event.</sub>
-</td>
-<td width="50%" align="center">
-  <img src="assets/architecture.svg" alt="Aegis system architecture" width="100%" />
-  <br/><b>04 · System Architecture</b><br/>
-  <sub>How perception, retrieval, reasoning and operator interaction connect.</sub>
-</td>
-</tr>
-</table>
-
-## Demo video
-
-<p align="center">
-  <img src="assets/demo-video-placeholder.svg" alt="Aegis demo video placeholder" width="100%" />
-</p>
-
-<!-- When a hosted demo is available, replace the placeholder above with a linked thumbnail or embedded player. -->
-
----
-
-## Why Aegis?
-
-Surveillance systems generate data faster than humans can correlate it.
-
-A camera can detect an object. An intercepted transcript can describe activity. A historical incident can contain relevant context. Individually, those signals are useful; together, they can support a more informed operator response.
-
-**Aegis Command is the orchestration layer between those signals.**
-
-```text
-VIDEO / SENSOR INPUT
-        │
-        ▼
-┌───────────────────┐
-│   EDGE VISION     │  YOLO detections + tracking telemetry
-└─────────┬─────────┘
-          │ compact threat event
-          ▼
-┌───────────────────┐
-│  THREAT ENGINE    │  WebSocket / FastAPI orchestration
-└─────────┬─────────┘
-          │ semantic query
-          ▼
-┌───────────────────┐
-│   RAG + FAISS     │  retrieve relevant intelligence
-└─────────┬─────────┘
-          │ evidence context
-          ▼
-┌───────────────────┐
-│ GROUNDED REASONING│  constrained assessment + action
-└─────────┬─────────┘
-          │
-          ▼
-      OPERATOR
-```
-
----
+> Video detections, intercepted intelligence and prior incidents become one operator-facing workflow instead of three disconnected sources of information.
 
 ## The Operator Experience
 
-Aegis is designed around a single operator workflow: **detect → correlate → retrieve → assess**.
+The system is designed around a simple loop: **detect → correlate → retrieve → assess**.
 
 ### Command Center
 
@@ -111,33 +25,34 @@ Aegis is designed around a single operator workflow: **detect → correlate → 
   <img src="assets/screenshots/dashboard.jpg" alt="Aegis Command operational dashboard" width="100%" />
 </p>
 
-The command center brings together the video feed, detection telemetry, tactical map, intelligence context and operator state.
+The dashboard combines replay video, detection telemetry, tactical mapping, intelligence retrieval and threat state in one operating surface.
 
-### Video Intelligence
-
-<p align="center">
-  <img src="assets/screenshots/video-feed.jpg" alt="Aegis Command computer vision video feed" width="100%" />
-</p>
-
-The vision layer turns the drone replay into structured detection telemetry that can feed the downstream threat workflow.
-
-### Tactical Map
-
-<p align="center">
-  <img src="assets/screenshots/tactical-map.jpg" alt="Aegis Command tactical map" width="100%" />
-</p>
-
-Detections are projected into the bounded tactical area so spatial context can be evaluated alongside the underlying video event.
-
-### Intelligence Feed
-
-<p align="center">
-  <img src="assets/screenshots/intel-feed.jpg" alt="Aegis Command intelligence feed" width="100%" />
-</p>
-
-Relevant intelligence is surfaced alongside the detected event so the reasoning layer can ground its assessment in retrieved evidence.
-
----
+<table>
+<tr>
+<td width="50%" align="center">
+  <img src="assets/screenshots/video-feed.jpg" alt="Aegis computer vision video feed" width="100%" />
+  <br/><b>01 · Video & Detection</b><br/>
+  <sub>YOLO-derived detection telemetry rendered over the surveillance feed.</sub>
+</td>
+<td width="50%" align="center">
+  <img src="assets/screenshots/tactical-map.jpg" alt="Aegis tactical map" width="100%" />
+  <br/><b>02 · Tactical Map</b><br/>
+  <sub>Detection events projected into a bounded operational area.</sub>
+</td>
+</tr>
+<tr>
+<td width="50%" align="center">
+  <img src="assets/screenshots/intel-feed.jpg" alt="Aegis intelligence retrieval feed" width="100%" />
+  <br/><b>03 · Intelligence Retrieval</b><br/>
+  <sub>Semantic evidence surfaced alongside the active event.</sub>
+</td>
+<td width="50%" align="center">
+  <img src="assets/architecture.svg" alt="Aegis Command system architecture" width="100%" />
+  <br/><b>04 · System Architecture</b><br/>
+  <sub>Perception, transport, retrieval, reasoning and operator interaction.</sub>
+</td>
+</tr>
+</table>
 
 ## Demo
 
@@ -145,103 +60,93 @@ Relevant intelligence is surfaced alongside the detected event so the reasoning 
   <img src="assets/demo-video-placeholder.svg" alt="Aegis Command demo video placeholder" width="100%" />
 </p>
 
-> 🎥 A full product walkthrough can be dropped into this section later.
+> 🎥 A full walkthrough will be added here after the recording is finalized.
+
+---
+
+## Why Aegis?
+
+Surveillance systems can produce more information than an operator can efficiently correlate in real time.
+
+A camera can identify an object. An intelligence record can provide context. Historical incidents can reveal patterns. Aegis connects those signals into a single decision-support workflow.
+
+It is intentionally a **decision-support system**, not an autonomous decision-maker.
 
 ---
 
 ## System Architecture
 
-Aegis is deliberately split into independent layers so perception, retrieval and operator interaction do not become one monolithic pipeline.
+<p align="center">
+  <img src="assets/architecture.svg" alt="Aegis Command architecture diagram" width="100%" />
+</p>
 
 | Layer | Responsibility | Implementation |
 |---|---|---|
-| **Vision** | Detect and track relevant objects from video | YOLOv8 + detection telemetry |
-| **Threat Gateway** | Render events and stream threat state | Next.js + React + WebSockets |
-| **Intelligence Retrieval** | Embed queries and retrieve relevant reports | SentenceTransformers + FAISS |
-| **Reasoning** | Produce evidence-constrained summaries | Groq + Llama 3.1 |
-| **Incident Memory** | Persist and retrieve prior assessments | Dedicated incident memory layer |
+| **Vision** | Detect and track objects from the replay feed | YOLOv8 + detection telemetry |
+| **Threat Gateway** | Stream events and coordinate the live UI | Next.js + React + WebSockets |
+| **Intelligence Retrieval** | Embed queries and retrieve relevant records | SentenceTransformers + FAISS |
+| **Reasoning** | Produce evidence-grounded assessments | Groq + Llama 3.1 |
+| **Incident Memory** | Persist and expose prior assessments | FastAPI + dedicated memory layer |
 
-### The important architectural decision
+### What happens when a threat appears?
 
-Aegis does **not** need to continuously move raw video through every layer of the system.
+```text
+Video / sensor input
+        ↓
+YOLO detection + tracking
+        ↓
+Compact threat telemetry
+        ↓
+WebSocket → FastAPI threat engine
+        ↓
+Semantic retrieval from FAISS
+        ↓
+Evidence-grounded LLM assessment
+        ↓
+Operator dashboard + incident memory
+```
 
-The vision layer extracts compact telemetry such as object class, confidence, position and motion. That event can then trigger retrieval and reasoning without treating the entire downstream pipeline as a video-processing system.
+### Perception
 
-This keeps the expensive perception workload separate from the intelligence workflow and makes the architecture easier to evolve.
+The frontend replays `frontend/public/drone_feed.mp4` and uses the matching `frontend/public/detections.json` timeline to render object detections over the video.
+
+Each event can carry class, confidence, bounding-box coordinates, movement information and projected map coordinates.
+
+### Event transport
+
+Threat assessment is asynchronous. The dashboard maintains a WebSocket connection to `/ws/threat-engine` so perception events can trigger downstream reasoning without blocking the UI.
+
+### Retrieval
+
+The intelligence layer uses `all-MiniLM-L6-v2` embeddings with a 384-dimensional FAISS index. Retrieval happens before generation so the language model receives relevant evidence instead of acting as the database itself.
+
+### Grounded reasoning
+
+The assessment layer returns reasoning, threat level/score and a recommended action while retaining the evidence context used to reach the assessment.
+
+### Incident memory
+
+Threat assessments can be persisted and reviewed later, allowing the operator workflow to retain an inspectable history rather than treating each event as ephemeral.
 
 ---
 
-## What happens when a threat is detected?
-
-### 1. Perception
-
-The video layer detects objects and extracts structured telemetry.
-
-```text
-class        → detected object type
-confidence   → model confidence
-box          → bounding coordinates
-speed        → movement telemetry when available
-position     → projected tactical map coordinates
-```
-
-The frontend renders detections directly over the video stream and maps the detection into the tactical operating area.
-
-### 2. Event transport
-
-A threat event is sent through a WebSocket channel to the threat engine.
-
-This allows the operator interface to receive asynchronous assessment results instead of blocking the UI on a synchronous request-response cycle.
-
-### 3. Retrieval
-
-The backend embeds the query using `all-MiniLM-L6-v2` and searches a 384-dimensional FAISS index for the most relevant intelligence records.
-
-Only the retrieved evidence is passed forward as context.
-
-### 4. Grounded assessment
-
-The reasoning layer is instructed to base its response on the supplied evidence and identify the evidence IDs used for the assessment.
-
-The intended output is therefore not simply a free-form model opinion:
-
-```text
-Threat detected
-↓
-Retrieved evidence
-↓
-Evidence-grounded assessment
-↓
-Recommended operator action
-```
-
-### 5. Incident memory
-
-Assessments can be persisted and exposed through incident-history APIs so the system has an operator-reviewable record of prior events.
-
----
-
-## Engineering Details Worth Looking At
+## Engineering Details
 
 ### ⚡ Efficient telemetry lookup
 
-Detection timestamps are sorted and searched using a binary-search style lookup rather than scanning every detection frame on each video update.
+Detection timestamps are ordered and searched with a binary-search style lookup rather than scanning every frame on every update.
 
-### 🔄 WebSocket-based threat flow
+### 🔄 Asynchronous threat flow
 
-Threat assessment is asynchronous. The frontend maintains a dedicated socket connection, reconnect behavior and request-in-flight protection so the UI is not tightly coupled to individual model requests.
+The frontend uses WebSockets with reconnect handling and in-flight request protection so model latency does not become a UI lock-up.
 
 ### 🗺️ Bounded geo-projection
 
-Video detections do not inherently contain GPS coordinates. The dashboard projects detection centers into a bounded tactical area for visualization while clamping coordinates to prevent extreme map jumps.
+Video detections contain pixel coordinates rather than GPS coordinates. A deterministic projection maps detection centers into a bounded tactical operating box while clamping extreme values.
 
 ### 🧠 Retrieval before generation
 
-The LLM is used after relevant intelligence has been retrieved, rather than treating the language model as the intelligence database itself.
-
-### 📜 Operator history
-
-The backend exposes both intelligence history and incident history so previously generated assessments remain inspectable.
+Relevant evidence is retrieved first and then supplied to the reasoning layer, reducing the chance of treating unconstrained model output as the source of truth.
 
 ---
 
@@ -259,37 +164,61 @@ The backend exposes both intelligence history and incident history so previously
 
 ```text
 Aegis-Command/
-├── frontend/              # Next.js tactical operator console
-│   └── src/
-│       ├── app/           # Dashboard
-│       └── components/    # Tactical map and UI components
+├── assets/
+│   ├── architecture.svg
+│   ├── demo-video-placeholder.svg
+│   └── screenshots/
+│       ├── dashboard.jpg
+│       ├── video-feed.jpg
+│       ├── tactical-map.jpg
+│       └── intel-feed.jpg
 │
-├── backend/               # FastAPI intelligence engine
-│   ├── main.py            # Retrieval, APIs and WebSocket flow
-│   └── incident_memory.py # Assessment persistence
+├── backend/
+│   ├── main.py
+│   ├── incident_memory.py
+│   ├── data_forger.py
+│   ├── mock_intel.json
+│   └── requirements.txt
 │
-├── vision/                # Computer vision pipeline
-├── assets/                # Documentation visuals
-└── docker-compose.yml     # Local orchestration
+├── frontend/
+│   ├── src/
+│   ├── public/
+│   │   ├── drone_feed.mp4
+│   │   └── detections.json
+│   └── package.json
+│
+├── vision/
+├── docs/
+├── docker-compose.yml
+└── README.md
 ```
 
 ---
 
 ## Running Locally
 
-The repository contains separate frontend, backend and vision components. Environment-specific credentials should be provided through local environment configuration rather than committed to source control.
+### Prerequisites
+
+- Git
+- Docker Engine
+- Docker Compose
+- A Groq API key for the reasoning layer
+
+### Quick start
 
 ```bash
-# Clone
 git clone https://github.com/TanmayJain-dev/Aegis-Command.git
 cd Aegis-Command
 
-# Start the stack
-# See the component-level configuration before running production services.
+cp backend/.env.example backend/.env
+# Add your GROQ_API_KEY to backend/.env
+
 docker compose up --build
 ```
 
-> Some components rely on model weights, local datasets or API credentials that are intentionally environment-specific.
+Open the frontend at **http://localhost:3000**. The FastAPI backend is exposed on **http://localhost:8000**.
+
+The demo replay and its matching detection timeline are already included in the repository. The ingestion workflow can regenerate the pair when a different source video is used.
 
 ---
 
@@ -297,9 +226,9 @@ docker compose up --build
 
 Aegis Command was built for **HackerRank Infinity Hacks 2026**, where the team finished **#14 out of 6,000+ global participants**.
 
-The project focused on the problem of **information fragmentation**: surveillance, intelligence and historical context often exist in separate interfaces, forcing a human operator to perform the correlation manually.
+The project focused on the problem of **information fragmentation**: surveillance, intelligence and historical context often live in separate systems, forcing an operator to perform the correlation manually.
 
-Aegis explores how computer vision, semantic retrieval and grounded language models can be combined into one operator-facing system.
+Aegis explores how computer vision, semantic retrieval and grounded language models can be composed into a single operator-facing system.
 
 ---
 
@@ -315,8 +244,8 @@ Aegis explores how computer vision, semantic retrieval and grounded language mod
 
 <div align="center">
 
-### Aegis Command is not an autonomous decision-maker.
+### Aegis Command is built to help an operator understand the signal faster.
 
-It is a **decision-support system** designed to surface relevant evidence, connect fragmented signals and reduce the time required for an operator to understand what the system has observed.
+**Detect. Correlate. Retrieve. Assess.**
 
 </div>
