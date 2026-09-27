@@ -15,10 +15,15 @@ from incident_memory import IncidentMemory
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY:
-    print("WARNING: GROQ_API_KEY not found in .env file!")
+    print("Notice: GROQ_API_KEY not found in environment. Using automated tactical synthesis mode.")
 
-# Initialize Groq Client
-groq_client = Groq(api_key=GROQ_API_KEY)
+# Initialize Groq Client safely
+groq_client = None
+if GROQ_API_KEY:
+    try:
+        groq_client = Groq(api_key=GROQ_API_KEY)
+    except Exception as e:
+        print(f"Warning: Failed to initialize Groq client: {e}")
 
 app = FastAPI(title="Aegis Autonomous Threat Engine")
 incident_memory = IncidentMemory()
@@ -31,8 +36,47 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-print("Loading NLP Model (all-MiniLM-L6-v2)...")
-model = SentenceTransformer('all-MiniLM-L6-v2')
+@app.get("/health")
+def health():
+    return {
+        "status": "healthy",
+        "service": "Aegis Autonomous Threat Engine",
+        "version": "1.0",
+        "groq_configured": bool(GROQ_API_KEY),
+        "indexed_reports": getattr(index, "ntotal", 0)
+    }
+
+class ResilientEmbedder:
+    def __init__(self):
+        self.model = None
+        low_mem = os.getenv("LOW_MEMORY_MODE", "false").lower() == "true"
+        if not low_mem:
+            try:
+                print("Loading NLP Model (all-MiniLM-L6-v2)...")
+                self.model = SentenceTransformer('all-MiniLM-L6-v2')
+            except Exception as e:
+                print(f"Notice: NLP Model loading skipped or failed ({e}). Using resilient vector encoder.")
+        else:
+            print("Notice: LOW_MEMORY_MODE enabled. Using lightweight vector encoder (<30MB RAM).")
+
+    def encode(self, texts):
+        if self.model is not None:
+            return self.model.encode(texts).astype('float32')
+        import hashlib
+        vectors = []
+        for text in texts:
+            vec = np.zeros(384, dtype=np.float32)
+            words = str(text).lower().split()
+            for w in words:
+                h = int(hashlib.md5(w.encode('utf-8')).hexdigest(), 16) % 384
+                vec[h] += 1.0
+            norm = np.linalg.norm(vec)
+            if norm > 0:
+                vec /= norm
+            vectors.append(vec)
+        return np.array(vectors, dtype=np.float32)
+
+model = ResilientEmbedder()
 
 dimension = 384
 index = faiss.IndexFlatL2(dimension)
