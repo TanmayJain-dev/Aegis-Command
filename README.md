@@ -3,9 +3,18 @@
 # AEGIS COMMAND
 ### AI-Assisted Tactical Intelligence & Decision Support
 
+<p align="center">
+  <a href="https://aegis-command-ui.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-aegis--command--ui.vercel.app-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/FastAPI-Python-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
+  <img src="https://img.shields.io/badge/HackerRank%20Infinity%20Hacks-Top%2014-gold?style=for-the-badge" alt="Hackathon" />
+</p>
+
 **Computer Vision · Retrieval-Augmented Intelligence · Real-Time Telemetry · Operator Decision Support**
 
 Built by **Tanmay Jain · Aryan Garg · Rishabh Bansal**
+
+🔗 **Live Tactical Web Console:** [https://aegis-command-ui.vercel.app](https://aegis-command-ui.vercel.app)
 
 </div>
 
