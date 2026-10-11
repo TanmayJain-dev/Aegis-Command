@@ -188,23 +188,25 @@ export function OpticsViewport({
   return (
     <div className="flex flex-col gap-3 lg:gap-4 relative w-full">
       {/* Feeds Switcher Bar */}
-      <div className="flex items-center gap-2 text-xs overflow-x-auto no-scrollbar pb-1 whitespace-nowrap">
-        {feeds.map((feed) => (
-          <button
-            key={feed.id}
-            type="button"
-            onClick={() => onSelectFeed(feed.id)}
-            className={`px-3 sm:px-4 py-1.5 sm:py-2 border rounded flex items-center gap-1.5 sm:gap-2 transition-all flex-shrink-0 ${
-              activeFeed?.id === feed.id
-                ? "bg-cyan-950/40 border-cyan-500/50 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]"
-                : "bg-slate-900/30 border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300"
-            }`}
-          >
-            <Video size={13} />
-            {feed.label}
-          </button>
-        ))}
-      </div>
+      {feeds.length >= 2 && (
+        <div className="flex items-center gap-2 text-xs overflow-x-auto no-scrollbar pb-1 whitespace-nowrap">
+          {feeds.map((feed) => (
+            <button
+              key={feed.id}
+              type="button"
+              onClick={() => onSelectFeed(feed.id)}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 border rounded flex items-center gap-1.5 sm:gap-2 transition-all flex-shrink-0 ${
+                activeFeed?.id === feed.id
+                  ? "bg-cyan-950/40 border-cyan-500/50 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]"
+                  : "bg-slate-900/30 border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300"
+              }`}
+            >
+              <Video size={13} />
+              {feed.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Main Video Viewport Container */}
       <div
