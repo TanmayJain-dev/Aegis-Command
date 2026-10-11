@@ -8,6 +8,7 @@ import math
 import pytest
 import numpy as np
 import sys
+import subprocess
 from pathlib import Path
 
 # Add vision/eval to path
@@ -202,3 +203,19 @@ def test_perform_error_analysis():
     assert err["fn_by_area"]["small"] == 0  # matched, not FN
     assert err["fn_by_area"]["medium"] == 1  # 50x50 = 2500
     assert err["fn_by_area"]["large"] == 1   # 120x120 = 14400
+
+
+def test_eval_detection_refuses_without_verified():
+    """Verify eval_detection.py exits with code 2 when vision/eval/labels/VERIFIED is missing."""
+    repo_root = Path(__file__).resolve().parent.parent.parent
+    script_path = repo_root / "vision" / "eval" / "eval_detection.py"
+
+    proc = subprocess.run(
+        [sys.executable, str(script_path)],
+        cwd=str(repo_root),
+        capture_output=True,
+        text=True
+    )
+    assert proc.returncode == 2
+    assert "STRICT GATE REJECTION" in proc.stderr
+

@@ -19,7 +19,6 @@ import json
 import time
 from pathlib import Path
 import numpy as np
-from ultralytics import YOLO
 
 # Import evaluation metrics engine
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -105,6 +104,7 @@ def run_evaluation(
         sys.exit(1)
 
     print(f"Verified marker found. Evaluating {len(images)} images with {model_path}...")
+    from ultralytics import YOLO
     model = YOLO(model_path)
 
     latencies_ms = []
