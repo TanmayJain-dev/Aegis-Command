@@ -1,8 +1,24 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, Profiler } from "react";
 import { Shield, Target, AlertTriangle, Search, Activity, Terminal, Video, Radio, Globe, Map as MapIcon, X, CheckCircle, Crosshair, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
 import dynamic from "next/dynamic";
+
+export interface PerfReport {
+  frames: number;
+  mean_draw_ms: number;
+  p95_draw_ms: number;
+  total_commits: number;
+  commits_per_second: number;
+  duration_sec: number;
+}
+
+declare global {
+  interface Window {
+    __AEGIS_PERF_REPORT__?: PerfReport;
+    __AEGIS_PERF_DONE__?: boolean;
+  }
+}
 
 const MapComponent = dynamic(() => import("../components/Map"), { ssr: false });
 
@@ -69,6 +85,26 @@ export default function AegisDashboard() {
   const [historySearch, setHistorySearch] =
     useState("");
 
+  // Dev-only Perf Probe (?perf=1)
+  const [perfEnabled] = useState(() => {
+    if (typeof window !== "undefined") {
+      return new URLSearchParams(window.location.search).get("perf") === "1";
+    }
+    return false;
+  });
+  const [perfTargetFrames] = useState(() => {
+    if (typeof window !== "undefined") {
+      const f = new URLSearchParams(window.location.search).get("frames");
+      if (f) return parseInt(f, 10);
+    }
+    return 600;
+  });
+  const perfDrawTimes = useRef<number[]>([]);
+  const perfCommitCount = useRef(0);
+  const perfStartTime = useRef<number | null>(null);
+  const [perfReport, setPerfReport] = useState<PerfReport | null>(null);
+
+
 
   const [query, setQuery] = useState("");
   const [intelData, setIntelData] = useState<any>(null);
@@ -91,6 +127,7 @@ export default function AegisDashboard() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoContainerRef = useRef<HTMLDivElement>(null);
   const threatSocket = useRef<WebSocket | null>(null);
+  const handleTimeUpdateRef = useRef<() => void>(() => {});
   const lastStableMapCoordinate = useRef<[number, number] | null>(null);
   const lastMapUpdateTime = useRef(0);
     const lastThreatTrigger = useRef<string>("");
@@ -325,6 +362,70 @@ export default function AegisDashboard() {
       }
     }
   };
+
+  useEffect(() => {
+    handleTimeUpdateRef.current = handleTimeUpdate;
+  });
+
+  useEffect(() => {
+    if (!perfEnabled || detectionKeys.length === 0) return;
+    const video = videoRef.current;
+    if (!video) return;
+
+    let handle = 0;
+    let active = true;
+
+    const startProbe = () => {
+      video.loop = true;
+      video.play().catch(() => {});
+      const onFrame = () => {
+        if (!active) return;
+        const t0 = performance.now();
+        if (perfStartTime.current === null) {
+          perfStartTime.current = t0;
+        }
+        handleTimeUpdateRef.current();
+        const t1 = performance.now();
+        perfDrawTimes.current.push(t1 - t0);
+        (window as unknown as { __AEGIS_PERF_FRAMES__?: number }).__AEGIS_PERF_FRAMES__ = perfDrawTimes.current.length;
+
+        if (perfDrawTimes.current.length >= perfTargetFrames) {
+          const sorted = [...perfDrawTimes.current].sort((a, b) => a - b);
+          const mean = sorted.reduce((a, b) => a + b, 0) / sorted.length;
+          const p95 = sorted[Math.floor(sorted.length * 0.95)];
+          const totalSec = (t1 - (perfStartTime.current ?? t0)) / 1000;
+          const commitsPerSec = totalSec > 0 ? perfCommitCount.current / totalSec : 0;
+          const report: PerfReport = {
+            frames: perfDrawTimes.current.length,
+            mean_draw_ms: Number(mean.toFixed(3)),
+            p95_draw_ms: Number(p95.toFixed(3)),
+            total_commits: perfCommitCount.current,
+            commits_per_second: Number(commitsPerSec.toFixed(2)),
+            duration_sec: Number(totalSec.toFixed(2)),
+          };
+          window.__AEGIS_PERF_REPORT__ = report;
+          window.__AEGIS_PERF_DONE__ = true;
+          setPerfReport(report);
+          return;
+        }
+
+        handle = requestAnimationFrame(onFrame);
+      };
+
+      handle = requestAnimationFrame(onFrame);
+    };
+
+    if (video.readyState >= 2) {
+      startProbe();
+    } else {
+      video.addEventListener("loadeddata", startProbe, { once: true });
+    }
+
+    return () => {
+      active = false;
+      cancelAnimationFrame(handle);
+    };
+  }, [perfEnabled, detectionKeys.length, perfTargetFrames]);
 
   const seekToTime = (timeStr: string) => {
     if (videoRef.current) {
@@ -623,7 +724,15 @@ export default function AegisDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
+    <Profiler
+      id="AegisDashboard"
+      onRender={() => {
+        if (perfEnabled) {
+          perfCommitCount.current += 1;
+        }
+      }}
+    >
+      <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
       {/* PITCH DECK HEADER */}
       <header className="bg-[#0a0a0a] px-3 py-2.5 sm:p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-rose-500"></div>
@@ -1229,6 +1338,12 @@ return (
       </main>
 
       {renderModal()}
+      {perfReport && (
+        <div id="perf-report-banner" className="fixed top-2 right-2 z-[99999] bg-black/90 border border-emerald-500 p-2 text-xs font-mono text-emerald-400">
+          PROBE: frames={perfReport.frames} mean={perfReport.mean_draw_ms}ms p95={perfReport.p95_draw_ms}ms commits/s={perfReport.commits_per_second}
+        </div>
+      )}
     </div>
+    </Profiler>
   );
 }
