@@ -48,9 +48,9 @@ def sample_frames(video_path="vision/source/drone_feed.mp4", out_dir="vision/eva
             break
 
         if frame_idx >= offset and (frame_idx - offset) % stride == 0:
-            filename = f"frame_{frame_idx:06d}.png"
+            filename = f"frame_{frame_idx:06d}.jpg"
             img_path = out_path / filename
-            cv2.imwrite(str(img_path), frame)
+            cv2.imwrite(str(img_path), frame, [cv2.IMWRITE_JPEG_QUALITY, 95])
 
             time_s = round(frame_idx / fps, 4)
             frames_meta.append({
