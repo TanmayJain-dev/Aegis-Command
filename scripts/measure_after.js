@@ -3,6 +3,44 @@ const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
 
+async function verifyPositiveControl(browser, port) {
+  console.log('\n================================================================');
+  console.log('[Positive Control Check] Verifying React Profiler commit counter...');
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  try {
+    await page.goto(`http://localhost:${port}/?perf=1&frames=300`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+
+    const initialCommits = await page.evaluate(() => window.__AEGIS_REACT_COMMITS__ || 0);
+    console.log(`  Initial commits at load: ${initialCommits}`);
+    if (initialCommits === 0) {
+      throw new Error('POSITIVE CONTROL FAILED: window.__AEGIS_REACT_COMMITS__ is 0. React Profiler is stripped or disabled in build!');
+    }
+
+    const liteBtn = await page.waitForSelector('button:has-text("LITE")', { timeout: 10000 });
+    await liteBtn.click();
+    await page.waitForTimeout(500);
+
+    const afterCommits = await page.evaluate(() => window.__AEGIS_REACT_COMMITS__ || 0);
+    console.log(`  Commits after clicking LITE button: ${afterCommits}`);
+    if (afterCommits <= initialCommits) {
+      throw new Error(`POSITIVE CONTROL FAILED: commits did not increase after state change (before: ${initialCommits}, after: ${afterCommits})`);
+    }
+
+    // Toggle back to standard state
+    await liteBtn.click();
+    await page.waitForTimeout(500);
+    const finalCommits = await page.evaluate(() => window.__AEGIS_REACT_COMMITS__ || 0);
+    console.log(`  Commits after resetting LITE toggle: ${finalCommits}`);
+    console.log('  -> POSITIVE CONTROL PASSED: React Profiler successfully tracks state transitions.');
+    console.log('================================================================\n');
+
+    return { initialCommits, afterCommits, finalCommits };
+  } finally {
+    await page.close();
+  }
+}
+
 async function measureSingleRun(browser, { port = 3001, throttled = false, targetFrames = 300, runIdx = 1 }) {
   console.log(`  -> Starting run #${runIdx} (${throttled ? '4x Throttled' : '1x Normal'}, ${targetFrames} frames)...`);
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -59,11 +97,14 @@ async function measureSingleRun(browser, { port = 3001, throttled = false, targe
     if (!report) {
       throw new Error('No performance report returned from page');
     }
+    if (report.status === 'FAIL_PROFILER_DISABLED') {
+      throw new Error('Probe FAILED: React Profiler was not active (status: FAIL_PROFILER_DISABLED)');
+    }
     if (report.status === 'FAIL_ZERO_BOXES' || report.mean_boxes === 0) {
       throw new Error(`Probe FAILED: mean boxes drawn per frame is ${report.mean_boxes} (status: ${report.status})`);
     }
 
-    console.log(`    Result #${runIdx}: mean=${report.mean_draw_ms}ms, p95=${report.p95_draw_ms}ms, boxes=${report.mean_boxes}, commits/100f=${report.commits_per_100_frames}, dur=${report.duration_sec}s`);
+    console.log(`    Result #${runIdx}: mean=${report.mean_draw_ms}ms, p95=${report.p95_draw_ms}ms, boxes=${report.mean_boxes}, commits=${report.total_commits} (${report.commits_per_100_frames}/100f), dur=${report.duration_sec}s`);
     return report;
   } finally {
     await page.close();
@@ -97,18 +138,16 @@ function computeStats(runs) {
 async function run() {
   const browserPath = '/usr/bin/brave-browser';
   const port = process.env.PORT ? parseInt(process.env.PORT, 10) : 3001;
+  const is1080p = process.argv.includes('--1080p') || process.env.RESOLUTION === '1080p';
   const targetFrames = 300;
   const numRuns = 3;
 
   console.log('================================================================');
-  console.log('AEGIS BENCHMARK RUNNER: AFTER STATE (modular rVFC canvas overlay)');
+  console.log(`AEGIS BENCHMARK RUNNER: AFTER STATE (${is1080p ? '1080p Control' : '720p Web Delivery'})`);
   console.log(`Target: http://localhost:${port}`);
   console.log(`Frames per run: ${targetFrames} | Runs per condition: ${numRuns}`);
-  console.log('Video Source: 720p feeds/uav-alpha/video.mp4');
+  console.log(`Video Source: ${is1080p ? '1080p drone_feed_1080p.mp4' : '720p feeds/uav-alpha/video.mp4'}`);
   console.log('================================================================');
-
-  const outShots = path.join(__dirname, '..', 'local_assets', 'shots_after');
-  fs.mkdirSync(outShots, { recursive: true });
 
   const browser = await chromium.launch({
     executablePath: browserPath,
@@ -121,24 +160,8 @@ async function run() {
     ],
   });
 
-  // Capture fresh verification screenshots
-  console.log('\nCapturing screenshots at 1440x900 and 390x844...');
-  {
-    const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
-    await page.goto(`http://localhost:${port}`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
-    await page.screenshot({ path: path.join(outShots, 'desktop_1440x900.png'), fullPage: false });
-    console.log('  Saved 1440x900 screenshot.');
-    await page.close();
-  }
-  {
-    const page = await browser.newPage({ viewport: { width: 390, height: 844 }, isMobile: true });
-    await page.goto(`http://localhost:${port}`, { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(2000);
-    await page.screenshot({ path: path.join(outShots, 'mobile_390x844.png'), fullPage: false });
-    console.log('  Saved 390x844 screenshot.');
-    await page.close();
-  }
+  // Verify positive control
+  const controlResult = await verifyPositiveControl(browser, port);
 
   const normalRuns = [];
   console.log('\n[Condition 1/2] Normal 1x Playback (3 runs):');
@@ -162,10 +185,17 @@ async function run() {
   const payload = {
     metadata: {
       version: 'after (feat/accuracy-v2 modular)',
-      video_source: '720p feeds/uav-alpha/video.mp4',
+      video_source: is1080p ? '1080p drone_feed.mp4 (control)' : '720p feeds/uav-alpha/video.mp4 (web delivery)',
+      resolution: is1080p ? '1080p' : '720p',
       target_frames: targetFrames,
       runs_per_condition: numRuns,
       measured_at: new Date().toISOString(),
+      positive_control: {
+        status: 'PASSED',
+        initial_commits: controlResult.initialCommits,
+        commits_after_state_change: controlResult.afterCommits,
+        final_commits_after_reset: controlResult.finalCommits,
+      },
     },
     normal: {
       stats: normalStats,
@@ -179,11 +209,11 @@ async function run() {
 
   const outDir = path.join(__dirname, '..', 'docs', 'results');
   fs.mkdirSync(outDir, { recursive: true });
-  const outFile = path.join(outDir, 'frontend_perf_after.json');
+  const outFile = path.join(outDir, is1080p ? 'frontend_perf_after_1080p.json' : 'frontend_perf_after.json');
   fs.writeFileSync(outFile, JSON.stringify(payload, null, 2));
 
   console.log('\n================================================================');
-  console.log('AFTER BENCHMARK COMPLETE');
+  console.log(`AFTER BENCHMARK COMPLETE (${is1080p ? '1080p' : '720p'})`);
   console.log(`Saved raw results to: ${outFile}`);
   console.log('Normal 1x Stats:', JSON.stringify(normalStats, null, 2));
   console.log('4x Throttled Stats:', JSON.stringify(throttledStats, null, 2));

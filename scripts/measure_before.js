@@ -3,6 +3,60 @@ const { chromium } = require('@playwright/test');
 const path = require('path');
 const fs = require('fs');
 
+async function verifyPositiveControlBefore(browser, port) {
+  console.log('\n================================================================');
+  console.log('[Positive Control Check] Verifying React Profiler commit counter (BEFORE)...');
+  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  try {
+    await page.goto(`http://localhost:${port}/?perf=1&frames=300`, { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+
+    const initialCommits = await page.evaluate(() => window.__AEGIS_REACT_COMMITS__ || 0);
+    console.log(`  Initial commits at load: ${initialCommits}`);
+    if (initialCommits === 0) {
+      throw new Error('POSITIVE CONTROL FAILED: window.__AEGIS_REACT_COMMITS__ is 0. React Profiler is stripped or disabled in build!');
+    }
+
+    // Trigger state change in BEFORE (e.g. click video to toggle play/pause or click a tab)
+    const clicked = await page.evaluate(() => {
+      const v = document.querySelector('video');
+      if (v) {
+        v.click();
+        return true;
+      }
+      return false;
+    });
+    if (!clicked) {
+      throw new Error('Could not find video element to trigger click event');
+    }
+    await page.waitForTimeout(500);
+
+    let afterCommits = await page.evaluate(() => window.__AEGIS_REACT_COMMITS__ || 0);
+    console.log(`  Commits after clicking video element: ${afterCommits}`);
+    if (afterCommits <= initialCommits) {
+      // Try clicking a button
+      await page.evaluate(() => {
+        const btn = document.querySelector('button');
+        if (btn) btn.click();
+      });
+      await page.waitForTimeout(500);
+      afterCommits = await page.evaluate(() => window.__AEGIS_REACT_COMMITS__ || 0);
+      console.log(`  Commits after clicking button: ${afterCommits}`);
+    }
+
+    if (afterCommits <= initialCommits) {
+      throw new Error(`POSITIVE CONTROL FAILED: commits did not increase after state change (before: ${initialCommits}, after: ${afterCommits})`);
+    }
+
+    console.log('  -> POSITIVE CONTROL PASSED: React Profiler successfully tracks state transitions in BEFORE.');
+    console.log('================================================================\n');
+
+    return { initialCommits, afterCommits };
+  } finally {
+    await page.close();
+  }
+}
+
 async function measureSingleRun(browser, { port = 3001, throttled = false, targetFrames = 300, runIdx = 1 }) {
   console.log(`  -> Starting run #${runIdx} (${throttled ? '4x Throttled' : '1x Normal'}, ${targetFrames} frames)...`);
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -54,11 +108,14 @@ async function measureSingleRun(browser, { port = 3001, throttled = false, targe
     if (!report) {
       throw new Error('No performance report returned from page');
     }
+    if (report.status === 'FAIL_PROFILER_DISABLED') {
+      throw new Error('Probe FAILED: React Profiler was not active (status: FAIL_PROFILER_DISABLED)');
+    }
     if (report.status === 'FAIL_ZERO_BOXES' || report.mean_boxes === 0) {
       throw new Error(`Probe FAILED: mean boxes drawn per frame is ${report.mean_boxes} (status: ${report.status})`);
     }
 
-    console.log(`    Result #${runIdx}: mean=${report.mean_draw_ms}ms, p95=${report.p95_draw_ms}ms, boxes=${report.mean_boxes}, commits/100f=${report.commits_per_100_frames}, dur=${report.duration_sec}s`);
+    console.log(`    Result #${runIdx}: mean=${report.mean_draw_ms}ms, p95=${report.p95_draw_ms}ms, boxes=${report.mean_boxes}, commits=${report.total_commits} (${report.commits_per_100_frames}/100f), dur=${report.duration_sec}s`);
     return report;
   } finally {
     await page.close();
@@ -100,6 +157,7 @@ async function run() {
   console.log(`Target: http://localhost:${port}`);
   console.log(`Frames per run: ${targetFrames} | Runs per condition: ${numRuns}`);
   console.log('Video Source: 1080p drone_feed.mp4');
+  console.log('Note: Timer covers old per-tick handler (per-frame overlay cost)');
   console.log('================================================================');
 
   const browser = await chromium.launch({
@@ -112,6 +170,9 @@ async function run() {
       '--autoplay-policy=no-user-gesture-required',
     ],
   });
+
+  // Verify positive control
+  const controlResult = await verifyPositiveControlBefore(browser, port);
 
   const normalRuns = [];
   console.log('\n[Condition 1/2] Normal 1x Playback (3 runs):');
@@ -136,9 +197,15 @@ async function run() {
     metadata: {
       version: 'before (commit 62de537)',
       video_source: '1080p drone_feed.mp4',
+      resolution: '1080p',
       target_frames: targetFrames,
       runs_per_condition: numRuns,
       measured_at: new Date().toISOString(),
+      positive_control: {
+        status: 'PASSED',
+        initial_commits: controlResult.initialCommits,
+        commits_after_state_change: controlResult.afterCommits,
+      },
     },
     normal: {
       stats: normalStats,

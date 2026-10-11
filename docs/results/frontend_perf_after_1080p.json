@@ -1,0 +1,208 @@
+{
+  "metadata": {
+    "version": "after (feat/accuracy-v2 modular)",
+    "video_source": "1080p drone_feed.mp4 (control)",
+    "resolution": "1080p",
+    "target_frames": 300,
+    "runs_per_condition": 3,
+    "measured_at": "2026-10-11T11:54:15.840Z",
+    "positive_control": {
+      "status": "PASSED",
+      "initial_commits": 5,
+      "commits_after_state_change": 6,
+      "final_commits_after_reset": 7
+    }
+  },
+  "normal": {
+    "stats": {
+      "mean_draw_ms": {
+        "median": 0.566,
+        "min": 0.528,
+        "max": 5.059,
+        "values": [
+          0.528,
+          0.566,
+          5.059
+        ]
+      },
+      "p95_draw_ms": {
+        "median": 1.8,
+        "min": 1.6,
+        "max": 3.6,
+        "values": [
+          1.6,
+          1.8,
+          3.6
+        ]
+      },
+      "mean_boxes": {
+        "median": 1.59,
+        "min": 1.3,
+        "max": 1.59,
+        "values": [
+          1.3,
+          1.59,
+          1.59
+        ]
+      },
+      "total_commits": {
+        "median": 99,
+        "min": 89,
+        "max": 165,
+        "values": [
+          89,
+          99,
+          165
+        ]
+      },
+      "commits_per_100_frames": {
+        "median": 33,
+        "min": 29.67,
+        "max": 55,
+        "values": [
+          29.67,
+          33,
+          55
+        ]
+      },
+      "duration_sec": {
+        "median": 26.47,
+        "min": 24.19,
+        "max": 53.73,
+        "values": [
+          24.19,
+          26.47,
+          53.73
+        ]
+      }
+    },
+    "runs": [
+      {
+        "frames": 300,
+        "mean_draw_ms": 0.528,
+        "p95_draw_ms": 1.8,
+        "mean_boxes": 1.59,
+        "total_commits": 99,
+        "commits_per_100_frames": 33,
+        "duration_sec": 26.47,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 0.566,
+        "p95_draw_ms": 1.6,
+        "mean_boxes": 1.59,
+        "total_commits": 89,
+        "commits_per_100_frames": 29.67,
+        "duration_sec": 24.19,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 5.059,
+        "p95_draw_ms": 3.6,
+        "mean_boxes": 1.3,
+        "total_commits": 165,
+        "commits_per_100_frames": 55,
+        "duration_sec": 53.73,
+        "status": "OK"
+      }
+    ]
+  },
+  "cpu_throttled_4x": {
+    "stats": {
+      "mean_draw_ms": {
+        "median": 1.939,
+        "min": 1.848,
+        "max": 2.215,
+        "values": [
+          1.848,
+          1.939,
+          2.215
+        ]
+      },
+      "p95_draw_ms": {
+        "median": 6.2,
+        "min": 5.8,
+        "max": 7.1,
+        "values": [
+          5.8,
+          6.2,
+          7.1
+        ]
+      },
+      "mean_boxes": {
+        "median": 1.41,
+        "min": 1.38,
+        "max": 1.43,
+        "values": [
+          1.38,
+          1.41,
+          1.43
+        ]
+      },
+      "total_commits": {
+        "median": 181,
+        "min": 181,
+        "max": 186,
+        "values": [
+          181,
+          181,
+          186
+        ]
+      },
+      "commits_per_100_frames": {
+        "median": 60.33,
+        "min": 60.33,
+        "max": 62,
+        "values": [
+          60.33,
+          60.33,
+          62
+        ]
+      },
+      "duration_sec": {
+        "median": 63.95,
+        "min": 62.63,
+        "max": 68.18,
+        "values": [
+          62.63,
+          63.95,
+          68.18
+        ]
+      }
+    },
+    "runs": [
+      {
+        "frames": 300,
+        "mean_draw_ms": 1.848,
+        "p95_draw_ms": 6.2,
+        "mean_boxes": 1.41,
+        "total_commits": 186,
+        "commits_per_100_frames": 62,
+        "duration_sec": 68.18,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 2.215,
+        "p95_draw_ms": 5.8,
+        "mean_boxes": 1.43,
+        "total_commits": 181,
+        "commits_per_100_frames": 60.33,
+        "duration_sec": 63.95,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 1.939,
+        "p95_draw_ms": 7.1,
+        "mean_boxes": 1.38,
+        "total_commits": 181,
+        "commits_per_100_frames": 60.33,
+        "duration_sec": 62.63,
+        "status": "OK"
+      }
+    ]
+  }
+}

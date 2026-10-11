@@ -54,6 +54,7 @@ export function OpticsViewport({
   const perfDrawTimes = useRef<number[]>([]);
   const perfBoxCounts = useRef<number[]>([]);
   const perfStartTime = useRef<number | null>(null);
+  const perfStartCommits = useRef<number | null>(null);
   const perfDone = useRef(false);
 
   const onThreatSampleRef = useRef(onThreatSample);
@@ -79,6 +80,9 @@ export function OpticsViewport({
 
       if (perfStartTime.current === null) {
         perfStartTime.current = performance.now();
+        perfStartCommits.current = (typeof window !== "undefined" && typeof window.__AEGIS_REACT_COMMITS__ === "number")
+          ? window.__AEGIS_REACT_COMMITS__
+          : 0;
       }
       perfDrawTimes.current.push(drawMs);
       perfBoxCounts.current.push(boxCount);
@@ -95,18 +99,29 @@ export function OpticsViewport({
         const totalBoxes = perfBoxCounts.current.reduce((a, b) => a + b, 0);
         const meanBoxes = totalBoxes / perfBoxCounts.current.length;
         const totalSec = (performance.now() - (perfStartTime.current ?? performance.now())) / 1000;
-        const totalCommits = (typeof window !== "undefined" && window.__AEGIS_REACT_COMMITS__) ? window.__AEGIS_REACT_COMMITS__ : 0;
-        const commitsPer100 = (totalCommits / perfDrawTimes.current.length) * 100;
+        const rawCommits = (typeof window !== "undefined" && typeof window.__AEGIS_REACT_COMMITS__ === "number")
+          ? window.__AEGIS_REACT_COMMITS__
+          : 0;
+        const startCommits = perfStartCommits.current ?? 0;
+        const playbackCommits = Math.max(0, rawCommits - startCommits);
+        const commitsPer100 = (playbackCommits / perfDrawTimes.current.length) * 100;
+
+        let status: PerfReport["status"] = "OK";
+        if (meanBoxes === 0) {
+          status = "FAIL_ZERO_BOXES";
+        } else if (rawCommits === 0) {
+          status = "FAIL_PROFILER_DISABLED";
+        }
 
         const report: PerfReport = {
           frames: perfDrawTimes.current.length,
           mean_draw_ms: Number(mean.toFixed(3)),
           p95_draw_ms: Number(p95.toFixed(3)),
           mean_boxes: Number(meanBoxes.toFixed(2)),
-          total_commits: totalCommits,
+          total_commits: playbackCommits,
           commits_per_100_frames: Number(commitsPer100.toFixed(2)),
           duration_sec: Number(totalSec.toFixed(2)),
-          status: meanBoxes === 0 ? "FAIL_ZERO_BOXES" : "OK",
+          status,
         };
 
         if (typeof window !== "undefined") {

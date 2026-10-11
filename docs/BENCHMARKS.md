@@ -82,15 +82,15 @@ Measured on branch `feat/accuracy-v2` after modular architecture refactoring and
 
 > [!IMPORTANT]
 > All performance numbers in this section are extracted directly from committed raw test outputs:
-> - Baseline (Before): [`docs/results/frontend_perf_before.json`](results/frontend_perf_before.json) (measured on worktree at commit `62de537`)
-> - Optimized (After): [`docs/results/frontend_perf_after.json`](results/frontend_perf_after.json) (measured on branch `feat/accuracy-v2`)
+> - Baseline (Before 1080p): [`docs/results/frontend_perf_before.json`](results/frontend_perf_before.json) (commit `62de537`, 1080p source)
+> - Same-Resolution Control (After 1080p): [`docs/results/frontend_perf_after_1080p.json`](results/frontend_perf_after_1080p.json) (`feat/accuracy-v2`, 1080p source)
+> - Web Delivery Build (After 720p): [`docs/results/frontend_perf_after.json`](results/frontend_perf_after.json) (`feat/accuracy-v2`, 720p web source)
 >
-> **Methodology & Equivalence Note**:
-> Both versions were tested under identical test conditions: headless Brave browser (`--headless=new`), 300 frames per run, 3 consecutive runs per condition, measuring both unthrottled 1x CPU and 4x CPU throttle via Chrome DevTools Protocol.
->
-> In the Before version, the application played the original 1080p source video (`drone_feed.mp4`, 24.6 MB). In the After version, the application played the transcoded 720p web video (`feeds/uav-alpha/video.mp4`, 9.74 MB). The draw timers in both versions specifically measure the end-to-end canvas drawing routine (`clearRect` + keyframe lookup/interpolation + bounding box and label rendering).
->
-> Mean boxes drawn per frame was recorded to guarantee the probe does not time an empty canvas; both versions consistently rendered between 1.41 and 1.62 boxes per frame across all runs.
+> **Methodology, Metric Definition & Positive Control**:
+> - **Production Profiling**: All runs were executed against production builds compiled with `next build --profile`, ensuring React `<Profiler>` callbacks are preserved under `next start`.
+> - **Positive Control Gate**: Before running any 300-frame test, the runner asserts that `window.__AEGIS_REACT_COMMITS__ > 0` upon hydration, triggers an interactive state change (e.g. LITE mode toggle or play/pause), and asserts that commit count increases. The probe fails immediately if commits read 0 or do not increase.
+> - **Metric Definition**: The "Before" timer wrapped the legacy per-tick handler (`handleTimeUpdateRef.current()`), encompassing `console.log` serializations, binary search, canvas dimension resets (`canvas.width = video.clientWidth`), coordinate scaling, and box drawing. The Before metric thus represents **per-frame overlay cost**, not just isolated box rasterization. In the After version, `useVideoOverlay` eliminates per-frame canvas resizing, uses binary search over typed keyframes, and wraps `clearRect` + `sampleAt` + `drawDetections` in `onDrawTiming`.
+> - **Testing Conditions**: Headless Brave browser (`--headless=new`), 300 frames per run, 3 consecutive runs per condition, measuring both normal 1x CPU and 4x CPU throttle via Chrome DevTools Protocol.
 
 ### Static Verification & Quality Gates
 - **TypeScript (`tsc --noEmit`)**: Exit code `0` (Zero type errors)
@@ -100,35 +100,57 @@ Measured on branch `feat/accuracy-v2` after modular architecture refactoring and
 - **Unit & Integration Tests**: 33 passing Vitest tests in frontend (`npm test`), 13 passing pytest tests in vision (`pytest vision/tests/`)
 - **Next.js Production Build (`next build`)**: Succeeded in `26.6s` (Turbopack, Next.js 16.2.11)
 
-### Measured Runtime Performance Comparison
+---
 
-Values show **Median [Min – Max]** across 3 runs of 300 frames each:
+### Same-Resolution Comparison (1080p Source Video)
 
-#### Normal Playback (1x CPU, 300 Frames)
-| Metric | Before (1080p, commit `62de537`) | After (720p, `feat/accuracy-v2`) | Difference |
+Both Before (`62de537`) and After (`feat/accuracy-v2`) tested playing the identical 1080p source video (`vision/source/drone_feed.mp4`, 1920×1080, 24.6 MB).
+
+Values show **Median [Min – Max]** across 3 runs of 300 frames:
+
+#### Normal Playback (1x CPU, 1080p Source, 300 Frames)
+| Metric | Before (`62de537`, 1080p) | After Control (`feat/accuracy-v2`, 1080p) | Comparison |
 |---|---|---|---|
-| **Mean Canvas Draw Time** | `10.402 ms` [10.106 – 10.989 ms] | `0.426 ms` [0.423 – 0.703 ms] | **~24.4× faster** (-95.9%) |
-| **p95 Canvas Tail Draw Time** | `20.000 ms` [16.900 – 22.900 ms] | `0.900 ms` [0.900 – 1.000 ms] | **~22.2× faster** (-95.5%) |
-| **Mean Boxes Drawn / Frame** | `1.53` [1.50 – 1.56] | `1.58` [1.55 – 1.60] | Validated non-zero |
-| **Total React Commits (Profiler)** | `0` [0 – 0] | `0` [0 – 0] | Identical (0 commits / 100 frames) |
-| **300-Frame Playback Duration** | `53.59 s` [53.20 – 53.85 s] (~5.6 fps) | `15.55 s` [15.44 – 15.60 s] (~19.3 fps) | **~3.4× faster headless pace** |
+| **Mean Per-Frame Overlay Cost** | `9.219 ms` [9.091 – 9.934 ms] | `0.566 ms` [0.528 – 5.059 ms] | **~16.3× faster** (-93.9%) |
+| **p95 Tail Overlay Cost** | `17.800 ms` [17.800 – 19.700 ms] | `1.800 ms` [1.600 – 3.600 ms] | **~9.9× faster** (-89.9%) |
+| **Mean Boxes Drawn / Frame** | `1.56` [1.54 – 1.57] | `1.59` [1.30 – 1.59] | Validated non-zero |
+| **Total React Commits (Profiler)** | `463` [459 – 467] | `99` [89 – 165] | **~4.7× fewer commits** (-78.6%) |
+| **Commits per 100 Frames** | `154.33` [153.00 – 155.67] | `33.00` [29.67 – 55.00] | -78.6% React commit pressure |
+| **300-Frame Playback Duration** | `60.64 s` [59.19 – 61.15 s] (~4.9 fps) | `26.47 s` [24.19 – 53.73 s] (~11.3 fps) | **~2.3× faster pace** |
 
-#### Throttled Playback (4x CPU Throttling, 300 Frames)
-| Metric | Before (1080p, commit `62de537`) | After (720p, `feat/accuracy-v2`) | Difference |
+#### Throttled Playback (4x CPU Throttling, 1080p Source, 300 Frames)
+| Metric | Before (`62de537`, 1080p) | After Control (`feat/accuracy-v2`, 1080p) | Comparison |
 |---|---|---|---|
-| **Mean Canvas Draw Time** | `25.270 ms` [23.543 – 33.746 ms] | `1.842 ms` [1.825 – 1.879 ms] | **~13.7× faster** (-92.7%) |
-| **p95 Canvas Tail Draw Time** | `58.200 ms` [57.500 – 61.600 ms] | `6.500 ms` [5.500 – 6.600 ms] | **~9.0× faster** (-88.8%) |
-| **Mean Boxes Drawn / Frame** | `1.57` [1.55 – 1.58] | `1.43` [1.41 – 1.45] | Validated non-zero |
-| **Total React Commits (Profiler)** | `0` [0 – 0] | `0` [0 – 0] | Identical (0 commits / 100 frames) |
-| **300-Frame Playback Duration** | `85.67 s` [84.82 – 90.84 s] (~3.5 fps) | `29.75 s` [29.51 – 30.96 s] (~10.1 fps) | **~2.9× faster headless pace** |
+| **Mean Per-Frame Overlay Cost** | `21.905 ms` [18.392 – 22.881 ms] | `1.939 ms` [1.848 – 2.215 ms] | **~11.3× faster** (-91.1%) |
+| **p95 Tail Overlay Cost** | `54.100 ms` [52.200 – 64.200 ms] | `6.200 ms` [5.800 – 7.100 ms] | **~8.7× faster** (-88.5%) |
+| **Mean Boxes Drawn / Frame** | `1.57` [1.49 – 1.58] | `1.41` [1.38 – 1.43] | Validated non-zero |
+| **Total React Commits (Profiler)** | `382` [332 – 428] | `181` [181 – 186] | **~2.1× fewer commits** (-52.6%) |
+| **Commits per 100 Frames** | `127.33` [110.67 – 142.67] | `60.33` [60.33 – 62.00] | -52.6% React commit pressure |
+| **300-Frame Playback Duration** | `119.57 s` [116.73 – 121.36 s] (~2.5 fps) | `63.95 s` [62.63 – 68.18 s] (~4.7 fps) | **~1.9× faster pace** |
+
+---
+
+### Web Delivery Build (720p Transcoded Video)
+
+Measured on branch `feat/accuracy-v2` playing the optimized 720p web video (`feeds/uav-alpha/video.mp4`, 1280×720, 9.74 MB):
+
+| Metric | Normal 1x CPU (720p) | 4x CPU Throttling (720p) |
+|---|---|---|
+| **Mean Canvas Draw Time** | `0.466 ms` [0.369 – 0.486 ms] | `1.693 ms` [1.664 – 1.719 ms] |
+| **p95 Tail Draw Time** | `0.900 ms` [0.800 – 1.100 ms] | `5.700 ms` [5.500 – 6.100 ms] |
+| **Mean Boxes Drawn / Frame** | `1.57` [1.56 – 1.59] | `1.44` [1.43 – 1.49] |
+| **Total React Commits (Profiler)** | `59` [57 – 60] | `159` [156 – 161] |
+| **Commits per 100 Frames** | `19.67` [19.00 – 20.00] | `53.00` [52.00 – 53.67] |
+| **300-Frame Playback Duration** | `15.61 s` [15.17 – 15.75 s] (~19.2 fps) | `52.04 s` [51.76 – 53.83 s] (~5.8 fps) |
+
+---
 
 ### Analysis of Results
-1. **Canvas Draw Speed**:
-   Canvas frame drawing dropped from ~10.4 ms to ~0.43 ms unthrottled, and from ~25.3 ms to ~1.84 ms under 4x CPU throttle. This improvement is driven by avoiding canvas dimension resizing on every tick, using binary search on typed array keyframe timestamps, and rendering against a 720p canvas rather than resizing 1080p elements.
-2. **React Commits**:
-   During steady-state video playback without operator interaction, React commits remain at 0 in both versions because video frame playback is decoupled from React component state cycles. Commits only occur on explicit state changes (feed switching, scrubbing, threat modal opening, or search queries).
-3. **Execution Pace**:
-   Headless browser frame pacing improved substantially (from ~5.6 fps to ~19.3 fps normal, and from ~3.5 fps to ~10.1 fps throttled), reducing the execution time for 300 frames from ~54s to ~16s normal and from ~86s to ~30s throttled.
+1. **Per-Frame Overlay Cost at 1080p**:
+   When holding resolution constant at 1080p, per-frame overlay cost dropped from 9.22 ms to 0.57 ms under normal CPU (a ~16.3× speedup) and from 21.91 ms to 1.94 ms under 4x CPU throttle (a ~11.3× speedup). This demonstrates that the architectural optimizations (removing repetitive canvas dimension mutations, pre-indexing keyframe observations, and eliminating console serialization) yield substantial per-frame savings independent of resolution.
+2. **React Commit Pressure**:
+   Under production profiling (`--profile`), React commits dropped from 463 to 99 commits per 300 frames at 1080p normal (-78.6%), and from 382 to 181 commits under 4x throttle (-52.6%). In the Before architecture, `handleTimeUpdate` triggered frequent re-renders through per-tick updates and video element handlers. In the modular architecture, canvas rendering is handled directly via `useVideoOverlay`, with React commits primarily reflecting real state events (e.g. threat evaluation triggers, UI controls).
+3. **Playback Pace & Resolution Impact**:
+   At the same 1080p resolution, headless playback duration decreased from 60.6 s to 26.5 s normal (~2.3× faster pace) and from 119.6 s to 64.0 s throttled (~1.9× faster pace). Transcoding to the 720p web delivery asset further reduces decode overhead and payload size (from 24.6 MB down to 9.74 MB), bringing 300-frame duration down to 15.6 s normal (~19.2 fps) and mean draw time to 0.47 ms.
 
 *Visual QA Reference captures: `local_assets/shots_after/desktop_1440x900.png` and `local_assets/shots_after/mobile_390x844.png`.*
-

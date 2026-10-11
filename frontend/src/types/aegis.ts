@@ -72,7 +72,7 @@ export interface PerfReport {
   total_commits: number;
   commits_per_100_frames: number;
   duration_sec: number;
-  status: "OK" | "FAIL_ZERO_BOXES";
+  status: "OK" | "FAIL_ZERO_BOXES" | "FAIL_PROFILER_DISABLED";
 }
 
 declare global {
