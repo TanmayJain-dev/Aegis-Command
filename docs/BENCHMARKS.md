@@ -41,3 +41,36 @@ Measured using Playwright running headless Brave (`--headless=new`) playing `fro
 | **Throttled Playback (4x CPU via CDP)** | 150 | 29.211 ms | 65.300 ms | 67 | 0.26 | 262.47 s |
 
 *Note: Visual baseline reference captures recorded at `local_assets/shots_before/desktop_1440x900.png` and `local_assets/shots_before/mobile_390x844.png`.*
+
+---
+
+## Detection & Track Distribution Baseline
+
+Measured via `vision/eval/track_stats.py` on `frontend/public/detections.json` (33.02s UAV footage):
+
+> [!NOTE]
+> Per project governance, accuracy metrics (Precision, Recall, F1, mAP50-95) are NOT reported because human-verified ground-truth labels (`vision/eval/labels/VERIFIED`) are pending verification. The numbers below document the operational data distribution and tracking continuity of the legacy feed. Speed (`speed_kmh`) and geo-projection telemetry are simulated attributes.
+
+### Volume & Rates
+- **Total Detections**: 2,563
+- **Video Duration**: 33.02 s
+- **Detection Rate**: 77.62 detections/second
+- **Unique Track IDs**: 84
+
+### Track Continuity
+- **Median Track Length**: 8.0 observations (mean: 30.51)
+- **Median Track Duration**: 0.46 s (mean: 1.26 s)
+- **Short Tracks ($\le 10$ observations)**: 47 out of 84 tracks (55.95%)
+
+### Class Breakdown
+| Class | Detections | Share (%) |
+|---|---|---|
+| `person` | 2,070 | 80.8% |
+| `truck` | 476 | 18.6% |
+| `car` | 17 | 0.7% |
+
+### Confidence Distribution
+- **Mean Confidence**: 0.5396
+- **Median Confidence**: 0.5200
+- **Detections below 0.50 confidence**: 1,116 (43.54%)
+

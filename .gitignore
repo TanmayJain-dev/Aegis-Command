@@ -57,3 +57,6 @@ extract_venv/
 frontend/.vercel/
 .shots/
 frontend/.shots/
+
+# Evaluation dataset images (untracked)
+vision/eval/images/
