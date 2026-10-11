@@ -111,13 +111,14 @@ export function useVideoOverlay({
   onFrame,
 }: UseVideoOverlayOptions): { redraw: () => void } {
   const onFrameRef = useRef(onFrame);
-  onFrameRef.current = onFrame;
-
   const timelineRef = useRef(timeline);
-  timelineRef.current = timeline;
-
   const liteModeRef = useRef(liteMode);
-  liteModeRef.current = liteMode;
+
+  useEffect(() => {
+    onFrameRef.current = onFrame;
+    timelineRef.current = timeline;
+    liteModeRef.current = liteMode;
+  });
 
   const draw = useCallback((mediaTime?: number) => {
     const video = videoRef.current;

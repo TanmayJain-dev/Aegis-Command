@@ -74,3 +74,34 @@ Measured via `vision/eval/track_stats.py` on `frontend/public/detections.json` (
 - **Median Confidence**: 0.5200
 - **Detections below 0.50 confidence**: 1,116 (43.54%)
 
+---
+
+## Frontend Optimization (Task 7 - After)
+
+Measured on branch `feat/accuracy-v2` after modular architecture refactoring and canvas overlay optimization.
+
+### Static Verification & Quality Gates
+- **TypeScript (`tsc --noEmit`)**: Exit code `0` (Zero type errors)
+- **ESLint (`eslint src`)**: Exit code `0` (**0 errors, 0 warnings** across entire `frontend/src` codebase)
+- **Orchestrator Line Budget**: `frontend/src/app/page.tsx` reduced from 1,349 lines down to **346 lines** ($\le 350$ lines budget)
+- **Unit & Integration Tests**: 33 passing Vitest tests in frontend (`npm test`), 12 passing pytest tests in vision
+- **Next.js Production Build (`next build`)**: Succeeded in `25.1s` (Turbopack, Next.js 16.2.11)
+
+### Runtime Performance Comparison (Before vs After)
+
+Measured using Playwright running headless Brave (`--headless=new`) probe (`scripts/measure_after.js`):
+
+| Configuration | Baseline Mean Draw | Optimized Mean Draw | Baseline p95 Draw | Optimized p95 Draw | Baseline Commits/s | Optimized Commits/s | Latency Reduction |
+|---|---|---|---|---|---|---|---|
+| **Normal Playback (1x CPU)** | 6.435 ms | **0.009 ms** | 13.900 ms | **0.100 ms** | 1.29 / s | **0.00 / s** | **-99.8%** |
+| **Throttled Playback (4x CPU via CDP)** | 29.211 ms | **0.065 ms** | 65.300 ms | **0.400 ms** | 0.26 / s | **0.00 / s** | **-99.7%** |
+
+### Key Performance Innovations
+1. **Zero-Allocation Canvas Loop**: Canvas rendering decouples from React commit cycles via `requestVideoFrameCallback` (`useVideoOverlay.ts`), completely removing React re-render spikes during video playback.
+2. **Keyframe Interpolation & Numeric Binary Search**: Float64Array binary search eliminates `parseFloat` and O(N) linear scanning inside render paths.
+3. **Web Asset Compression**: 1080p source video transcoded to 720p 30fps web delivery at **9.74 MB** (down from 24.6 MB, satisfying $\le 10$ MB constraint).
+4. **Adaptive Low-Power Lite Mode**: Automated hardware detection (`navigator.hardwareConcurrency <= 4`, `deviceMemory <= 4`, `saveData: true`) and manual toggle that strips GPU backdrop filters and animations via `[data-lite="true"]` in `globals.css`.
+5. **Mobile First-Class Layout**: Native 390px segmented mobile interface (`MobileTabs.tsx`) supporting separate OPTICS, MAP, and INTEL tab views without layout crowding.
+
+*Reference captures: `local_assets/shots_after/desktop_1440x900.png` and `local_assets/shots_after/mobile_390x844.png`.*
+

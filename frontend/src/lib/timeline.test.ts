@@ -5,7 +5,6 @@ import {
   parseTimeline,
   LEGACY_SOURCE_SIZE,
   LEGACY_FPS,
-  LEGACY_TOLERANCE_S,
 } from "./timeline";
 
 describe("Timeline Binary Search Utilities", () => {
