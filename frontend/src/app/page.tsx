@@ -81,6 +81,7 @@ export default function AegisDashboard() {
   const [intelMode, setIntelMode] = useState<IntelMode>("SIGINT");
   const [mapCoordinates, setMapCoordinates] = useState<[number, number] | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"optics" | "map" | "intel">("optics");
   
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(true); 
@@ -552,9 +553,9 @@ export default function AegisDashboard() {
   const renderModal = () => {
     if (!isModalOpen) return null;
     return (
-      <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div className="absolute inset-0 z-[10000] bg-black/80 backdrop-blur-md" onClick={() => setIsModalOpen(false)}></div>
-        <div className="relative z-[10001] bg-slate-950 border border-fuchsia-900/50 rounded shadow-[0_0_50px_rgba(217,70,239,0.15)] w-full max-w-2xl overflow-hidden flex flex-col">
+        <div className="relative z-[10001] bg-slate-950 border border-fuchsia-900/50 rounded-t-xl sm:rounded shadow-[0_0_50px_rgba(217,70,239,0.15)] w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
           <div className="bg-fuchsia-950/40 border-b border-fuchsia-900/50 p-4 flex justify-between items-center">
             <h2 className="text-fuchsia-400 font-bold tracking-widest flex items-center gap-2 text-sm">
               <AlertTriangle size={18} /> ACTION REQUIRED: INTEL #{intelData?.id || "UNKNOWN"}
@@ -624,55 +625,97 @@ export default function AegisDashboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
       {/* PITCH DECK HEADER */}
-      <header className="bg-[#0a0a0a] p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
+      <header className="bg-[#0a0a0a] px-3 py-2.5 sm:p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
         <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-rose-500"></div>
-        <div className="flex items-center gap-4">
-          <div className="relative flex items-center justify-center w-10 h-10 border border-cyan-500/30 rounded bg-cyan-950/20">
-            <Shield className="text-cyan-400" size={20} />
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 border border-cyan-500/30 rounded bg-cyan-950/20 flex-shrink-0">
+            <Shield className="text-cyan-400" size={18} />
             <div className="absolute inset-0 animate-ping opacity-20 border border-cyan-500 rounded"></div>
           </div>
-          <button
-              onClick={loadIncidentHistory}
-              className="px-3 py-2 text-[10px] font-bold tracking-widest border border-cyan-500/40 text-cyan-300 bg-cyan-950/20 hover:bg-cyan-950/50 hover:border-cyan-400 transition-all"
-            >
-              INCIDENT HISTORY
-            </button>
-            <div className="flex flex-col">
-            <h1 className="text-xl font-bold tracking-widest text-white leading-none">AEGIS COMMAND</h1>
-            <span className="text-[10px] text-cyan-400 font-bold tracking-[0.2em] mt-1">UNIFIED THREAT INTELLIGENCE</span>
+          <div className="flex flex-col">
+            <h1 className="text-sm sm:text-xl font-bold tracking-widest text-white leading-none">AEGIS COMMAND</h1>
+            <span className="text-[8px] sm:text-[10px] text-cyan-400 font-bold tracking-[0.2em] mt-0.5 sm:mt-1">UNIFIED THREAT INTELLIGENCE</span>
           </div>
         </div>
-        <div className="flex items-center gap-6 text-xs border border-slate-800 bg-slate-900/50 px-4 py-2 rounded">
-          <span className="flex items-center gap-2 text-slate-400">
-            <Activity className="text-cyan-400" size={14} /> 
-            SYS: <span className="text-cyan-400 font-bold">SECURE</span>
-          </span>
-          <span className="w-[1px] h-4 bg-slate-700"></span>
-          <span className="text-slate-400 flex items-center gap-2">
-            <Globe size={14} className="text-fuchsia-400"/>
-            OP-SEC: <span className="text-fuchsia-400 font-bold">OMEGA</span>
-          </span>
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            onClick={loadIncidentHistory}
+            className="px-2 py-1 sm:px-3 sm:py-2 text-[9px] sm:text-[10px] font-bold tracking-widest border border-cyan-500/40 text-cyan-300 bg-cyan-950/20 hover:bg-cyan-950/50 hover:border-cyan-400 transition-all flex-shrink-0"
+          >
+            HISTORY
+          </button>
+          <div className="flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs border border-slate-800 bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 rounded">
+            <span className="flex items-center gap-1 sm:gap-2 text-slate-400">
+              <Activity className="text-cyan-400" size={12} /> 
+              <span className="hidden sm:inline">SYS:</span> <span className="text-cyan-400 font-bold font-mono">SECURE</span>
+            </span>
+            <span className="w-[1px] h-3 sm:h-4 bg-slate-700"></span>
+            <span className="text-slate-400 flex items-center gap-1 sm:gap-2">
+              <Globe size={12} className="text-fuchsia-400"/>
+              <span className="hidden sm:inline">OP-SEC:</span> <span className="text-fuchsia-400 font-bold font-mono">OMEGA</span>
+            </span>
+          </div>
         </div>
       </header>
 
+      {/* MOBILE TACTICAL SEGMENTED SELECTOR */}
+      <div className="lg:hidden flex border-b border-slate-800 bg-slate-950 px-2 py-1.5 gap-1.5 z-40 sticky top-0">
+        <button
+          type="button"
+          onClick={() => setMobileTab("optics")}
+          className={`flex-1 py-1.5 px-2 rounded text-[10px] font-mono font-bold tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+            mobileTab === "optics"
+              ? "bg-cyan-950/70 border border-cyan-500/80 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.25)]"
+              : "bg-slate-900/50 border border-slate-800 text-slate-500 hover:text-slate-300"
+          }`}
+        >
+          <Video size={13} />
+          OPTICS
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab("map")}
+          className={`flex-1 py-1.5 px-2 rounded text-[10px] font-mono font-bold tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+            mobileTab === "map"
+              ? "bg-fuchsia-950/70 border border-fuchsia-500/80 text-fuchsia-400 shadow-[0_0_10px_rgba(217,70,239,0.25)]"
+              : "bg-slate-900/50 border border-slate-800 text-slate-500 hover:text-slate-300"
+          }`}
+        >
+          <MapIcon size={13} />
+          MAP
+        </button>
+        <button
+          type="button"
+          onClick={() => setMobileTab("intel")}
+          className={`flex-1 py-1.5 px-2 rounded text-[10px] font-mono font-bold tracking-wider flex items-center justify-center gap-1.5 transition-all ${
+            mobileTab === "intel"
+              ? "bg-rose-950/70 border border-rose-500/80 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.25)]"
+              : "bg-slate-900/50 border border-slate-800 text-slate-500 hover:text-slate-300"
+          }`}
+        >
+          <Terminal size={13} />
+          INTEL
+        </button>
+      </div>
+
       {/* MAIN DASHBOARD */}
-      <main className="flex-1 grid grid-cols-12 gap-6 p-6 min-h-0">
+      <main className="flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-6 p-3 lg:p-6 min-h-0 overflow-y-auto lg:overflow-visible">
         
         {/* LEFT PANE: OPTICS HUD (VISION PATH - CYAN THEME) */}
-        <section className="col-span-7 flex flex-col gap-4 relative">
+        <section className={`${mobileTab === "optics" ? "flex" : "hidden lg:flex"} lg:col-span-7 flex flex-col gap-3 lg:gap-4 relative`}>
           
-          <div className="flex items-center gap-2 text-xs">
+          <div className="flex items-center gap-2 text-xs overflow-x-auto no-scrollbar pb-1 whitespace-nowrap">
             {(["UAV-ALPHA", "PERIMETER CCTV-04", "MOBILE INFANTRY BODYCAM"] as VideoSource[]).map((src) => (
               <button
                 key={src}
                 onClick={() => setVideoSource(src)}
-                className={`px-4 py-2 border rounded flex items-center gap-2 transition-all ${
+                className={`px-3 sm:px-4 py-1.5 sm:py-2 border rounded flex items-center gap-1.5 sm:gap-2 transition-all flex-shrink-0 ${
                   videoSource === src 
                     ? "bg-cyan-950/40 border-cyan-500/50 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]" 
                     : "bg-slate-900/30 border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300"
                 }`}
               >
-                <Video size={14} />
+                <Video size={13} />
                 {src}
               </button>
             ))}
@@ -680,7 +723,7 @@ export default function AegisDashboard() {
 
           <div 
             ref={videoContainerRef} 
-            className="relative flex-1 w-full rounded border border-cyan-900/50 bg-black overflow-hidden group shadow-2xl"
+            className="relative flex-1 w-full rounded border border-cyan-900/50 bg-black overflow-hidden group shadow-2xl min-h-[240px] sm:min-h-[300px]"
           >
             <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-4">
                <div className="flex justify-between items-start text-[10px] text-cyan-400 font-bold tracking-widest drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]">
@@ -764,9 +807,9 @@ export default function AegisDashboard() {
                 if (leftPercentage >= 0 && leftPercentage <= 100) {
                   
       {historyOpen && (
-        <div className="fixed inset-0 z-[10000] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[10000] bg-black/85 backdrop-blur-sm flex items-end sm:items-center justify-center p-0 sm:p-4">
 
-          <div className="relative z-[10001] w-full max-w-6xl max-h-[90vh] bg-slate-950 border border-cyan-500/40 shadow-2xl overflow-hidden flex flex-col">
+          <div className="relative z-[10001] w-full max-w-6xl max-h-[85vh] sm:max-h-[90vh] rounded-t-xl sm:rounded bg-slate-950 border border-cyan-500/40 shadow-2xl overflow-hidden flex flex-col">
 
             <div className="flex items-center justify-between px-5 py-4 border-b border-cyan-500/20">
               <div>
@@ -1067,20 +1110,20 @@ return (
         </section>
 
         {/* RIGHT PANE: GEO & INTEL (INTELLIGENCE PATH - FUCHSIA/ROSE THEME) */}
-        <section className="col-span-5 flex flex-col gap-6">
+        <section className={`${mobileTab !== "optics" ? "flex" : "hidden lg:flex"} lg:col-span-5 flex flex-col gap-4 lg:gap-6`}>
           
           {/* Top Half: Geospatial Map */}
-          <div className="h-[40%] min-h-[250px] relative flex flex-col bg-slate-900/20 border border-slate-800 rounded p-1">
+          <div className={`${mobileTab === "map" ? "flex flex-1" : mobileTab === "intel" ? "hidden lg:flex" : "flex"} h-auto min-h-[380px] lg:h-[40%] lg:min-h-[250px] relative flex-col bg-slate-900/20 border border-slate-800 rounded p-1`}>
              <div className="flex items-center gap-2 text-xs text-fuchsia-400 font-bold p-2 uppercase tracking-wider bg-slate-900/50">
                 <MapIcon size={14} className="text-fuchsia-400"/> Tactical Map
              </div>
-             <div className="flex-1 relative bg-black border-t border-slate-800">
-               <MapComponent coordinates={mapCoordinates} />
+             <div className="flex-1 min-h-[340px] h-[340px] lg:h-full relative bg-black border-t border-slate-800">
+               <MapComponent key={`aegis-map-${mobileTab}`} coordinates={mapCoordinates} />
              </div>
           </div>
 
           {/* Bottom Half: Intelligence Stream */}
-          <div className="flex-1 flex flex-col gap-4 border border-fuchsia-900/30 bg-slate-900/20 p-4 rounded relative shadow-inner">
+          <div className={`${mobileTab === "intel" ? "flex flex-1" : mobileTab === "map" ? "hidden lg:flex" : "flex"} flex-1 flex flex-col gap-4 border border-fuchsia-900/30 bg-slate-900/20 p-3 sm:p-4 rounded relative shadow-inner`}>
             
             <div className="flex justify-between items-center border-b border-slate-800 pb-4">
               <div className="text-xs uppercase tracking-widest text-fuchsia-400 font-bold flex items-center gap-2">
