@@ -12,11 +12,15 @@ import datetime
 from pathlib import Path
 import cv2
 
-def sample_frames(video_path="vision/drone_feed.mp4", out_dir="vision/eval/images", manifest_path="vision/eval/manifest.json", stride=13, offset=6):
+def sample_frames(video_path="vision/source/drone_feed.mp4", out_dir="vision/eval/images", manifest_path="vision/eval/manifest.json", stride=13, offset=6):
     video_file = Path(video_path)
     if not video_file.exists():
-        print(f"Error: video not found at {video_file}", file=sys.stderr)
-        sys.exit(1)
+        legacy_file = Path("vision/drone_feed.mp4")
+        if legacy_file.exists():
+            video_file = legacy_file
+        else:
+            print(f"Error: video not found at {video_file}", file=sys.stderr)
+            sys.exit(1)
 
     out_path = Path(out_dir)
     out_path.mkdir(parents=True, exist_ok=True)

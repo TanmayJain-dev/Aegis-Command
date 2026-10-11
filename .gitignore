@@ -60,3 +60,7 @@ frontend/.shots/
 
 # Evaluation dataset images (untracked)
 vision/eval/images/
+
+# Local compatibility symlinks
+frontend/public/detections.json
+

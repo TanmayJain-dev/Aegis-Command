@@ -1,0 +1,11 @@
+[
+  {
+    "id": "uav-alpha",
+    "label": "UAV Alpha (FLIR 4K)",
+    "video": "/feeds/uav-alpha/video.mp4",
+    "detections": "/feeds/uav-alpha/detections.json",
+    "center_lat": 31.4520,
+    "center_lng": 74.9250,
+    "sensor": "EO/IR Optronics"
+  }
+]

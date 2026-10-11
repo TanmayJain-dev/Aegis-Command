@@ -4,14 +4,25 @@ Aegis ships with a deterministic replay pipeline rather than requiring a live dr
 
 ## Canonical assets
 
-- `frontend/public/drone_feed.mp4` — the video rendered by the operator console.
-- `frontend/public/detections.json` — timestamped object detections consumed by the frontend.
+- `vision/source/drone_feed.mp4` — canonical 1080p source video of truth for extraction.
+- `frontend/public/feeds/index.json` — feeds manifest registry.
+- `frontend/public/feeds/uav-alpha/video.mp4` — web-transcoded video (720p 30fps <= 10MB) rendered by the operator console.
+- `frontend/public/feeds/uav-alpha/detections.json` — timestamped object detections consumed by the frontend.
+- `frontend/public/drone_feed.mp4` & `frontend/public/detections.json` — legacy compatibility aliases.
 
-These two files belong together. Replacing the video without regenerating the detection timeline will produce an invalid replay.
+These assets belong together. Replacing the video without regenerating the detection timeline will produce an invalid replay.
+
+## Web Transcoder
+
+To compress source footage to web-ready 720p 30fps (<= 10MB) while maintaining bounding box coordinate alignment:
+
+```bash
+./scripts/transcode_web.sh vision/source/drone_feed.mp4 frontend/public/feeds/uav-alpha/video.mp4
+```
 
 ## Regenerating the demo
 
-The optional ingestion utility lives at `vision/ingest_target.py`. Run it from the repository root after installing the vision dependencies:
+The ingestion utility lives at `vision/ingest_target.py`. Run it from the repository root after installing the vision dependencies:
 
 ```bash
 cd vision
@@ -22,7 +33,7 @@ cd ..
 python vision/ingest_target.py path/to/video.mp4
 ```
 
-The utility copies the selected source video to `frontend/public/drone_feed.mp4`, runs YOLOv8 + ByteTrack processing, and writes the matching detection timeline to `frontend/public/detections.json`.
+The utility ingests the source video into `frontend/public/feeds/uav-alpha/video.mp4` (and legacy paths), runs YOLOv8 + ByteTrack processing, and writes the matching detection timeline to `frontend/public/feeds/uav-alpha/detections.json`.
 
 ## Repository policy
 

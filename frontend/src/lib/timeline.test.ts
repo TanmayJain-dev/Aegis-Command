@@ -214,6 +214,29 @@ describe("Resolution-Decoupled Scaling", () => {
     expect(scale.scaleX).toBeCloseTo(2 / 3);
     expect(scale.scaleY).toBeCloseTo(2 / 3);
   });
+
+  it("proves normalized alignment holds invariant between 1080p source and 720p transcode", () => {
+    // Arbitrary detection in 1080p source coordinates
+    const sourceBox: [number, number, number, number] = [960, 540, 1440, 810];
+    const normX1 = sourceBox[0] / 1920;
+    const normY1 = sourceBox[1] / 1080;
+    const normX2 = sourceBox[2] / 1920;
+    const normY2 = sourceBox[3] / 1080;
+
+    // Scale to 720p transcode (1280x720)
+    const scaled720 = timeline.scaleBox(sourceBox, 1280, 720);
+    expect(scaled720[0] / 1280).toBeCloseTo(normX1);
+    expect(scaled720[1] / 720).toBeCloseTo(normY1);
+    expect(scaled720[2] / 1280).toBeCloseTo(normX2);
+    expect(scaled720[3] / 720).toBeCloseTo(normY2);
+
+    // Scale to arbitrary display container (e.g. responsive viewport 800x450)
+    const scaledViewport = timeline.scaleBox(sourceBox, 800, 450);
+    expect(scaledViewport[0] / 800).toBeCloseTo(normX1);
+    expect(scaledViewport[1] / 450).toBeCloseTo(normY1);
+    expect(scaledViewport[2] / 800).toBeCloseTo(normX2);
+    expect(scaledViewport[3] / 450).toBeCloseTo(normY2);
+  });
 });
 
 describe("Empty Timeline Resilience", () => {

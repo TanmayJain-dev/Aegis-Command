@@ -184,11 +184,18 @@ Aegis-Command/
 ├── frontend/
 │   ├── src/
 │   ├── public/
+│   │   ├── feeds/
+│   │   │   ├── index.json
+│   │   │   └── uav-alpha/
+│   │   │       ├── video.mp4
+│   │   │       └── detections.json
 │   │   ├── drone_feed.mp4
 │   │   └── detections.json
 │   └── package.json
 │
 ├── vision/
+│   ├── source/
+│   │   └── drone_feed.mp4
 │   ├── vision_engine.py
 │   ├── yolo_extractor.py
 │   ├── ingest_target.py
@@ -296,7 +303,7 @@ From the repository root, a replacement video can be processed with:
 python vision/ingest_target.py path/to/video.mp4
 ```
 
-That utility updates `frontend/public/drone_feed.mp4` and `frontend/public/detections.json` together. Because the canonical replay already ships with the repository, this step is only needed when regenerating the demo data.
+That utility ingests into `frontend/public/feeds/uav-alpha/video.mp4` and `frontend/public/feeds/uav-alpha/detections.json` (as well as legacy paths). The web transcode utility `scripts/transcode_web.sh` converts raw 1080p source footage into lightweight 720p 30fps web video (<= 10MB). Because the canonical replay already ships with the repository, this step is only needed when regenerating the demo data.
 
 ---
 
