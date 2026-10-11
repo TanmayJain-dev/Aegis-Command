@@ -50,7 +50,12 @@ export default function AegisDashboard() {
   const [perfReport, setPerfReport] = useState<PerfReport | null>(null);
   const perfCommitCount = useRef(0);
   const [perfEnabled] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("perf") === "1");
-  const [perfTargetFrames] = useState(() => typeof window !== "undefined" ? parseInt(new URLSearchParams(window.location.search).get("frames") || "600", 10) : 600);
+  const [perfTargetFrames] = useState(() => typeof window !== "undefined" ? parseInt(new URLSearchParams(window.location.search).get("frames") || "300", 10) : 300);
+
+  const handleRender = useCallback(() => {
+    perfCommitCount.current += 1;
+    if (typeof window !== "undefined") window.__AEGIS_REACT_COMMITS__ = perfCommitCount.current;
+  }, []);
 
   const threatInFlightRef = useRef(false);
 
@@ -187,14 +192,8 @@ export default function AegisDashboard() {
     [socketReady, sendThreat, intelData, isSearching, handleSearch]
   );
 
-  return (
-    <Profiler
-      id="AegisDashboard"
-      onRender={() => {
-        if (perfEnabled) perfCommitCount.current += 1;
-      }}
-    >
-      <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
+  const content = (
+    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
         {/* TACTICAL COMMAND HEADER */}
         <header className="bg-[#0a0a0a] px-3 py-2.5 sm:p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
           <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-rose-500" />
@@ -338,10 +337,10 @@ export default function AegisDashboard() {
             id="perf-report-banner"
             className="fixed top-2 right-2 z-[99999] bg-black/90 border border-emerald-500 p-2 text-xs font-mono text-emerald-400"
           >
-            PROBE: frames={perfReport.frames} mean={perfReport.mean_draw_ms}ms p95={perfReport.p95_draw_ms}ms commits/s={perfReport.commits_per_second}
+            PROBE: frames={perfReport.frames} mean={perfReport.mean_draw_ms}ms p95={perfReport.p95_draw_ms}ms boxes={perfReport.mean_boxes} commits/100f={perfReport.commits_per_100_frames} status={perfReport.status}
           </div>
         )}
       </div>
-    </Profiler>
   );
+  return perfEnabled ? <Profiler id="AegisDashboard" onRender={handleRender}>{content}</Profiler> : content;
 }

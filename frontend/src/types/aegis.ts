@@ -68,9 +68,11 @@ export interface PerfReport {
   frames: number;
   mean_draw_ms: number;
   p95_draw_ms: number;
+  mean_boxes: number;
   total_commits: number;
-  commits_per_second: number;
+  commits_per_100_frames: number;
   duration_sec: number;
+  status: "OK" | "FAIL_ZERO_BOXES";
 }
 
 declare global {
@@ -78,5 +80,6 @@ declare global {
     __AEGIS_PERF_REPORT__?: PerfReport;
     __AEGIS_PERF_DONE__?: boolean;
     __AEGIS_PERF_FRAMES__?: number;
+    __AEGIS_REACT_COMMITS__?: number;
   }
 }

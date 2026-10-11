@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "version": "before (commit 62de537)",
+    "video_source": "1080p drone_feed.mp4",
+    "target_frames": 300,
+    "runs_per_condition": 3,
+    "measured_at": "2026-10-11T10:19:38.285Z"
+  },
+  "normal": {
+    "stats": {
+      "mean_draw_ms": {
+        "median": 10.402,
+        "min": 10.106,
+        "max": 10.989,
+        "values": [
+          10.106,
+          10.402,
+          10.989
+        ]
+      },
+      "p95_draw_ms": {
+        "median": 20,
+        "min": 16.9,
+        "max": 22.9,
+        "values": [
+          16.9,
+          20,
+          22.9
+        ]
+      },
+      "mean_boxes": {
+        "median": 1.53,
+        "min": 1.5,
+        "max": 1.56,
+        "values": [
+          1.5,
+          1.53,
+          1.56
+        ]
+      },
+      "total_commits": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "commits_per_100_frames": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "duration_sec": {
+        "median": 53.59,
+        "min": 53.2,
+        "max": 53.85,
+        "values": [
+          53.2,
+          53.59,
+          53.85
+        ]
+      }
+    },
+    "runs": [
+      {
+        "frames": 300,
+        "mean_draw_ms": 10.989,
+        "p95_draw_ms": 22.9,
+        "mean_boxes": 1.5,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 53.59,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 10.106,
+        "p95_draw_ms": 20,
+        "mean_boxes": 1.53,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 53.85,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 10.402,
+        "p95_draw_ms": 16.9,
+        "mean_boxes": 1.56,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 53.2,
+        "status": "OK"
+      }
+    ]
+  },
+  "cpu_throttled_4x": {
+    "stats": {
+      "mean_draw_ms": {
+        "median": 25.27,
+        "min": 23.543,
+        "max": 33.746,
+        "values": [
+          23.543,
+          25.27,
+          33.746
+        ]
+      },
+      "p95_draw_ms": {
+        "median": 58.2,
+        "min": 57.5,
+        "max": 61.6,
+        "values": [
+          57.5,
+          58.2,
+          61.6
+        ]
+      },
+      "mean_boxes": {
+        "median": 1.57,
+        "min": 1.55,
+        "max": 1.58,
+        "values": [
+          1.55,
+          1.57,
+          1.58
+        ]
+      },
+      "total_commits": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "commits_per_100_frames": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "duration_sec": {
+        "median": 85.67,
+        "min": 84.82,
+        "max": 90.84,
+        "values": [
+          84.82,
+          85.67,
+          90.84
+        ]
+      }
+    },
+    "runs": [
+      {
+        "frames": 300,
+        "mean_draw_ms": 23.543,
+        "p95_draw_ms": 57.5,
+        "mean_boxes": 1.58,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 85.67,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 25.27,
+        "p95_draw_ms": 58.2,
+        "mean_boxes": 1.57,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 84.82,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 33.746,
+        "p95_draw_ms": 61.6,
+        "mean_boxes": 1.55,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 90.84,
+        "status": "OK"
+      }
+    ]
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "metadata": {
+    "version": "after (feat/accuracy-v2 modular)",
+    "video_source": "720p feeds/uav-alpha/video.mp4",
+    "target_frames": 300,
+    "runs_per_condition": 3,
+    "measured_at": "2026-10-11T10:34:37.068Z"
+  },
+  "normal": {
+    "stats": {
+      "mean_draw_ms": {
+        "median": 0.426,
+        "min": 0.423,
+        "max": 0.703,
+        "values": [
+          0.423,
+          0.426,
+          0.703
+        ]
+      },
+      "p95_draw_ms": {
+        "median": 0.9,
+        "min": 0.9,
+        "max": 1,
+        "values": [
+          0.9,
+          0.9,
+          1
+        ]
+      },
+      "mean_boxes": {
+        "median": 1.58,
+        "min": 1.55,
+        "max": 1.6,
+        "values": [
+          1.55,
+          1.58,
+          1.6
+        ]
+      },
+      "total_commits": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "commits_per_100_frames": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "duration_sec": {
+        "median": 15.55,
+        "min": 15.44,
+        "max": 15.6,
+        "values": [
+          15.44,
+          15.55,
+          15.6
+        ]
+      }
+    },
+    "runs": [
+      {
+        "frames": 300,
+        "mean_draw_ms": 0.703,
+        "p95_draw_ms": 0.9,
+        "mean_boxes": 1.58,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 15.6,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 0.423,
+        "p95_draw_ms": 0.9,
+        "mean_boxes": 1.55,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 15.44,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 0.426,
+        "p95_draw_ms": 1,
+        "mean_boxes": 1.6,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 15.55,
+        "status": "OK"
+      }
+    ]
+  },
+  "cpu_throttled_4x": {
+    "stats": {
+      "mean_draw_ms": {
+        "median": 1.842,
+        "min": 1.825,
+        "max": 1.879,
+        "values": [
+          1.825,
+          1.842,
+          1.879
+        ]
+      },
+      "p95_draw_ms": {
+        "median": 6.5,
+        "min": 5.5,
+        "max": 6.6,
+        "values": [
+          5.5,
+          6.5,
+          6.6
+        ]
+      },
+      "mean_boxes": {
+        "median": 1.43,
+        "min": 1.41,
+        "max": 1.45,
+        "values": [
+          1.41,
+          1.43,
+          1.45
+        ]
+      },
+      "total_commits": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "commits_per_100_frames": {
+        "median": 0,
+        "min": 0,
+        "max": 0,
+        "values": [
+          0,
+          0,
+          0
+        ]
+      },
+      "duration_sec": {
+        "median": 29.75,
+        "min": 29.51,
+        "max": 30.96,
+        "values": [
+          29.51,
+          29.75,
+          30.96
+        ]
+      }
+    },
+    "runs": [
+      {
+        "frames": 300,
+        "mean_draw_ms": 1.842,
+        "p95_draw_ms": 6.5,
+        "mean_boxes": 1.43,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 30.96,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 1.879,
+        "p95_draw_ms": 6.6,
+        "mean_boxes": 1.45,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 29.51,
+        "status": "OK"
+      },
+      {
+        "frames": 300,
+        "mean_draw_ms": 1.825,
+        "p95_draw_ms": 5.5,
+        "mean_boxes": 1.41,
+        "total_commits": 0,
+        "commits_per_100_frames": 0,
+        "duration_sec": 29.75,
+        "status": "OK"
+      }
+    ]
+  }
+}

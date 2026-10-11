@@ -93,6 +93,7 @@ export interface UseVideoOverlayOptions {
   timeline: Timeline | null;
   liteMode?: boolean;
   onFrame?: (time: number, detections: DrawableDetection[]) => void;
+  onDrawTiming?: (drawTimeMs: number, boxCount: number) => void;
 }
 
 /**
@@ -109,13 +110,16 @@ export function useVideoOverlay({
   timeline,
   liteMode = false,
   onFrame,
+  onDrawTiming,
 }: UseVideoOverlayOptions): { redraw: () => void } {
   const onFrameRef = useRef(onFrame);
+  const onDrawTimingRef = useRef(onDrawTiming);
   const timelineRef = useRef(timeline);
   const liteModeRef = useRef(liteMode);
 
   useEffect(() => {
     onFrameRef.current = onFrame;
+    onDrawTimingRef.current = onDrawTiming;
     timelineRef.current = timeline;
     liteModeRef.current = liteMode;
   });
@@ -135,6 +139,7 @@ export function useVideoOverlay({
     const cssHeight = canvas.clientHeight;
     if (cssWidth === 0 || cssHeight === 0) return;
 
+    const tStart = performance.now();
     ctx.clearRect(0, 0, cssWidth, cssHeight);
 
     const detections = tl.sampleAt(t);
@@ -144,6 +149,11 @@ export function useVideoOverlay({
     };
 
     drawDetections(ctx, detections, scale);
+    const tEnd = performance.now();
+
+    if (onDrawTimingRef.current) {
+      onDrawTimingRef.current(tEnd - tStart, detections.length);
+    }
 
     if (onFrameRef.current) {
       onFrameRef.current(t, detections);
