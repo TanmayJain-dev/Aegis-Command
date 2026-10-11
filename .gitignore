@@ -58,8 +58,9 @@ frontend/.vercel/
 .shots/
 frontend/.shots/
 
-# Evaluation dataset images (untracked)
+# Evaluation dataset images and draft labels (untracked)
 vision/eval/images/
+vision/eval/labels_draft/
 
 # Local compatibility symlinks
 frontend/public/detections.json
