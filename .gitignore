@@ -4,9 +4,14 @@ __pycache__/
 *$py.class
 venv/
 env/
+.venv/
+*/.venv/
 .env
+.env*
 *.db
 backend/incidents.db
+uploads/
+backend/uploads/
 
 # Node & Next.js
 node_modules/
@@ -46,3 +51,9 @@ Thumbs.db
 # Docker
 .dockerignore
 extract_venv/
+
+# Vercel and Visual QA
+.vercel/
+frontend/.vercel/
+.shots/
+frontend/.shots/
