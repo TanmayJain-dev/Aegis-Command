@@ -26,8 +26,11 @@ from finalize_labels import (
     convert_shapes_to_yolo,
     convert_labeling_dir,
     write_verified_marker,
+    compute_labels_sha256,
+    find_unchanged_frames,
     CLASS_NAMES,
 )
+from eval_detection import check_verification_gate
 
 
 def test_validate_labels_success(tmp_path):
@@ -153,13 +156,31 @@ def test_convert_shapes_to_yolo():
         }
     ]
 
-    yolo_lines = convert_shapes_to_yolo(shapes, img_w=1000, img_h=1000)
+    yolo_lines, clamped_count = convert_shapes_to_yolo(shapes, img_w=1000, img_h=1000)
     assert len(yolo_lines) == 2
+    assert clamped_count == 0
 
     # Person: x_center = 150/1000 = 0.15, y_center = 200/1000 = 0.20, w = 100/1000 = 0.10, h = 200/1000 = 0.20
     assert yolo_lines[0] == "0 0.150000 0.200000 0.100000 0.200000"
     # Truck: x_center = 400/1000 = 0.40, y_center = 500/1000 = 0.50, w = 200/1000 = 0.20, h = 200/1000 = 0.20
     assert yolo_lines[1] == "2 0.400000 0.500000 0.200000 0.200000"
+
+
+def test_convert_shapes_clamping():
+    """Test clamping of out-of-bounds coordinates to image boundaries."""
+    shapes = [
+        {
+            "label": "car",
+            # Points outside 0..1000 bounds: (-50, -20) and (1050, 800)
+            "points": [[-50, -20], [1050, 800]],
+            "shape_type": "rectangle"
+        }
+    ]
+    yolo_lines, clamped_count = convert_shapes_to_yolo(shapes, img_w=1000, img_h=1000)
+    assert clamped_count == 2  # 2 points had coordinates outside bounds and were clamped
+    assert len(yolo_lines) == 1
+    # Clamped bounds: [0, 0] to [1000, 800] -> x_c = 0.50, y_c = 0.40, w = 1.0, h = 0.80
+    assert yolo_lines[0] == "1 0.500000 0.400000 1.000000 0.800000"
 
 
 def test_convert_shapes_unknown_class():
@@ -170,13 +191,77 @@ def test_convert_shapes_unknown_class():
 
 
 def test_write_verified_marker(tmp_path):
-    """Test VERIFIED marker file structure and content."""
+    """Test VERIFIED marker file structure and content including SHA256."""
+    # Create sample label files in tmp_path
+    (tmp_path / "frame_001.txt").write_text("0 0.5 0.5 0.1 0.1\n")
     marker_file = tmp_path / "VERIFIED"
-    write_verified_marker(marker_file, annotator="Jane Doe", frame_count=155)
+    expected_sha256 = compute_labels_sha256(tmp_path)
+
+    sha = write_verified_marker(marker_file, annotator="Jane Doe", frame_count=1)
 
     assert marker_file.exists()
+    assert sha == expected_sha256
     content = marker_file.read_text()
     assert "Annotator: Jane Doe" in content
-    assert "Frame Count: 155" in content
+    assert "Frame Count: 1" in content
+    assert f"SHA256: {expected_sha256}" in content
     assert "Tool Used: X-AnyLabeling" in content
     assert "Verified Status: APPROVED" in content
+
+
+def test_find_unchanged_frames(tmp_path):
+    """Test identifying frames whose annotations are identical to draft."""
+    draft_dir = tmp_path / "draft"
+    final_dir = tmp_path / "final"
+    draft_dir.mkdir()
+    final_dir.mkdir()
+
+    # Frame 1: Identical
+    (draft_dir / "frame_001.txt").write_text("0 0.5000 0.5000 0.1000 0.1000\n")
+    (final_dir / "frame_001.txt").write_text("0 0.5000 0.5000 0.1000 0.1000\n")
+
+    # Frame 2: Modified
+    (draft_dir / "frame_002.txt").write_text("1 0.2000 0.2000 0.0500 0.0500\n")
+    (final_dir / "frame_002.txt").write_text("1 0.2500 0.2500 0.0600 0.0600\n")
+
+    # Frame 3: Only in final
+    (final_dir / "frame_003.txt").write_text("0 0.1000 0.1000 0.1000 0.1000\n")
+
+    unchanged = find_unchanged_frames(final_dir, draft_dir)
+    assert unchanged == ["frame_001.txt"]
+
+
+def test_eval_detection_gate_rejection_no_marker(tmp_path):
+    """Test eval_detection gate exits with code 2 when VERIFIED is missing."""
+    with pytest.raises(SystemExit) as exc:
+        check_verification_gate(tmp_path)
+    assert exc.value.code == 2
+
+
+def test_eval_detection_gate_rejection_missing_sha256(tmp_path):
+    """Test eval_detection gate exits with code 2 when SHA256 is absent from VERIFIED."""
+    marker = tmp_path / "VERIFIED"
+    marker.write_text("Annotator: Test User\nVerified Status: APPROVED\n")
+    with pytest.raises(SystemExit) as exc:
+        check_verification_gate(tmp_path)
+    assert exc.value.code == 2
+
+
+def test_eval_detection_gate_rejection_mismatched_sha256(tmp_path):
+    """Test eval_detection gate exits with code 2 when SHA256 checksum does not match files."""
+    (tmp_path / "frame_001.txt").write_text("0 0.5 0.5 0.1 0.1\n")
+    marker = tmp_path / "VERIFIED"
+    marker.write_text("Annotator: Test User\nSHA256: badbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbadbad\n")
+    with pytest.raises(SystemExit) as exc:
+        check_verification_gate(tmp_path)
+    assert exc.value.code == 2
+
+
+def test_eval_detection_gate_success(tmp_path):
+    """Test eval_detection gate succeeds when VERIFIED marker has matching SHA256."""
+    (tmp_path / "frame_001.txt").write_text("0 0.5 0.5 0.1 0.1\n")
+    marker = tmp_path / "VERIFIED"
+    write_verified_marker(marker, annotator="Verified User", frame_count=1)
+
+    result = check_verification_gate(tmp_path)
+    assert result == marker

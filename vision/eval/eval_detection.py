@@ -25,6 +25,7 @@ import numpy as np
 # Import evaluation metrics engine
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from metrics import calculate_metrics_for_class, perform_error_analysis
+from finalize_labels import compute_labels_sha256
 
 CLASS_NAMES = {
     0: "person",
@@ -56,6 +57,39 @@ def check_verification_gate(labels_dir: Path) -> Path:
             file=sys.stderr
         )
         sys.exit(2)
+
+    content = verified_file.read_text(encoding="utf-8")
+    expected_sha256 = None
+    for line in content.splitlines():
+        if line.startswith("SHA256:"):
+            expected_sha256 = line.split(":", 1)[1].strip()
+            break
+
+    if not expected_sha256:
+        print(
+            "\n" + "=" * 70 + "\n"
+            "STRICT GATE REJECTION (Exit Code 2):\n"
+            f"Missing SHA256 checksum in verification marker: {verified_file}\n"
+            "The labels directory must be finalized with a valid SHA256 checksum.\n"
+            "=" * 70 + "\n",
+            file=sys.stderr
+        )
+        sys.exit(2)
+
+    actual_sha256 = compute_labels_sha256(labels_dir)
+    if actual_sha256 != expected_sha256:
+        print(
+            "\n" + "=" * 70 + "\n"
+            "STRICT GATE REJECTION (Exit Code 2):\n"
+            f"SHA256 checksum mismatch for label files in {labels_dir}!\n"
+            f"  Expected: {expected_sha256}\n"
+            f"  Actual:   {actual_sha256}\n"
+            "Labels have been modified, corrupted, or tampered with since verification.\n"
+            "=" * 70 + "\n",
+            file=sys.stderr
+        )
+        sys.exit(2)
+
     return verified_file
 
 def load_yolo_labels(labels_dir: Path, image_ids: list) -> list:

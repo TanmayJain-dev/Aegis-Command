@@ -23,6 +23,7 @@ Certification Gate:
 import os
 import sys
 import json
+import hashlib
 import argparse
 import datetime
 import subprocess
@@ -37,9 +38,13 @@ class ValidationError(Exception):
     pass
 
 
-def convert_shapes_to_yolo(shapes: List[dict], img_w: int = 1920, img_h: int = 1080) -> List[str]:
-    """Convert X-AnyLabeling shape objects into YOLO format string lines."""
+def convert_shapes_to_yolo(shapes: List[dict], img_w: int = 1920, img_h: int = 1080) -> Tuple[List[str], int]:
+    """
+    Convert X-AnyLabeling shape objects into YOLO format string lines.
+    Clamps points to image bounds [0, img_w] x [0, img_h] and reports count of clamped points.
+    """
     yolo_lines = []
+    clamped_count = 0
     for s in shapes:
         label = s.get("label", "").strip().lower()
         if label not in CLASS_TO_ID:
@@ -50,14 +55,25 @@ def convert_shapes_to_yolo(shapes: List[dict], img_w: int = 1920, img_h: int = 1
         if not points or len(points) < 2:
             raise ValidationError(f"Invalid shape points for {label}: {points}")
 
-        xs = [p[0] for p in points]
-        ys = [p[1] for p in points]
+        xs = []
+        ys = []
+        for p in points:
+            orig_x, orig_y = float(p[0]), float(p[1])
+            cx = max(0.0, min(float(img_w), orig_x))
+            cy = max(0.0, min(float(img_h), orig_y))
+            if cx != orig_x or cy != orig_y:
+                clamped_count += 1
+            xs.append(cx)
+            ys.append(cy)
 
         x_min, x_max = min(xs), max(xs)
         y_min, y_max = min(ys), max(ys)
 
         box_w = x_max - x_min
         box_h = y_max - y_min
+
+        if box_w <= 0.0 or box_h <= 0.0:
+            raise ValidationError(f"Box collapsed to zero dimension after clamping for {label}: {points}")
 
         x_center = (x_min + x_max) / 2.0 / img_w
         y_center = (y_min + y_max) / 2.0 / img_h
@@ -66,17 +82,18 @@ def convert_shapes_to_yolo(shapes: List[dict], img_w: int = 1920, img_h: int = 1
 
         yolo_lines.append(f"{cls_id} {x_center:.6f} {y_center:.6f} {w_norm:.6f} {h_norm:.6f}")
 
-    return yolo_lines
+    return yolo_lines, clamped_count
 
 
-def convert_labeling_dir(input_dir: Path, output_dir: Path) -> int:
-    """Convert all X-AnyLabeling JSONs in input_dir to YOLO .txt files in output_dir."""
+def convert_labeling_dir(input_dir: Path, output_dir: Path) -> Tuple[int, int]:
+    """Convert all X-AnyLabeling JSONs in input_dir to YOLO .txt files in output_dir. Returns (converted_count, total_clamped)."""
     output_dir.mkdir(parents=True, exist_ok=True)
     json_files = sorted(input_dir.glob("*.json"))
     if not json_files:
         raise ValidationError(f"No JSON files found in {input_dir}")
 
     converted_count = 0
+    total_clamped = 0
     for jf in json_files:
         with open(jf, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -85,7 +102,8 @@ def convert_labeling_dir(input_dir: Path, output_dir: Path) -> int:
         img_h = data.get("imageHeight", 1080) or 1080
         shapes = data.get("shapes", [])
 
-        lines = convert_shapes_to_yolo(shapes, img_w=img_w, img_h=img_h)
+        lines, clamped = convert_shapes_to_yolo(shapes, img_w=img_w, img_h=img_h)
+        total_clamped += clamped
 
         out_txt = output_dir / f"{jf.stem}.txt"
         with open(out_txt, "w", encoding="utf-8") as f:
@@ -94,7 +112,7 @@ def convert_labeling_dir(input_dir: Path, output_dir: Path) -> int:
 
         converted_count += 1
 
-    return converted_count
+    return converted_count, total_clamped
 
 
 def validate_labels(
@@ -202,10 +220,46 @@ def get_git_commit() -> str:
         return "UNKNOWN_COMMIT"
 
 
-def write_verified_marker(marker_path: Path, annotator: str, frame_count: int = 155) -> None:
-    """Write the VERIFIED certification marker file."""
+def compute_labels_sha256(labels_dir: Path) -> str:
+    """Compute deterministic SHA256 checksum across all sorted .txt label files."""
+    hasher = hashlib.sha256()
+    for txt_path in sorted(labels_dir.glob("*.txt")):
+        hasher.update(txt_path.name.encode("utf-8"))
+        hasher.update(b"\n")
+        hasher.update(txt_path.read_bytes())
+    return hasher.hexdigest()
+
+
+def find_unchanged_frames(final_dir: Path, draft_dir: Path) -> List[str]:
+    """Find frame file names whose annotations are identical to draft."""
+    unchanged = []
+    for f in sorted(final_dir.glob("*.txt")):
+        df = draft_dir / f.name
+        if not df.exists():
+            continue
+
+        def parse_boxes(p: Path):
+            boxes = []
+            for line in p.read_text(encoding="utf-8").splitlines():
+                line = line.strip()
+                if not line:
+                    continue
+                parts = line.split()
+                if len(parts) == 5:
+                    boxes.append((int(parts[0]), round(float(parts[1]), 4), round(float(parts[2]), 4), round(float(parts[3]), 4), round(float(parts[4]), 4)))
+            return sorted(boxes)
+
+        if parse_boxes(f) == parse_boxes(df):
+            unchanged.append(f.name)
+    return unchanged
+
+
+def write_verified_marker(marker_path: Path, annotator: str, frame_count: int = 155, sha256_hash: Optional[str] = None) -> str:
+    """Write the VERIFIED certification marker file with annotator metadata and labels SHA256."""
     commit_sha = get_git_commit()
     today_str = datetime.date.today().isoformat()
+    if sha256_hash is None:
+        sha256_hash = compute_labels_sha256(marker_path.parent)
 
     content = (
         f"Annotator: {annotator}\n"
@@ -213,12 +267,14 @@ def write_verified_marker(marker_path: Path, annotator: str, frame_count: int = 
         f"Base Commit: {commit_sha}\n"
         f"Tool Used: X-AnyLabeling\n"
         f"Frame Count: {frame_count}\n"
+        f"SHA256: {sha256_hash}\n"
         f"Verified Status: APPROVED\n"
     )
 
     marker_path.parent.mkdir(parents=True, exist_ok=True)
     with open(marker_path, "w", encoding="utf-8") as f:
         f.write(content)
+    return sha256_hash
 
 
 def main():
@@ -227,6 +283,7 @@ def main():
     parser.add_argument("--output", default="vision/eval/labels", help="Output directory for YOLO labels")
     parser.add_argument("--draft-dir", default="vision/eval/labels_draft", help="Directory of initial draft labels")
     parser.add_argument("--annotator", default=None, help="Full name of human annotator (required to write VERIFIED)")
+    parser.add_argument("--confirm-unchanged", action="store_true", help="Print frames whose annotations are identical to draft labels")
     parser.add_argument("--skip-convert", action="store_true", help="Skip conversion and run validation only")
     args = parser.parse_args()
 
@@ -246,8 +303,9 @@ def main():
             sys.exit(1)
         print(f"Converting X-AnyLabeling JSON annotations from {input_dir}...")
         try:
-            converted = convert_labeling_dir(input_dir, output_dir)
+            converted, clamped = convert_labeling_dir(input_dir, output_dir)
             print(f"Successfully converted {converted} files to {output_dir}.")
+            print(f"Points clamped to image bounds: {clamped}")
         except Exception as e:
             print(f"Conversion failed: {e}", file=sys.stderr)
             sys.exit(1)
@@ -290,15 +348,22 @@ def main():
     print(f"{'TOTAL':<22} {total_draft:<14} {total_final:<14} {total_final - total_draft:+d}")
     print("----------------------------------------------------------------")
 
+    if args.confirm_unchanged:
+        unchanged = find_unchanged_frames(output_dir, draft_dir)
+        print(f"\n[CONFIRM-UNCHANGED] Identical to draft ({len(unchanged)} frames):")
+        for fname in unchanged:
+            print(f"  {fname}")
+
     verified_file = output_dir / "VERIFIED"
     if args.annotator:
         annotator_clean = args.annotator.strip()
         if not annotator_clean:
             print("Error: --annotator must provide a non-empty human name.", file=sys.stderr)
             sys.exit(1)
-        write_verified_marker(verified_file, annotator_clean, frame_count=155)
+        sha256_hex = write_verified_marker(verified_file, annotator_clean, frame_count=155)
         print(f"\n[CERTIFICATION GATE] Created marker file: {verified_file}")
         print(f"  Annotator: {annotator_clean}")
+        print(f"  SHA256: {sha256_hex}")
         print("  Status: APPROVED")
     else:
         print("\n[NOTE] --annotator flag was not provided.")
