@@ -193,10 +193,15 @@ All vision evaluations are strictly gated by cryptographic certification (`visio
 ## Hardware Reality & Benchmark Execution Budget
 
 - **Local Machine Constraints**: Intel Core i3-3217U (2 physical cores @ 1.80GHz, no AVX2/FMA/BMI2 vector extensions, 3.8 GB RAM, 5400 RPM HDD).
-- **Local Latency Measurement**: Profiling a single forward pass of `yolov8n` @ 640px on local CPU requires **44,767 ms** (~44.8 seconds per frame) due to unaccelerated software convolution and disk paging.
-- **Execution Budget Rule**: Evaluating all 155 frames on CPU requires $\approx 115$ minutes per model (>10 minute threshold). Therefore, per engineering budget constraints:
-  - **Local CPU Execution**: Dedicated to deterministic cryptographic verification gates, test suite validation (34 tests in 2.07s), dataset partitioning, and transfer-learning smoke testing.
-  - **Google Colab GPU Pipelines**: Authored production-ready notebooks for full 155-frame matrix evaluation (`vision/bakeoff_colab.ipynb`) and 50-epoch contiguous holdout fine-tuning (`vision/train_colab.ipynb`) on GPU.
+- **Latency Measurements & Discrepancy Analysis**:
+  - *Cold Start Measurement*: Initial profiling of a single cold PyTorch forward pass of `yolov8n` @ 640px required **44,767 ms** (~44.8 seconds) due to cold library loading, process initialization, and OS memory paging under swap pressure.
+  - *Warm Steady-State Measurement (10 frames post-warmup)*: With ~1.3 GB available RAM (`free -m`), steady-state CPU inference clocked:
+    - `yolov8n @ 640px`: Mean = **801.44 ms**, P50 = **611.35 ms** (~1.2 frames/second)
+    - `yolov8s @ 640px`: Mean = **1,376.36 ms**, P50 = **1,250.96 ms** (~0.7 frames/second)
+- **Local Execution Budget & Abort Protocol**:
+  - An attempt to evaluate all 155 full frames sequentially on CPU for `yolov8n @ 640px` reached the mandatory **25-minute engineering timeout** (1,500s) and was aborted.
+  - In strict compliance with project invariants, because the 155-frame CPU pass timed out, **all model configurations remain marked `NOT RUN`** until raw outputs are produced and committed.
+- **Google Colab GPU Pipelines**: Authored production-ready notebooks for full 155-frame matrix evaluation ([`vision/bakeoff_colab.ipynb`](../vision/bakeoff_colab.ipynb)) and 50-epoch contiguous holdout fine-tuning ([`vision/train_colab.ipynb`](../vision/train_colab.ipynb)) on GPU. See the human execution guide in [`docs/COLAB_GUIDE.md`](COLAB_GUIDE.md).
 
 ---
 
