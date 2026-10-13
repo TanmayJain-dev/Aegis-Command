@@ -41,6 +41,14 @@ COCO_TO_EVAL = {
     5: 3
 }
 
+def get_git_commit() -> str:
+    try:
+        import subprocess
+        res = subprocess.run(["git", "rev-parse", "HEAD"], capture_output=True, text=True, check=True)
+        return res.stdout.strip()
+    except Exception:
+        return "unknown"
+
 def check_verification_gate(labels_dir: Path) -> Path:
     verified_file = labels_dir / "VERIFIED"
     if not verified_file.exists():
@@ -113,8 +121,10 @@ def load_yolo_labels(labels_dir: Path, image_ids: list) -> list:
                     y2 = min(1.0, yc + h / 2)
                     gts.append({
                         "image_id": img_id,
+                        "frame_id": img_id,
                         "class": cls_id,
-                        "box": [x1, y1, x2, y2]
+                        "class_id": cls_id,
+                        "box": [round(x1, 6), round(y1, 6), round(x2, 6), round(y2, 6)]
                     })
     return gts
 
@@ -130,7 +140,10 @@ def run_evaluation(
     native_classes: Optional[bool] = None,
     device: str = "cpu",
     limit: Optional[int] = None,
-    out_results: str = "vision/eval/eval_results.json"
+    out_results: str = "vision/eval/eval_results.json",
+    save_raw: bool = False,
+    raw_root: str = "docs/results/raw",
+    run_id: Optional[str] = None
 ):
     labels_path = Path(labels_dir)
     check_verification_gate(labels_path)
@@ -189,16 +202,17 @@ def run_evaluation(
     raw_predictions = []
     image_ids = [img.stem for img in images]
 
-    # Predict with minimum threshold to capture both 0.25 and 0.35
-    eval_conf_min = min(0.20, conf)
+    # Predict with candidate threshold: 0.001 if save_raw, else min(0.20, conf)
+    eval_conf_min = 0.001 if save_raw else min(0.20, conf)
 
-    # Warmup
+    # Warmup (1 frame)
     if images:
         model.predict(source=str(images[0]), imgsz=imgsz, conf=eval_conf_min, device=device, verbose=False)
 
     print("Running inference and latency profiling...")
     predict_classes = list(CLASS_NAMES.keys()) if native_classes else list(COCO_TO_EVAL.keys())
 
+    total_infer_start = time.perf_counter()
     for img in images:
         t0 = time.perf_counter()
         results = model.predict(
@@ -235,11 +249,15 @@ def run_evaluation(
                 x2 = min(1.0, xc + w / 2)
                 y2 = min(1.0, yc + h / 2)
                 raw_predictions.append({
+                    "frame_id": img.stem,
                     "image_id": img.stem,
+                    "class_id": eval_cls,
                     "class": eval_cls,
-                    "conf": conf_val,
-                    "box": [x1, y1, x2, y2]
+                    "conf": round(conf_val, 6),
+                    "bbox_xywh_norm": [round(float(v), 6) for v in xywhn],
+                    "box": [round(x1, 6), round(y1, 6), round(x2, 6), round(y2, 6)]
                 })
+    total_infer_wall_seconds = time.perf_counter() - total_infer_start
 
     # Load verified ground truths
     ground_truths = load_yolo_labels(labels_path, image_ids)
@@ -315,6 +333,51 @@ def run_evaluation(
         "error_analysis": error_analysis
     }
 
+    if save_raw:
+        import torch
+        import ultralytics
+        if not run_id:
+            m_stem = Path(model_path).stem
+            run_id = f"{m_stem}_{imgsz}px_{split}"
+            if split != "all":
+                run_id += f"_fold{fold}"
+
+        raw_dir = Path(raw_root) / run_id
+        raw_dir.mkdir(parents=True, exist_ok=True)
+
+        run_meta = {
+            "run_id": run_id,
+            "command": " ".join(sys.argv),
+            "git_commit": get_git_commit(),
+            "device": device,
+            "torch_version": getattr(torch, "__version__", "unknown"),
+            "ultralytics_version": getattr(ultralytics, "__version__", "unknown"),
+            "imgsz": imgsz,
+            "weights": str(model_path),
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "wall_seconds": round(total_infer_wall_seconds, 2),
+            "labels_sha256": compute_labels_sha256(labels_path),
+            "num_frames": len(images),
+            "split": split,
+            "fold": fold,
+            "latency_mean_ms": latency_stats["mean_ms"],
+            "latency_p50_ms": latency_stats["p50_ms"],
+            "latency_p95_ms": latency_stats["p95_ms"]
+        }
+
+        preds_path = raw_dir / "predictions.json"
+        meta_path = raw_dir / "run_meta.json"
+
+        with open(preds_path, "w", encoding="utf-8") as f:
+            json.dump(raw_predictions, f, indent=2)
+
+        with open(meta_path, "w", encoding="utf-8") as f:
+            json.dump(run_meta, f, indent=2)
+
+        results["raw_dir"] = str(raw_dir)
+        print(f"\n[RAW PIPELINE] Saved {len(raw_predictions)} candidate predictions to {preds_path}")
+        print(f"[RAW PIPELINE] Saved execution metadata to {meta_path}")
+
     out_path = Path(out_results)
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
@@ -355,6 +418,9 @@ def main():
     parser.add_argument("--limit", type=int, default=None, help="Limit number of images for rapid testing")
     parser.add_argument("--native-classes", action="store_true", default=None, help="Force native class indices")
     parser.add_argument("--out", default="vision/eval/eval_results.json", help="Output results JSON path")
+    parser.add_argument("--save-raw", action="store_true", help="Save candidate raw predictions and run_meta")
+    parser.add_argument("--raw-root", default="docs/results/raw", help="Root directory for raw outputs")
+    parser.add_argument("--run-id", default=None, help="Identifier for the raw run directory")
     args = parser.parse_args()
 
     run_evaluation(
@@ -369,7 +435,10 @@ def main():
         native_classes=args.native_classes,
         device=args.device,
         limit=args.limit,
-        out_results=args.out
+        out_results=args.out,
+        save_raw=args.save_raw,
+        raw_root=args.raw_root,
+        run_id=args.run_id
     )
 
 
