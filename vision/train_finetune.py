@@ -18,6 +18,9 @@ import os
 import time
 from pathlib import Path
 
+from typing import Optional
+from eval.split_dataset import split_dataset
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DATA_YAML = REPO_ROOT / "vision" / "data" / "aegis_data.yaml"
 MODELS_DIR = REPO_ROOT / "vision" / "models"
@@ -29,14 +32,22 @@ def run_training(
     imgsz: int = 640,
     batch: int = 2,
     freeze_layers: int = 10,
-    lr0: float = 0.005
+    lr0: float = 0.005,
+    fold: int = 1,
+    name: Optional[str] = None
 ):
+    # Ensure specified fold is partitioned and active
+    split_dataset(fold=fold)
+
+    run_name = name or f"aegis_finetuned_fold{fold}"
+
     if not DATA_YAML.exists():
         print(f"Error: dataset YAML not found at {DATA_YAML}. Run split_dataset.py first.", file=sys.stderr)
         sys.exit(1)
 
     print("=" * 65)
-    print("AEGIS VISION GROUND-TRUTH FINE-TUNING")
+    print(f"AEGIS VISION GROUND-TRUTH FINE-TUNING (Fold {fold})")
+    print(f"Run Name:          {run_name}")
     print(f"Base Checkpoint:   {base_model}")
     print(f"Dataset Config:    {DATA_YAML}")
     print(f"Epochs:            {epochs}")
@@ -72,6 +83,9 @@ def run_training(
 
     trainer_module.BaseTrainer.read_results_csv = safe_read_results_csv
 
+    import ultralytics.utils.plotting as plotting_module
+    plotting_module.plot_results = lambda *args, **kwargs: None
+
     model = YOLO(base_model)
 
     t_start = time.time()
@@ -90,15 +104,15 @@ def run_training(
         cache=False,
         amp=False,
         project=str(MODELS_DIR),
-        name="aegis_finetuned",
+        name=run_name,
         exist_ok=True,
         verbose=True,
-        plots=True,
+        plots=False,
         save=True
     )
     elapsed = time.time() - t_start
 
-    best_weights = MODELS_DIR / "aegis_finetuned" / "weights" / "best.pt"
+    best_weights = MODELS_DIR / run_name / "weights" / "best.pt"
     print("\n" + "=" * 65)
     print("FINE-TUNING COMPLETED")
     print(f"Total Training Time: {elapsed:.1f}s ({elapsed/60.0:.2f} min)")
@@ -116,6 +130,8 @@ if __name__ == "__main__":
     parser.add_argument("--batch", type=int, default=4, help="Batch size")
     parser.add_argument("--freeze", type=int, default=10, help="Number of layers to freeze")
     parser.add_argument("--lr", type=float, default=0.005, help="Initial learning rate")
+    parser.add_argument("--fold", type=int, default=1, choices=[1, 2], help="Fold index (1 or 2)")
+    parser.add_argument("--name", default=None, help="Custom run name")
     args = parser.parse_args()
 
     run_training(
@@ -124,5 +140,7 @@ if __name__ == "__main__":
         imgsz=args.imgsz,
         batch=args.batch,
         freeze_layers=args.freeze,
-        lr0=args.lr
+        lr0=args.lr,
+        fold=args.fold,
+        name=args.name
     )

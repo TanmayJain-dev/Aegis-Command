@@ -19,6 +19,7 @@ from metrics import (
     match_image_predictions,
     calculate_metrics_for_class,
     perform_error_analysis,
+    bootstrap_metric_ci,
 )
 
 
@@ -218,4 +219,25 @@ def test_eval_detection_refuses_without_verified(tmp_path):
     )
     assert proc.returncode == 2
     assert "STRICT GATE REJECTION" in proc.stderr
+
+
+def test_bootstrap_metric_ci():
+    """Test 95% bootstrap CI calculation produces valid bounds [0, 1] containing the mean."""
+    image_ids = [f"frame_{i}" for i in range(10)]
+    # Perfect detection on half the frames
+    preds = [{"image_id": f"frame_{i}", "class": 0, "conf": 0.9, "box": [0.1, 0.1, 0.2, 0.2]} for i in range(5)]
+    gts = [{"image_id": f"frame_{i}", "class": 0, "box": [0.1, 0.1, 0.2, 0.2]} for i in range(10)]
+
+    ci_res = bootstrap_metric_ci(preds, gts, image_ids, target_class=0, n_bootstraps=100, seed=42)
+
+    assert "ap50_ci" in ci_res
+    assert "recall_ci" in ci_res
+    ap_low, ap_high = ci_res["ap50_ci"]
+    rec_low, rec_high = ci_res["recall_ci"]
+
+    assert 0.0 <= ap_low <= ap_high <= 1.0
+    assert 0.0 <= rec_low <= rec_high <= 1.0
+    assert ap_low <= ci_res["ap50_mean"] <= ap_high
+    assert rec_low <= ci_res["recall_mean"] <= rec_high
+
 

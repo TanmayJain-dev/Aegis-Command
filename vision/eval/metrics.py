@@ -150,6 +150,8 @@ def calculate_metrics_for_class(
         return {
             "n_gt": 0,
             "n_pred": n_pred,
+            "tp": 0,
+            "fp": n_pred,
             "precision": 0.0 if n_pred > 0 else 1.0,
             "recall": 1.0,
             "f1": 0.0,
@@ -161,6 +163,8 @@ def calculate_metrics_for_class(
         return {
             "n_gt": n_gt,
             "n_pred": 0,
+            "tp": 0,
+            "fp": 0,
             "precision": 0.0,
             "recall": 0.0,
             "f1": 0.0,
@@ -251,6 +255,8 @@ def calculate_metrics_for_class(
     return {
         "n_gt": n_gt,
         "n_pred": n_pred,
+        "tp": tp_count,
+        "fp": fp_count,
         "precision": round(precision, 4),
         "recall": round(recall, 4),
         "f1": round(f1, 4),
@@ -336,3 +342,71 @@ def perform_error_analysis(
         "fp_breakdown": fp_breakdown,
         "fn_by_area": fn_by_area
     }
+
+
+def bootstrap_metric_ci(
+    all_preds: List[Dict[str, Any]],
+    all_gts: List[Dict[str, Any]],
+    image_ids: List[str],
+    target_class: int = 0,
+    n_bootstraps: int = 1000,
+    seed: int = 42,
+    alpha: float = 0.05
+) -> Dict[str, Any]:
+    """
+    Computes 95% bootstrap confidence intervals for AP50 and Recall by resampling whole frames with replacement.
+    """
+    rng = np.random.RandomState(seed)
+    n_images = len(image_ids)
+    if n_images == 0:
+        return {
+            "ap50_ci": (0.0, 0.0),
+            "recall_ci": (0.0, 0.0),
+            "ap50_mean": 0.0,
+            "recall_mean": 0.0
+        }
+
+    preds_by_img = {}
+    for p in all_preds:
+        if p.get("class") == target_class:
+            preds_by_img.setdefault(p.get("image_id", ""), []).append(p)
+
+    gts_by_img = {}
+    for g in all_gts:
+        if g.get("class") == target_class:
+            gts_by_img.setdefault(g.get("image_id", ""), []).append(g)
+
+    ap50_samples = []
+    recall_samples = []
+
+    for b in range(n_bootstraps):
+        sampled_indices = rng.choice(n_images, size=n_images, replace=True)
+        sampled_preds = []
+        sampled_gts = []
+
+        for new_idx, idx in enumerate(sampled_indices):
+            orig_id = image_ids[idx]
+            virtual_id = f"virtual_{new_idx}"
+            for p in preds_by_img.get(orig_id, []):
+                p_copy = dict(p)
+                p_copy["image_id"] = virtual_id
+                sampled_preds.append(p_copy)
+            for g in gts_by_img.get(orig_id, []):
+                g_copy = dict(g)
+                g_copy["image_id"] = virtual_id
+                sampled_gts.append(g_copy)
+
+        m = calculate_metrics_for_class(sampled_preds, sampled_gts, target_class=target_class)
+        ap50_samples.append(m["ap50"])
+        recall_samples.append(m["recall"])
+
+    lower_p = (alpha / 2.0) * 100.0
+    upper_p = (1.0 - alpha / 2.0) * 100.0
+
+    return {
+        "ap50_ci": (round(float(np.percentile(ap50_samples, lower_p)), 4), round(float(np.percentile(ap50_samples, upper_p)), 4)),
+        "recall_ci": (round(float(np.percentile(recall_samples, lower_p)), 4), round(float(np.percentile(recall_samples, upper_p)), 4)),
+        "ap50_mean": round(float(np.mean(ap50_samples)), 4),
+        "recall_mean": round(float(np.mean(recall_samples)), 4)
+    }
+

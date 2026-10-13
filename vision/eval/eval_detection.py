@@ -125,8 +125,11 @@ def run_evaluation(
     imgsz: int = 960,
     conf: float = 0.25,
     split: str = "all",
+    fold: int = 1,
     manifest_path: str = "vision/data/split_manifest.json",
     native_classes: Optional[bool] = None,
+    device: str = "cpu",
+    limit: Optional[int] = None,
     out_results: str = "vision/eval/eval_results.json"
 ):
     labels_path = Path(labels_dir)
@@ -150,20 +153,30 @@ def run_evaluation(
             sys.exit(1)
         with open(m_path, "r", encoding="utf-8") as f:
             manifest = json.load(f)
-        target_stems = set(manifest[f"{split}_stems"])
+        fold_key = f"fold_{fold}"
+        if fold_key in manifest and f"{split}_stems" in manifest[fold_key]:
+            target_stems = set(manifest[fold_key][f"{split}_stems"])
+        elif f"{split}_stems" in manifest:
+            target_stems = set(manifest[f"{split}_stems"])
+        else:
+            print(f"Error: no stems found for split {split} in {m_path}", file=sys.stderr)
+            sys.exit(1)
         images = [img for img in all_images if img.stem in target_stems]
-        print(f"Filtered split '{split}': {len(images)} / {len(all_images)} images.")
+        print(f"Filtered split '{split}' (Fold {fold}): {len(images)} / {len(all_images)} images.")
     else:
         images = all_images
         print(f"Evaluating full set: {len(images)} images.")
 
-    print(f"Verified marker found. Evaluating {len(images)} images with {model_path}...")
+    if limit is not None and limit > 0:
+        images = images[:limit]
+        print(f"Applied image limit: evaluating first {len(images)} images only.")
+
+    print(f"Verified marker found. Evaluating {len(images)} images with {model_path} on {device}...")
     from ultralytics import YOLO
     model = YOLO(model_path)
 
     # Auto-detect native classes if not explicitly provided
     if native_classes is None:
-        # If model has <= 4 classes and first class is person, it is our custom fine-tuned model
         model_names = getattr(model, "names", {})
         if len(model_names) <= 4 and model_names.get(0, "").lower() == "person":
             native_classes = True
@@ -173,12 +186,15 @@ def run_evaluation(
             print("Auto-detected standard COCO model; applying COCO_TO_EVAL class remapping.")
 
     latencies_ms = []
-    predictions = []
+    raw_predictions = []
     image_ids = [img.stem for img in images]
+
+    # Predict with minimum threshold to capture both 0.25 and 0.35
+    eval_conf_min = min(0.20, conf)
 
     # Warmup
     if images:
-        model.predict(source=str(images[0]), imgsz=imgsz, conf=conf, device="cpu", verbose=False)
+        model.predict(source=str(images[0]), imgsz=imgsz, conf=eval_conf_min, device=device, verbose=False)
 
     print("Running inference and latency profiling...")
     predict_classes = list(CLASS_NAMES.keys()) if native_classes else list(COCO_TO_EVAL.keys())
@@ -188,9 +204,9 @@ def run_evaluation(
         results = model.predict(
             source=str(img),
             imgsz=imgsz,
-            conf=conf,
+            conf=eval_conf_min,
             classes=predict_classes,
-            device="cpu",
+            device=device,
             verbose=False
         )
         t1 = time.perf_counter()
@@ -218,7 +234,7 @@ def run_evaluation(
                 y1 = max(0.0, yc - h / 2)
                 x2 = min(1.0, xc + w / 2)
                 y2 = min(1.0, yc + h / 2)
-                predictions.append({
+                raw_predictions.append({
                     "image_id": img.stem,
                     "class": eval_cls,
                     "conf": conf_val,
@@ -228,46 +244,74 @@ def run_evaluation(
     # Load verified ground truths
     ground_truths = load_yolo_labels(labels_path, image_ids)
 
-    # Compute latency statistics
+    # Latency statistics
     latency_stats = {
-        "mean_ms": round(float(np.mean(latencies_ms)), 2),
-        "p50_ms": round(float(np.percentile(latencies_ms, 50)), 2),
-        "p95_ms": round(float(np.percentile(latencies_ms, 95)), 2)
+        "mean_ms": round(float(np.mean(latencies_ms)), 2) if latencies_ms else 0.0,
+        "p50_ms": round(float(np.percentile(latencies_ms, 50)), 2) if latencies_ms else 0.0,
+        "p95_ms": round(float(np.percentile(latencies_ms, 95)), 2) if latencies_ms else 0.0
     }
 
-    # Compute per-class and overall metrics
-    class_metrics = {}
-    ap50_list = []
-    ap50_95_list = []
+    # Evaluate at multiple confidence thresholds: 0.25 and 0.35
+    conf_thresholds = [0.25, 0.35]
+    metrics_by_conf = {}
 
-    for c_id, c_name in CLASS_NAMES.items():
-        m = calculate_metrics_for_class(predictions, ground_truths, target_class=c_id)
-        class_metrics[c_name] = m
-        if m["n_gt"] > 0:
-            ap50_list.append(m["ap50"])
-            ap50_95_list.append(m["ap50_95"])
+    from metrics import bootstrap_metric_ci
 
-    overall_metrics = {
-        "mAP50": round(float(np.mean(ap50_list)) if ap50_list else 0.0, 4),
-        "mAP50_95": round(float(np.mean(ap50_95_list)) if ap50_95_list else 0.0, 4),
-        "total_gt": len(ground_truths),
-        "total_pred": len(predictions)
-    }
+    for c_thresh in conf_thresholds:
+        preds_thresh = [p for p in raw_predictions if p["conf"] >= c_thresh]
+        class_eval = {}
+        for c_id, c_name in CLASS_NAMES.items():
+            m = calculate_metrics_for_class(preds_thresh, ground_truths, target_class=c_id)
+            fp_per_frame = round(m["fp"] / len(images), 4) if images else 0.0
+            class_eval[c_name] = {
+                "n_gt": m["n_gt"],
+                "n_pred": m["n_pred"],
+                "tp": m["tp"],
+                "fp": m["fp"],
+                "fp_per_frame": fp_per_frame,
+                "precision": m["precision"],
+                "recall": m["recall"],
+                "f1": m["f1"],
+                "ap50": m["ap50"],
+                "ap50_95": m["ap50_95"],
+            }
+            if c_name == "car":
+                class_eval[c_name]["note"] = "n=58, unreliable"
+            elif c_name == "bus":
+                class_eval[c_name]["note"] = "n=0, excluded"
 
-    # Error analysis
-    error_analysis = perform_error_analysis(predictions, ground_truths, num_classes=len(CLASS_NAMES))
+        metrics_by_conf[f"conf_{c_thresh}"] = class_eval
+
+    # Compute 95% bootstrap confidence intervals for primary metric: person AP50 and recall (conf=0.25)
+    preds_025 = [p for p in raw_predictions if p["conf"] >= 0.25]
+    bootstrap_ci = bootstrap_metric_ci(
+        preds_025,
+        ground_truths,
+        image_ids,
+        target_class=0, # person
+        n_bootstraps=1000,
+        seed=42
+    )
+
+    # Primary class metrics at requested conf (default 0.25)
+    primary_metrics = metrics_by_conf.get(f"conf_{conf}", metrics_by_conf["conf_0.25"])
+
+    # Error analysis at conf 0.25
+    error_analysis = perform_error_analysis(preds_025, ground_truths, num_classes=len(CLASS_NAMES))
 
     results = {
         "evaluated_at": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
         "model": model_path,
         "split": split,
+        "fold": fold,
         "native_classes": native_classes,
         "imgsz": imgsz,
-        "conf_threshold": conf,
+        "device": device,
         "num_images": len(images),
-        "latency_cpu": latency_stats,
-        "overall": overall_metrics,
-        "per_class": class_metrics,
+        "latency_ms": latency_stats,
+        "bootstrap_ci_95_person": bootstrap_ci,
+        "metrics_at_conf_0.25": metrics_by_conf["conf_0.25"],
+        "metrics_at_conf_0.35": metrics_by_conf["conf_0.35"],
         "error_analysis": error_analysis
     }
 
@@ -276,13 +320,23 @@ def run_evaluation(
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump(results, f, indent=2)
 
-    print("\n" + "=" * 60)
-    print(f"DETECTION EVALUATION RESULTS (Split: {split}, Model: {model_path})")
-    print("=" * 60)
-    print(f"CPU Latency: Mean={latency_stats['mean_ms']}ms, P50={latency_stats['p50_ms']}ms, P95={latency_stats['p95_ms']}ms")
-    print(f"Overall: mAP50={overall_metrics['mAP50']:.4f}, mAP50-95={overall_metrics['mAP50_95']:.4f}")
-    for c_name, m in class_metrics.items():
-        print(f"  {c_name:8s}: P={m['precision']:.4f}, R={m['recall']:.4f}, F1={m['f1']:.4f}, AP50={m['ap50']:.4f}, AP50-95={m['ap50_95']:.4f} (GT={m['n_gt']})")
+    print("\n" + "=" * 75)
+    print(f"DETECTION EVALUATION RESULTS (Split: {split}, Model: {model_path}, Imgsz: {imgsz})")
+    print("=" * 75)
+    print(f"Latency: Mean={latency_stats['mean_ms']}ms, P50={latency_stats['p50_ms']}ms, P95={latency_stats['p95_ms']}ms")
+    print(f"Person 95% Bootstrap CI (1,000 resamples):")
+    print(f"  AP50:   [{bootstrap_ci['ap50_ci'][0]:.4f}, {bootstrap_ci['ap50_ci'][1]:.4f}] (mean={bootstrap_ci['ap50_mean']:.4f})")
+    print(f"  Recall: [{bootstrap_ci['recall_ci'][0]:.4f}, {bootstrap_ci['recall_ci'][1]:.4f}] (mean={bootstrap_ci['recall_mean']:.4f})")
+    print("\nPer-Class Breakdown (Confidence = 0.25):")
+    print(f"{'Class':<10} {'GT Count':<10} {'P':<8} {'R':<8} {'F1':<8} {'AP50':<8} {'AP50-95':<10} {'FP/frame':<10} {'Notes'}")
+    print("-" * 75)
+    for c_id, c_name in CLASS_NAMES.items():
+        if c_name == "bus":
+            continue # Exclude bus (n=0, meaningless)
+        cm = metrics_by_conf["conf_0.25"][c_name]
+        note = cm.get("note", "")
+        print(f"{c_name:<10} {cm['n_gt']:<10} {cm['precision']:<8.4f} {cm['recall']:<8.4f} {cm['f1']:<8.4f} {cm['ap50']:<8.4f} {cm['ap50_95']:<10.4f} {cm['fp_per_frame']:<10.4f} {note}")
+    print("=" * 75)
     print(f"\nFull results saved to {out_results}")
     return results
 
@@ -291,11 +345,14 @@ def main():
     parser = argparse.ArgumentParser(description="Evaluate detection models on verified ground truth.")
     parser.add_argument("--model", default="yolov8s.pt", help="Path or name of model weights")
     parser.add_argument("--split", choices=["all", "train", "val"], default="all", help="Dataset split to evaluate")
+    parser.add_argument("--fold", type=int, default=1, choices=[1, 2], help="Fold index (1 or 2)")
     parser.add_argument("--images-dir", default="vision/eval/images", help="Path to images directory")
     parser.add_argument("--labels-dir", default="vision/eval/labels", help="Path to labels directory")
     parser.add_argument("--manifest", default="vision/data/split_manifest.json", help="Path to split manifest")
     parser.add_argument("--imgsz", type=int, default=960, help="Inference image resolution")
     parser.add_argument("--conf", type=float, default=0.25, help="Confidence threshold")
+    parser.add_argument("--device", default="cpu", help="Compute device (cpu, cuda, or 0)")
+    parser.add_argument("--limit", type=int, default=None, help="Limit number of images for rapid testing")
     parser.add_argument("--native-classes", action="store_true", default=None, help="Force native class indices")
     parser.add_argument("--out", default="vision/eval/eval_results.json", help="Output results JSON path")
     args = parser.parse_args()
@@ -307,8 +364,11 @@ def main():
         imgsz=args.imgsz,
         conf=args.conf,
         split=args.split,
+        fold=args.fold,
         manifest_path=args.manifest,
         native_classes=args.native_classes,
+        device=args.device,
+        limit=args.limit,
         out_results=args.out
     )
 
