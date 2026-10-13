@@ -205,13 +205,13 @@ def test_perform_error_analysis():
     assert err["fn_by_area"]["large"] == 1   # 120x120 = 14400
 
 
-def test_eval_detection_refuses_without_verified():
+def test_eval_detection_refuses_without_verified(tmp_path):
     """Verify eval_detection.py exits with code 2 when vision/eval/labels/VERIFIED is missing."""
     repo_root = Path(__file__).resolve().parent.parent.parent
     script_path = repo_root / "vision" / "eval" / "eval_detection.py"
 
     proc = subprocess.run(
-        [sys.executable, str(script_path)],
+        [sys.executable, str(script_path), "--labels-dir", str(tmp_path)],
         cwd=str(repo_root),
         capture_output=True,
         text=True
