@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from "vitest";
-import { loadFeedsManifest, DEFAULT_FALLBACK_FEED } from "./feeds";
+import { loadFeedsManifest, loadFeedTimeline, DEFAULT_FALLBACK_FEED } from "./feeds";
 
 describe("Feeds Manifest Loader", () => {
   it("loads valid feed entries from manifest", async () => {
@@ -47,5 +47,25 @@ describe("Feeds Manifest Loader", () => {
     const errorFetch = vi.fn().mockRejectedValue(new Error("Network Error"));
     const errorFeeds = await loadFeedsManifest("/error.json", errorFetch as unknown as typeof fetch);
     expect(errorFeeds).toEqual([DEFAULT_FALLBACK_FEED]);
+  });
+
+  it("loads timeline from inline detections object directly", async () => {
+    const inlineData = {
+      "0.5": [
+        {
+          id: "Truck-1",
+          class: "truck",
+          confidence: 0.95,
+          box: [100, 200, 300, 400],
+          speed_kmh: 40,
+          direction: "NE",
+        },
+      ],
+    };
+
+    const tl = await loadFeedTimeline(inlineData);
+    expect(tl).not.toBeNull();
+    expect(tl?.sampleAt(0.5)).toHaveLength(1);
+    expect(tl?.sampleAt(0.5)[0].class).toBe("truck");
   });
 });

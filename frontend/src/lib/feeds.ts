@@ -9,7 +9,7 @@ export interface FeedManifestItem {
   id: string;
   label: string;
   video: string;
-  detections: string;
+  detections: string | Record<string, unknown>;
   center_lat: number;
   center_lng: number;
   sensor: string;
@@ -47,11 +47,17 @@ export async function loadFeedsManifest(
 export const loadFeedManifest = loadFeedsManifest;
 
 export async function loadFeedTimeline(
-  detectionsUrl: string,
+  detectionsSource: string | Record<string, unknown>,
   fetchFn: typeof fetch = fetch
 ): Promise<Timeline | null> {
+  if (typeof detectionsSource === "object" && detectionsSource !== null) {
+    return parseTimeline(detectionsSource);
+  }
+  if (typeof detectionsSource !== "string" || !detectionsSource) {
+    return null;
+  }
   try {
-    const res = await fetchFn(detectionsUrl);
+    const res = await fetchFn(detectionsSource);
     if (!res.ok) return null;
     const data = await res.json();
     return parseTimeline(data);

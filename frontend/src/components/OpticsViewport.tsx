@@ -11,6 +11,8 @@ import {
   Maximize,
   Minimize,
   Target,
+  Upload,
+  Zap,
 } from "lucide-react";
 import { FeedItem } from "../lib/feeds";
 import { Timeline, DrawableDetection } from "../lib/timeline";
@@ -27,6 +29,8 @@ export interface OpticsViewportProps {
   perfEnabled?: boolean;
   perfTargetFrames?: number;
   onPerfReport?: (report: PerfReport) => void;
+  onSimulateThreat?: () => void;
+  onOpenUploadModal?: () => void;
 }
 
 export function OpticsViewport({
@@ -39,6 +43,8 @@ export function OpticsViewport({
   perfEnabled = false,
   perfTargetFrames = 600,
   onPerfReport,
+  onSimulateThreat,
+  onOpenUploadModal,
 }: OpticsViewportProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -221,26 +227,50 @@ export function OpticsViewport({
 
   return (
     <div className="flex flex-col gap-3 lg:gap-4 relative w-full">
-      {/* Feeds Switcher Bar */}
-      {feeds.length >= 2 && (
-        <div className="flex items-center gap-2 text-xs overflow-x-auto no-scrollbar pb-1 whitespace-nowrap">
+      {/* Feeds Switcher & Operational Controls Bar */}
+      <div className="flex items-center justify-between gap-2 text-xs overflow-x-auto no-scrollbar pb-1">
+        <div className="flex items-center gap-1.5 sm:gap-2 flex-nowrap">
           {feeds.map((feed) => (
             <button
               key={feed.id}
               type="button"
               onClick={() => onSelectFeed(feed.id)}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 border rounded flex items-center gap-1.5 sm:gap-2 transition-all flex-shrink-0 ${
+              className={`px-2.5 sm:px-3 py-1 sm:py-1.5 border rounded flex items-center gap-1.5 transition-all flex-shrink-0 text-[10px] sm:text-xs font-mono ${
                 activeFeed?.id === feed.id
-                  ? "bg-cyan-950/40 border-cyan-500/50 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]"
-                  : "bg-slate-900/30 border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300"
+                  ? "bg-cyan-950/50 border-cyan-500/60 text-cyan-300 shadow-[0_0_10px_rgba(6,182,212,0.15)] font-bold"
+                  : "bg-slate-900/40 border-slate-800 text-slate-500 hover:border-slate-700 hover:text-slate-300"
               }`}
             >
-              <Video size={13} />
-              {feed.label}
+              <Video size={12} className={activeFeed?.id === feed.id ? "text-cyan-400" : "text-slate-500"} />
+              <span className="truncate max-w-[120px] sm:max-w-[160px]">{feed.label}</span>
             </button>
           ))}
+
+          {onOpenUploadModal && (
+            <button
+              type="button"
+              onClick={onOpenUploadModal}
+              className="px-2.5 sm:px-3 py-1 sm:py-1.5 border border-dashed border-cyan-500/30 hover:border-cyan-400/70 text-cyan-400/80 hover:text-cyan-200 bg-cyan-950/10 hover:bg-cyan-950/30 rounded flex items-center gap-1.5 transition-all flex-shrink-0 text-[10px] sm:text-xs font-mono font-bold"
+              title="Import custom surveillance video file (.mp4, .webm) and companion detections"
+            >
+              <Upload size={12} />
+              <span>+ IMPORT FEED</span>
+            </button>
+          )}
         </div>
-      )}
+
+        {onSimulateThreat && (
+          <button
+            type="button"
+            onClick={onSimulateThreat}
+            className="px-2.5 sm:px-3 py-1 sm:py-1.5 border border-rose-500/50 hover:border-rose-400 bg-rose-950/30 hover:bg-rose-950/60 text-rose-300 hover:text-rose-100 rounded flex items-center gap-1.5 transition-all flex-shrink-0 text-[10px] sm:text-xs font-mono font-bold shadow-[0_0_10px_rgba(244,63,94,0.15)] ml-auto"
+            title="Trigger immediate tactical drill / threat alert modal for presentation demo"
+          >
+            <Zap size={12} className="text-rose-400 animate-pulse" />
+            <span>⚡ SIMULATE DRILL</span>
+          </button>
+        )}
+      </div>
 
       {/* Main Video Viewport Container */}
       <div
