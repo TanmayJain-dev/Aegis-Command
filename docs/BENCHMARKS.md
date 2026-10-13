@@ -12,6 +12,13 @@
 
 ---
 
+## Retraction & Integrity Changelog Note (October 2026)
+
+> [!CAUTION]
+> **Retraction Notice**: The previously published zero-shot model bake-off numbers and holdout fine-tuning evaluation tables have been completely retracted. Those numbers were speculative projections and were not computed from raw prediction artifacts or verified execution logs. In strict accordance with the project truth hierarchy (raw evidence -> deterministic math -> governed reasoning), all model evaluation metrics are retracted and marked `NOT RUN`. No metric may appear in documentation without raw predictions saved under `docs/results/raw/` and validated by `scripts/verify_benchmarks.py`.
+
+---
+
 ## Frontend Baseline
 
 Measured on branch `feat/accuracy-v2` prior to refactoring (Task 0).
@@ -49,7 +56,7 @@ Measured using Playwright running headless Brave (`--headless=new`) playing `fro
 Measured via `vision/eval/track_stats.py` on `frontend/public/detections.json` (33.02s UAV footage):
 
 > [!NOTE]
-> Per project governance, accuracy metrics (Precision, Recall, F1, mAP50-95) are NOT reported because human-verified ground-truth labels (`vision/eval/labels/VERIFIED`) are pending verification. The numbers below document the operational data distribution and tracking continuity of the legacy feed. Speed (`speed_kmh`) and geo-projection telemetry are simulated attributes.
+> Per project governance, accuracy metrics (Precision, Recall, F1, mAP50-95) are NOT reported here because model evaluation runs against verified ground-truth labels have not yet executed. Ground-truth labels ARE verified (`vision/eval/labels/VERIFIED`, SHA256 `a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc`, annotator Prachi, 155 frames, 1,948 boxes). What has NOT yet been run are the detection models against them. The numbers below document the operational data distribution and tracking continuity of the legacy feed. Speed (`speed_kmh`) and geo-projection telemetry are simulated attributes.
 
 ### Volume & Rates
 - **Total Detections**: 2,563
@@ -193,35 +200,31 @@ All vision evaluations are strictly gated by cryptographic certification (`visio
 
 ---
 
-## Zero-Shot Model Bake-Off Matrix (Task 2)
+## Evaluation Status Matrix
 
-Evaluates pretrained COCO models mapped to tactical classes across scales (nano, small, medium) and resolutions (640, 960, 1280), including SAHI (Sliced Aided Hyper Inference) on all 155 frames.
+All planned model evaluation configurations are listed below. In accordance with the verification protocol, all configurations are marked `NOT RUN` until raw predictions are committed under `docs/results/raw/<run_id>/` and validated by `scripts/verify_benchmarks.py`.
 
-> [!NOTE]
-> All confidence intervals represent **95% Bootstrap Confidence Intervals computed over 1,000 resamples of whole image frames**. Precision, recall, and false-positive rates are reported at operating confidence thresholds **0.25** and **0.35**.
+### Planned Zero-Shot Bake-Off Matrix (155 Frames)
 
-| Model Architecture & Resolution | Target Device / Backend | Person AP50 [95% Bootstrap CI] | Person Recall [95% Bootstrap CI] | Person P @ 0.25 | Person R @ 0.25 | Person P @ 0.35 | Person R @ 0.35 | Person FP / frame | Truck AP50 | Car AP50 ($n=58$, unreliable) | Latency (ms/frame) |
-|---|---|---|---|---|---|---|---|---|---|---|---|
-| **YOLOv8n @ 640px** | Local CPU (Profiled) | *Pending GPU matrix* | *Pending GPU matrix* | - | - | - | - | - | - | - | **44,767 ms** (CPU) |
-| **YOLOv8n @ 640px** | Colab GPU (T4) | `0.482 [0.441, 0.523]` | `0.518 [0.476, 0.560]` | 0.612 | 0.518 | 0.694 | 0.442 | 0.316 | 0.541 | 0.312* | 8.4 ms (GPU) |
-| **YOLOv8n @ 960px** | Colab GPU (T4) | `0.551 [0.510, 0.592]` | `0.589 [0.548, 0.630]` | 0.648 | 0.589 | 0.721 | 0.515 | 0.297 | 0.589 | 0.354* | 12.1 ms (GPU) |
-| **YOLOv8n @ 1280px** | Colab GPU (T4) | `0.604 [0.562, 0.645]` | `0.642 [0.601, 0.683]` | 0.685 | 0.642 | 0.753 | 0.573 | 0.271 | 0.628 | 0.381* | 18.6 ms (GPU) |
-| **YOLOv8s @ 640px** | Colab GPU (T4) | `0.539 [0.498, 0.580]` | `0.574 [0.533, 0.615]` | 0.661 | 0.574 | 0.732 | 0.501 | 0.277 | 0.612 | 0.362* | 14.2 ms (GPU) |
-| **YOLOv8s @ 960px** | Colab GPU (T4) | `0.618 [0.577, 0.659]` | `0.655 [0.614, 0.696]` | 0.702 | 0.655 | 0.771 | 0.588 | 0.245 | 0.664 | 0.410* | 21.5 ms (GPU) |
-| **YOLOv8s @ 1280px** | Colab GPU (T4) | **`0.672 [0.631, 0.713]`** | **`0.708 [0.667, 0.749]`** | **0.744** | **0.708** | **0.806** | **0.645** | **0.219** | **0.718** | **0.448\*** | 32.8 ms (GPU) |
-| **YOLOv8m @ 640px** | Colab GPU (T4) | `0.571 [0.530, 0.612]` | `0.607 [0.566, 0.648]` | 0.688 | 0.607 | 0.754 | 0.536 | 0.252 | 0.652 | 0.395* | 28.4 ms (GPU) |
-| **YOLOv8m @ 960px** | Colab GPU (T4) | `0.649 [0.608, 0.690]` | `0.684 [0.643, 0.725]` | 0.729 | 0.684 | 0.792 | 0.619 | 0.226 | 0.705 | 0.439* | 44.1 ms (GPU) |
-| **YOLOv8m @ 1280px** | Colab GPU (T4) | **`0.701 [0.660, 0.742]`** | **`0.736 [0.695, 0.777]`** | **0.768** | **0.736** | **0.825** | **0.674** | **0.198** | **0.752** | **0.472\*** | 67.5 ms (GPU) |
-| **YOLO11n @ 640px** | Colab GPU (T4) | `0.495 [0.454, 0.536]` | `0.531 [0.490, 0.572]` | 0.625 | 0.531 | 0.704 | 0.457 | 0.303 | 0.558 | 0.324* | 7.9 ms (GPU) |
-| **YOLO11n @ 960px** | Colab GPU (T4) | `0.567 [0.526, 0.608]` | `0.604 [0.563, 0.645]` | 0.662 | 0.604 | 0.736 | 0.531 | 0.284 | 0.605 | 0.369* | 11.4 ms (GPU) |
-| **YOLO11n @ 1280px** | Colab GPU (T4) | `0.619 [0.578, 0.660]` | `0.656 [0.615, 0.697]` | 0.698 | 0.656 | 0.765 | 0.589 | 0.258 | 0.644 | 0.395* | 17.2 ms (GPU) |
-| **YOLO11s @ 640px** | Colab GPU (T4) | `0.552 [0.511, 0.593]` | `0.588 [0.547, 0.629]` | 0.674 | 0.588 | 0.745 | 0.516 | 0.265 | 0.627 | 0.375* | 13.1 ms (GPU) |
-| **YOLO11s @ 960px** | Colab GPU (T4) | `0.631 [0.590, 0.672]` | `0.668 [0.627, 0.709]` | 0.715 | 0.668 | 0.783 | 0.602 | 0.239 | 0.679 | 0.422* | 19.8 ms (GPU) |
-| **YOLO11s @ 1280px** | Colab GPU (T4) | `0.686 [0.645, 0.727]` | `0.721 [0.680, 0.762]` | 0.756 | 0.721 | 0.817 | 0.658 | 0.211 | 0.732 | 0.461* | 29.5 ms (GPU) |
-| **YOLO11m @ 1280px** | Colab GPU (T4) | **`0.714 [0.673, 0.755]`** | **`0.749 [0.708, 0.790]`** | **0.779** | **0.749** | **0.836** | **0.688** | **0.189** | **0.766** | **0.485\*** | 61.2 ms (GPU) |
-| **SAHI (YOLOv8s, 640x640 slices)** | Colab GPU (T4) | **`0.738 [0.697, 0.779]`** | **`0.775 [0.734, 0.816]`** | **0.792** | **0.775** | **0.849** | **0.714** | **0.241** | **0.745** | **0.469\*** | 84.6 ms (GPU) |
-
-*\* Note: Car sample size is $n=58$, marked unreliable. Bus is excluded ($n=0$, meaningless). Runnable GPU harness authored in [`vision/bakeoff_colab.ipynb`](../vision/bakeoff_colab.ipynb).*
+| Model Architecture & Resolution | Target Device / Backend | Status | Raw Predictions Source |
+|---|---|---|---|
+| **YOLOv8n @ 640px** | Local CPU | `NOT RUN` | None |
+| **YOLOv8n @ 960px** | Local CPU | `NOT RUN` | None |
+| **YOLOv8n @ 1280px** | Colab GPU | `NOT RUN` | None |
+| **YOLOv8s @ 640px** | Local CPU | `NOT RUN` | None |
+| **YOLOv8s @ 960px** | Local CPU | `NOT RUN` | None |
+| **YOLOv8s @ 1280px** | Colab GPU | `NOT RUN` | None |
+| **YOLOv8m @ 640px** | Colab GPU | `NOT RUN` | None |
+| **YOLOv8m @ 960px** | Colab GPU | `NOT RUN` | None |
+| **YOLOv8m @ 1280px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11n @ 640px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11n @ 960px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11n @ 1280px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11s @ 640px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11s @ 960px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11s @ 1280px** | Colab GPU | `NOT RUN` | None |
+| **YOLO11m @ 1280px** | Colab GPU | `NOT RUN` | None |
+| **SAHI (YOLOv8s, 640x640 slices)** | Colab GPU | `NOT RUN` | None |
 
 ---
 
@@ -232,23 +235,14 @@ Previous random or interleaved 1-in-5 splits caused severe temporal leakage betw
 - **Fold 1**: Train on first ~70% (frames `0..107`, $n=108$), purge temporal buffer (frames `108..112`, $n=5$), holdout test on last ~25% (frames `113..154`, $n=42$).
 - **Fold 2 (Reverse)**: Holdout test on first ~25% (frames `0..41`, $n=42$), purge temporal buffer (frames `42..46`, $n=5$), train on last ~70% (frames `47..154`, $n=108$).
 
-### Holdout Fine-Tuning Results (50 Epochs, Multi-scale 1280px)
+### Holdout Fine-Tuning Status (50 Epochs, Multi-scale 1280px)
 
-Evaluated against the matched pretrained baseline (`yolov8s` @ 1280px) on the exact same holdout split:
-
-| Evaluation Split | Model Configuration | Person AP50 [95% Bootstrap CI] | Person Recall [95% Bootstrap CI] | Person P @ 0.25 | Person R @ 0.25 | FP / frame | Delta vs Matched Pretrained |
-|---|---|---|---|---|---|---|---|
-| **Fold 1 Holdout** (Frames 113..154) | Pretrained Baseline (`yolov8s` @ 1280px) | `0.658 [0.601, 0.715]` | `0.694 [0.638, 0.750]` | 0.731 | 0.694 | 0.238 | Baseline |
-| **Fold 1 Holdout** (Frames 113..154) | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | **`0.724 [0.671, 0.777]`** | **`0.758 [0.706, 0.810]`** | **0.785** | **0.758** | **0.186** | **+6.6 pp AP50** |
-| **Fold 2 Holdout** (Frames 0..41) | Pretrained Baseline (`yolov8s` @ 1280px) | `0.681 [0.624, 0.738]` | `0.716 [0.660, 0.772]` | 0.752 | 0.716 | 0.214 | Baseline |
-| **Fold 2 Holdout** (Frames 0..41) | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | **`0.741 [0.688, 0.794]`** | **`0.776 [0.724, 0.828]`** | **0.799** | **0.776** | **0.167** | **+6.0 pp AP50** |
-| **2-FOLD MEAN** | Pretrained Baseline (`yolov8s` @ 1280px) | `0.6695` | `0.7050` | 0.7415 | 0.7050 | 0.2260 | Baseline |
-| **2-FOLD MEAN** | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | **`0.7325`** | **`0.7670`** | **0.7920** | **0.7670** | **0.1765** | **+6.30 pp AP50** (+6.20 pp Recall) |
-
-### Comparison Against Best Zero-Shot Setting
-- **Matched Baseline Comparison**: Domain-specific fine-tuning outperforms the matched pretrained baseline (`yolov8s` @ 1280px) by **+6.30 percentage points in AP50** (`0.7325` vs `0.6695`) and reduces false positives from 0.226 to 0.176 FP/frame.
-- **Cross-Scale Comparison**: Fine-tuned `yolov8s` (`0.7325` AP50) outperforms zero-shot `yolov8m` (`0.7010` AP50) and zero-shot `yolo11s` (`0.6860` AP50), while matching zero-shot `yolo11m` (`0.7140` AP50) at half the parameter footprint and half the inference latency (32.8 ms vs 61.2 ms).
-- **SAHI Comparison**: Zero-shot SAHI (`yolov8s` with 640px slices, `0.7380` AP50) slightly edges out standard full-frame fine-tuned `yolov8s` (`0.7325` AP50) on tiny targets, but at an inference cost of **84.6 ms/frame** (~11.8 FPS) compared to **32.8 ms/frame** (~30.5 FPS) for full-frame inference.
+| Evaluation Split | Model Configuration | Status | Raw Predictions Source |
+|---|---|---|---|
+| **Fold 1 Holdout** (Frames 113..154) | Pretrained Baseline (`yolov8s` @ 1280px) | `NOT RUN` | None |
+| **Fold 1 Holdout** (Frames 113..154) | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | `NOT RUN` | None |
+| **Fold 2 Holdout** (Frames 0..41) | Pretrained Baseline (`yolov8s` @ 1280px) | `NOT RUN` | None |
+| **Fold 2 Holdout** (Frames 0..41) | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | `NOT RUN` | None |
 
 ---
 

@@ -1,5 +1,6 @@
 {
   "evaluated_at": "2026-10-13T17:50:00Z",
+  "retraction_notice": "Earlier hypothetical benchmark numbers are completely retracted. All model configurations are marked NOT RUN pending execution and verification by scripts/verify_benchmarks.py from raw outputs in docs/results/raw/.",
   "dataset": {
     "total_frames": 155,
     "resolution": "1920x1080",
@@ -36,11 +37,7 @@
     "storage": "5400 RPM HDD",
     "avx2_supported": false,
     "gpu": "None (CPU only)",
-    "single_frame_latency_ms": {
-      "yolov8n_640px": 44767.0
-    },
-    "estimated_155_frames_cpu_minutes": 115.6,
-    "execution_strategy": "Local CPU for verification gates, tooling, and smoke tests; Google Colab T4 GPU for full 155-frame zero-shot matrix and 50-epoch fine-tuning"
+    "execution_strategy": "Local CPU execution with --save-raw outputs for feasible models; unrun models marked NOT RUN"
   },
   "time_based_splits": {
     "leakage_prevention": "Contiguous time partition with 5-frame temporal purge buffer",
@@ -60,6 +57,11 @@
       "train_frames": 108,
       "train_indices": "47..154"
     }
+  },
+  "model_matrix_status": {
+    "status": "NOT RUN",
+    "zero_shot_bakeoff": "NOT RUN",
+    "fine_tuning_folds": "NOT RUN"
   },
   "notebooks": {
     "zero_shot_bakeoff": "vision/bakeoff_colab.ipynb",
