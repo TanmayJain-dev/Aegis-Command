@@ -29,6 +29,9 @@ npm-debug.log*
 *.pth
 *.onnx
 *.tar.gz
+vision/data/
+vision/models/
+runs/
 
 # Local media / generated detection assets
 *.mp4
