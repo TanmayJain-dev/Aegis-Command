@@ -49,6 +49,14 @@ def health():
         "indexed_reports": getattr(index, "ntotal", 0)
     }
 
+SYNONYMS = {
+    "person": ["patrol", "personnel", "human", "pedestrian"],
+    "moving": ["movement", "move"],
+    "truck": ["pickup", "vehicle"],
+    "drone": ["uav", "hexacopter", "aerial"],
+    "car": ["vehicle", "pickup", "tractor"],
+}
+
 class ResilientEmbedder:
     def __init__(self):
         self.model = None
@@ -64,13 +72,19 @@ class ResilientEmbedder:
 
     def encode(self, texts):
         if self.model is not None:
-            return self.model.encode(texts).astype('float32')
+            return self.model.encode(texts, normalize_embeddings=True).astype('float32')
         import hashlib
         vectors = []
         for text in texts:
             vec = np.zeros(384, dtype=np.float32)
             words = str(text).lower().split()
+            expanded_words = []
             for w in words:
+                clean = w.strip('.,()[]{}:;"\'')
+                expanded_words.append(clean)
+                if clean in SYNONYMS:
+                    expanded_words.extend(SYNONYMS[clean])
+            for w in expanded_words:
                 h = int(hashlib.md5(w.encode('utf-8')).hexdigest(), 16) % 384
                 vec[h] += 1.0
             norm = np.linalg.norm(vec)
@@ -136,6 +150,31 @@ async def startup_event():
     else:
         print("[WARMUP] Groq client not configured. Operating in rule-based assessment mode.")
 
+TACTICAL_TERMS = {
+    "truck", "pickup", "vehicle", "car", "van", "tractor", "convoy",
+    "drone", "uav", "hexacopter", "aerial", "flight", "ingress",
+    "patrol", "bsf", "perimeter", "akhnoor", "samba", "pathankot", "amritsar", "tarn", "taran", "gurdaspur",
+    "person", "human", "pedestrian", "movement", "moving", "foot", "personnel",
+    "threat", "intercept", "radar", "optical", "thermal", "payload", "arms", "narcotics",
+    "post", "border", "clear", "sector", "outpost", "drop", "zone", "ib", "recon"
+}
+
+RELEVANCE_THRESHOLD = 0.20
+
+
+def is_tactically_relevant(query: str, transcripts: list) -> bool:
+    """Pre-filters queries to ensure domain relevance."""
+    q_words = [w.strip('.,()[]{}:;"\'') for w in query.lower().split() if w]
+    if not q_words:
+        return False
+    if any(w in TACTICAL_TERMS for w in q_words):
+        return True
+    for t in transcripts:
+        if any(w in t.lower() for w in q_words if len(w) > 2):
+            return True
+    return False
+
+
 class SearchQuery(BaseModel):
     query: str
 
@@ -144,7 +183,25 @@ class SearchQuery(BaseModel):
 # ---------------------------------------------------------
 @app.post("/api/intel/search")
 async def search_intel(req: SearchQuery):
-    query_vector = model.encode([req.query]).astype('float32')
+    query_text = (req.query or "").strip()
+    if not query_text:
+        return {
+            "status": "success",
+            "message": "No relevant intel found.",
+            "ai_summary": "No relevant intel found.",
+            "data": []
+        }
+
+    transcripts = [item["transcript"] for item in intel_data] if intel_data else []
+    if not is_tactically_relevant(query_text, transcripts):
+        return {
+            "status": "success",
+            "message": "No relevant intel found.",
+            "ai_summary": "No relevant intel found.",
+            "data": []
+        }
+
+    query_vector = model.encode([query_text]).astype('float32')
     k = 3 
     distances, indices = index.search(query_vector, k)
     
@@ -154,18 +211,28 @@ async def search_intel(req: SearchQuery):
     for i, idx in enumerate(indices[0]):
         if idx != -1 and idx < len(intel_data):
             report = intel_data[idx]
-            retrieved_reports.append({
-                "id": report["id"],
-                "score": float(distances[0][i]),
-                "location": report["location"],
-                "lat": report.get("lat", 28.6139),
-                "lng": report.get("lng", 77.2090),
-                "transcript": report["transcript"]
-            })
-            context_blocks.append(f"[ID: {report['id']}] {report['transcript']}")
+            raw_dist = float(distances[0][i])
+            # Documented score semantic: 0.0 to 1.0 (higher = more relevant)
+            # For unit vectors in L2 space: dist = 2 - 2*cos(theta), so cos(theta) = 1 - dist/2
+            norm_score = round(max(0.0, min(1.0, 1.0 - raw_dist / 2.0)), 4)
+            if norm_score >= RELEVANCE_THRESHOLD:
+                retrieved_reports.append({
+                    "id": report["id"],
+                    "score": norm_score,
+                    "location": report["location"],
+                    "lat": report.get("lat", 28.6139),
+                    "lng": report.get("lng", 77.2090),
+                    "transcript": report["transcript"]
+                })
+                context_blocks.append(f"[ID: {report['id']}] {report['transcript']}")
             
     if not retrieved_reports:
-        return {"status": "error", "message": "No relevant intel found."}
+        return {
+            "status": "success",
+            "message": "No relevant intel found.",
+            "ai_summary": "No relevant intel found.",
+            "data": []
+        }
 
     combined_context = "\n".join(context_blocks)
     ai_summary = ""

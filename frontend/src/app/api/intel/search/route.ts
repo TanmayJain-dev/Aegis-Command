@@ -39,7 +39,7 @@ const TACTICAL_DATABASE: Array<{
     ai_summary: "Threat detected. Evidence: [INTEL-1603]. Action: Aerial surveillance active. Pathankot Perimeter monitoring hexacopter ingress. Deploy electronic countermeasures."
   },
   {
-    keywords: ["patrol", "bsf", "perimeter", "akhnoor", "samba"],
+    keywords: ["patrol", "bsf", "perimeter", "akhnoor", "samba", "person", "moving", "movement", "personnel", "pedestrian"],
     record: {
       id: "INTEL-1437",
       score: 0.88,
@@ -57,7 +57,16 @@ export async function POST(req: Request) {
     const body = await req.json();
     const query = (body?.query || "").trim().toLowerCase();
 
-    const backendUrl = process.env.BACKEND_URL;
+    if (!query) {
+      return NextResponse.json({
+        status: "success",
+        message: "No relevant intelligence found.",
+        ai_summary: "No relevant intelligence found.",
+        data: []
+      });
+    }
+
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL;
     if (backendUrl && !backendUrl.includes("localhost") && !backendUrl.includes("backend:8000")) {
       try {
         const controller = new AbortController();
@@ -72,7 +81,7 @@ export async function POST(req: Request) {
 
         if (res.ok) {
           const data = await res.json();
-          if (data && data.status === "success" && data.data && data.data.length > 0) {
+          if (data && data.status === "success") {
             return NextResponse.json(data);
           }
         }
@@ -86,7 +95,16 @@ export async function POST(req: Request) {
       item.keywords.some(k => query.includes(k)) ||
       item.record.transcript.toLowerCase().includes(query) ||
       item.record.location.toLowerCase().includes(query)
-    ) || TACTICAL_DATABASE[0];
+    );
+
+    if (!matched) {
+      return NextResponse.json({
+        status: "success",
+        message: "No relevant intelligence found.",
+        ai_summary: "No relevant intelligence found.",
+        data: []
+      });
+    }
 
     return NextResponse.json({
       status: "success",
@@ -95,12 +113,12 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     console.error("API error:", error);
-    const fallback = TACTICAL_DATABASE[0];
     return NextResponse.json({
-      status: "success",
-      ai_summary: fallback.ai_summary,
-      data: [fallback.record]
-    });
+      status: "error",
+      message: "Intelligence search failed.",
+      ai_summary: "Intelligence search failed.",
+      data: []
+    }, { status: 500 });
   }
 }
 

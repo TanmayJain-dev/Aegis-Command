@@ -240,20 +240,8 @@ export default function AegisDashboard() {
         }
       } catch (error) {
         console.warn("Search network fallback:", error);
-        const fallbackIntel: IntelRecord = {
-          id: "INTEL-9999",
-          score: 0.94,
-          location: "Tarn Taran Border",
-          lat: 31.452,
-          lng: 74.925,
-          transcript:
-            "URGENT INTERCEPT: Unidentified pickup truck confirmed waiting at drop zone Alpha. Awaiting hexacopter payload of narcotics/arms from across the IB.",
-        };
-        setIntelData(fallbackIntel);
-        setAiSummary(
-          "Threat detected. Evidence: [INTEL-9999]. Action: Dispatch immediate QRT intercept to Tarn Taran Border."
-        );
-        setMapCoordinates([31.452, 74.925]);
+        setIntelData(null);
+        setAiSummary("Search service temporarily unreachable. Check network connection.");
       } finally {
         setIsSearching(false);
       }
