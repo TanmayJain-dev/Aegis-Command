@@ -7,7 +7,6 @@ from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from sentence_transformers import SentenceTransformer
 from dotenv import load_dotenv
 from groq import Groq
 from incident_memory import IncidentMemory
@@ -64,6 +63,7 @@ class ResilientEmbedder:
         if not low_mem:
             try:
                 print("Loading NLP Model (all-MiniLM-L6-v2)...")
+                from sentence_transformers import SentenceTransformer
                 self.model = SentenceTransformer('all-MiniLM-L6-v2')
             except Exception as e:
                 print(f"Notice: NLP Model loading skipped or failed ({e}). Using resilient vector encoder.")

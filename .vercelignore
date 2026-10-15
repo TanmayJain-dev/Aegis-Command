@@ -1,0 +1,13 @@
+local_assets/
+vision/
+backend/
+docs/
+scripts/
+audit_shots/
+.shots/
+*.pt
+*.pth
+*.zip
+*.db
+.next_root/
+frontend/.next_root/
