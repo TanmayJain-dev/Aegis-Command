@@ -6,6 +6,83 @@ export interface DrawDetectionsOptions {
   fillAlpha?: number;
 }
 
+export interface OverlayScale {
+  scaleX: number;
+  scaleY: number;
+  offsetX?: number;
+  offsetY?: number;
+}
+
+export interface DisplayedVideoRect {
+  width: number;
+  height: number;
+  offsetX: number;
+  offsetY: number;
+}
+
+/**
+ * Computes the actual displayed video frame rectangle inside a container
+ * using standard object-contain letterboxing/pillarboxing semantics.
+ */
+export function computeDisplayedVideoRect(
+  containerWidth: number,
+  containerHeight: number,
+  videoWidth: number,
+  videoHeight: number
+): DisplayedVideoRect {
+  if (containerWidth <= 0 || containerHeight <= 0 || videoWidth <= 0 || videoHeight <= 0) {
+    return {
+      width: Math.max(0, containerWidth),
+      height: Math.max(0, containerHeight),
+      offsetX: 0,
+      offsetY: 0,
+    };
+  }
+
+  const videoAspect = videoWidth / videoHeight;
+  const containerAspect = containerWidth / containerHeight;
+
+  if (containerAspect > videoAspect) {
+    // Pillarboxed (bars on left/right)
+    const height = containerHeight;
+    const width = containerHeight * videoAspect;
+    const offsetX = (containerWidth - width) / 2;
+    return { width, height, offsetX, offsetY: 0 };
+  } else {
+    // Letterboxed (bars on top/bottom)
+    const width = containerWidth;
+    const height = containerWidth / videoAspect;
+    const offsetY = (containerHeight - height) / 2;
+    return { width, height, offsetX: 0, offsetY };
+  }
+}
+
+/**
+ * Computes the uniform scale factor and centering offsets to map
+ * source coordinate space (e.g. 1920x1080) to the physical video frame
+ * rendered inside the container under object-contain.
+ */
+export function computeOverlayScale(
+  containerWidth: number,
+  containerHeight: number,
+  sourceWidth: number,
+  sourceHeight: number,
+  videoWidth?: number,
+  videoHeight?: number
+): OverlayScale {
+  const vw = videoWidth && videoWidth > 0 ? videoWidth : sourceWidth;
+  const vh = videoHeight && videoHeight > 0 ? videoHeight : sourceHeight;
+
+  const rect = computeDisplayedVideoRect(containerWidth, containerHeight, vw, vh);
+
+  return {
+    scaleX: rect.width / sourceWidth,
+    scaleY: rect.height / sourceHeight,
+    offsetX: rect.offsetX,
+    offsetY: rect.offsetY,
+  };
+}
+
 /**
  * Pure canvas rendering routine for bounding boxes and telemetry tags.
  * Preserves the exact visual style, colors, fonts, and corner brackets of Aegis HUD.
@@ -13,18 +90,20 @@ export interface DrawDetectionsOptions {
 export function drawDetections(
   ctx: CanvasRenderingContext2D,
   detections: DrawableDetection[],
-  scale: { scaleX: number; scaleY: number },
+  scale: OverlayScale,
   opts: DrawDetectionsOptions = {}
 ): void {
   const primaryColor = opts.primaryColor ?? "#06b6d4"; // cyan-500
   const fillAlpha = opts.fillAlpha ?? 0.15;
+  const offX = scale.offsetX ?? 0;
+  const offY = scale.offsetY ?? 0;
 
   for (let i = 0; i < detections.length; i++) {
     const det = detections[i];
     const [x1, y1, x2, y2] = det.box;
 
-    const scaledX = x1 * scale.scaleX;
-    const scaledY = y1 * scale.scaleY;
+    const scaledX = offX + x1 * scale.scaleX;
+    const scaledY = offY + y1 * scale.scaleY;
     const scaledWidth = (x2 - x1) * scale.scaleX;
     const scaledHeight = (y2 - y1) * scale.scaleY;
 
@@ -143,10 +222,14 @@ export function useVideoOverlay({
     ctx.clearRect(0, 0, cssWidth, cssHeight);
 
     const detections = tl.sampleAt(t);
-    const scale = {
-      scaleX: cssWidth / tl.meta.width,
-      scaleY: cssHeight / tl.meta.height,
-    };
+    const scale = computeOverlayScale(
+      cssWidth,
+      cssHeight,
+      tl.meta.width,
+      tl.meta.height,
+      video.videoWidth,
+      video.videoHeight
+    );
 
     drawDetections(ctx, detections, scale);
     const tEnd = performance.now();
