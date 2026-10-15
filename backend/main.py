@@ -3,6 +3,7 @@ import faiss
 import numpy as np
 import os
 import time
+from pathlib import Path
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -14,6 +15,7 @@ from incident_memory import IncidentMemory
 # Load environment variables
 load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
 if not GROQ_API_KEY:
     print("Notice: GROQ_API_KEY not found in environment. Using automated tactical synthesis mode.")
 
@@ -43,6 +45,7 @@ def health():
         "service": "Aegis Autonomous Threat Engine",
         "version": "1.0",
         "groq_configured": bool(GROQ_API_KEY),
+        "groq_model": GROQ_MODEL,
         "indexed_reports": getattr(index, "ntotal", 0)
     }
 
@@ -89,19 +92,49 @@ async def startup_event():
     # FIX: Prevent duplicate indexing on reload
     if index.ntotal > 0:
         print("FAISS index already populated. Skipping re-indexing.")
-        return
-        
-    print("Loading Mock Intel Database...")
+    else:
+        print("Loading Mock Intel Database...")
+        try:
+            candidates = [
+                Path("mock_intel.json"),
+                Path("backend/mock_intel.json"),
+                Path("data/mock_intel.json"),
+            ]
+            intel_path = next((p for p in candidates if p.exists()), None)
+            if intel_path:
+                with intel_path.open("r", encoding="utf-8") as f:
+                    intel_data = json.load(f)
+                transcripts = [item["transcript"] for item in intel_data]
+                embeddings = model.encode(transcripts).astype('float32')
+                index.add(embeddings)
+                print(f"Successfully indexed {index.ntotal} reports into FAISS.")
+            else:
+                print("Warning: mock_intel.json not found.")
+        except Exception as e:
+            print(f"Error loading data: {e}")
+
+    # Embedder warmup to eliminate cold-start penalty on first request
     try:
-        with open("mock_intel.json", "r") as f:
-            intel_data = json.load(f)
-        
-        transcripts = [item["transcript"] for item in intel_data]
-        embeddings = model.encode(transcripts).astype('float32')
-        index.add(embeddings)
-        print(f"Successfully indexed {index.ntotal} reports into FAISS.")
+        t0 = time.time()
+        _ = model.encode(["warmup embedder query"])
+        print(f"[WARMUP] Embedder warmed up in {time.time() - t0:.3f}s")
     except Exception as e:
-        print(f"Error loading data: {e}")
+        print(f"[WARMUP] Embedder warmup failed: {e}")
+
+    # Startup self-check and connection warmup for Groq LLM
+    if groq_client is not None:
+        try:
+            t0 = time.time()
+            _ = groq_client.chat.completions.create(
+                messages=[{"role": "user", "content": "ping"}],
+                model=GROQ_MODEL,
+                max_tokens=5,
+            )
+            print(f"[WARMUP] Groq model '{GROQ_MODEL}' verified and ready in {time.time() - t0:.3f}s")
+        except Exception as e:
+            print(f"[WARMUP] Groq check failed for model '{GROQ_MODEL}': {e}. Operating in rule-based fallback mode.")
+    else:
+        print("[WARMUP] Groq client not configured. Operating in rule-based assessment mode.")
 
 class SearchQuery(BaseModel):
     query: str
@@ -135,26 +168,32 @@ async def search_intel(req: SearchQuery):
         return {"status": "error", "message": "No relevant intel found."}
 
     combined_context = "\n".join(context_blocks)
-    try:
-        groq_start = time.time()
-        chat_completion = groq_client.chat.completions.create(
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are Aegis AI, a military intelligence analyst. Base your summary ONLY on the provided evidence. Cite the Evidence ID. Format: 'Threat detected. Evidence: [ID]. Action: [Recommendation].'"
-                },
-                {
-                    "role": "user",
-                    "content": f"Intercepted Intel Context:\n{combined_context}\n\nQuery: {req.query}"
-                }
-            ],
-            model="llama-3.1-8b-instant",
-            temperature=0.2,
-        )
-        ai_summary = chat_completion.choices[0].message.content
-    except Exception as e:
-        print(f"Groq API Error: {e}")
-        ai_summary = "AI processing unavailable. Refer to raw transcripts."
+    ai_summary = ""
+    if groq_client is not None:
+        try:
+            groq_start = time.time()
+            chat_completion = groq_client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": "You are Aegis AI, a military intelligence analyst. Base your summary ONLY on the provided evidence. Cite the Evidence ID. Format: 'Threat detected. Evidence: [ID]. Action: [Recommendation].'"
+                    },
+                    {
+                        "role": "user",
+                        "content": f"Intercepted Intel Context:\n{combined_context}\n\nQuery: {req.query}"
+                    }
+                ],
+                model=GROQ_MODEL,
+                temperature=0.2,
+            )
+            ai_summary = chat_completion.choices[0].message.content
+        except Exception as e:
+            print(f"Groq API Error: {e}")
+            top_id = retrieved_reports[0]["id"] if retrieved_reports else "NONE"
+            ai_summary = f"[Rule-based] Threat correlated with intel record [{top_id}]. Threat level assessed from raw intercepts. Manual operator review advised."
+    else:
+        top_id = retrieved_reports[0]["id"] if retrieved_reports else "NONE"
+        ai_summary = f"[Rule-based] Threat correlated with intel record [{top_id}]. Threat level assessed from raw intercepts. Manual operator review advised."
 
     return {
         "status": "success",
@@ -262,6 +301,150 @@ async def get_incident_history(
 
 
 
+def generate_rule_based_assessment(trigger_class: str, speed: any, direction: any, evidence: list) -> dict:
+    """
+    Generate a deterministic, evidence-grounded threat assessment
+    when LLM inference is disabled, timed out, or unavailable.
+    """
+    speed_val = 0.0
+    try:
+        if speed is not None and str(speed).lower() != "unknown":
+            speed_val = float(speed)
+    except (ValueError, TypeError):
+        speed_val = 0.0
+
+    cls = str(trigger_class).lower()
+    dir_str = str(direction).upper() if direction else "UNKNOWN"
+
+    top_evidence_id = (
+        evidence[0]["id"]
+        if evidence and len(evidence) > 0 and isinstance(evidence[0], dict) and "id" in evidence[0]
+        else None
+    )
+    evidence_str = f" Correlated with intel [{top_evidence_id}]." if top_evidence_id else ""
+
+    if "drone" in cls or "uav" in cls:
+        if speed_val > 50:
+            level = "CRITICAL"
+            score = 92
+            reasoning = f"[Rule-based] High-speed aerial contact ({speed_val:.0f} km/h) tracking {dir_str}.{evidence_str}"
+            action = "Activate counter-UAS electronic countermeasures and scramble perimeter defense."
+        else:
+            level = "HIGH"
+            score = 78
+            reasoning = f"[Rule-based] Unidentified aerial contact moving {dir_str}.{evidence_str}"
+            action = "Track vector on optics and prepare directed RF jammer."
+    elif any(v in cls for v in ("vehicle", "truck", "car", "suv", "van")):
+        if speed_val > 70:
+            level = "HIGH"
+            score = 82
+            reasoning = f"[Rule-based] High-speed vehicle ({speed_val:.0f} km/h) approaching {dir_str} sector.{evidence_str}"
+            action = "Dispatch perimeter security interceptors to access control gates."
+        elif speed_val > 25:
+            level = "MED"
+            score = 55
+            reasoning = f"[Rule-based] Vehicle tracking {dir_str} at moderate speed ({speed_val:.0f} km/h).{evidence_str}"
+            action = "Maintain continuous optical surveillance and monitor intersection points."
+        else:
+            level = "LOW"
+            score = 25
+            reasoning = f"[Rule-based] Low-speed or stationary vehicle in sector.{evidence_str}"
+            action = "Log vehicle registration and verify perimeter clearance."
+    elif any(p in cls for p in ("person", "human", "pedestrian")):
+        if speed_val > 15:
+            level = "MED"
+            score = 60
+            reasoning = f"[Rule-based] Rapid personnel movement ({speed_val:.0f} km/h) toward {dir_str}.{evidence_str}"
+            action = "Direct perimeter PTZ cameras to maintain visual contact."
+        else:
+            level = "LOW"
+            score = 20
+            reasoning = f"[Rule-based] Personnel movement detected at normal velocity.{evidence_str}"
+            action = "Monitor access checkpoints and log trajectory."
+    else:
+        if speed_val > 50:
+            level = "MED"
+            score = 50
+            reasoning = f"[Rule-based] Fast-moving contact ({cls}) detected heading {dir_str}.{evidence_str}"
+            action = "Classify target with secondary optical zoom."
+        else:
+            level = "LOW"
+            score = 15
+            reasoning = f"[Rule-based] Contact ({cls}) detected moving {dir_str}.{evidence_str}"
+            action = "Continue automated observation."
+
+    return {
+        "threat_level": level,
+        "score": score,
+        "reasoning": reasoning,
+        "recommended_action": action,
+        "assessment_source": "rule-based",
+    }
+
+
+_DEFAULT_CLIENT = object()
+
+
+def assess_threat(
+    trigger_class: str,
+    speed: any,
+    direction: any,
+    combined_context: str,
+    retrieved_reports: list,
+    client: any = _DEFAULT_CLIENT,
+) -> dict:
+    """
+    Assess threat using Groq LLM if available, falling back gracefully
+    to deterministic rule-based assessment.
+    """
+    active_client = groq_client if client is _DEFAULT_CLIENT else client
+    assessment_json = None
+
+    if active_client is not None:
+        try:
+            groq_start = time.time()
+            chat_completion = active_client.chat.completions.create(
+                messages=[
+                    {
+                        "role": "system",
+                        "content": (
+                            "You are an autonomous Threat Assessment Algorithm. "
+                            "You MUST output ONLY valid JSON. The JSON must contain "
+                            "exactly these keys: 'threat_level' (string: LOW, MED, HIGH, CRITICAL), "
+                            "'score' (integer 0-100), 'reasoning' (string: 1 short sentence), "
+                            "'recommended_action' (string: 1 short sentence). "
+                            "Base the assessment on the provided radar telemetry and SIGINT evidence."
+                        ),
+                    },
+                    {
+                        "role": "user",
+                        "content": (
+                            f"Telemetry: {trigger_class} detected moving {direction} at {speed}km/h.\n"
+                            f"SIGINT Evidence:\n{combined_context}"
+                        ),
+                    },
+                ],
+                model=GROQ_MODEL,
+                temperature=0.1,
+                response_format={"type": "json_object"},
+            )
+            parsed = json.loads(chat_completion.choices[0].message.content)
+            if isinstance(parsed, dict) and "threat_level" in parsed:
+                parsed["assessment_source"] = "llm"
+                assessment_json = parsed
+                print(f"[GROQ LATENCY] {time.time() - groq_start:.2f}s")
+        except Exception as e:
+            print(f"Groq Threat Engine Error: {e}")
+            assessment_json = None
+
+    if not assessment_json:
+        assessment_json = generate_rule_based_assessment(
+            trigger_class, speed, direction, retrieved_reports
+        )
+
+    return assessment_json
+
+
 @app.websocket("/ws/threat-engine")
 async def websocket_endpoint(websocket: WebSocket):
     await websocket.accept()
@@ -315,27 +498,10 @@ async def websocket_endpoint(websocket: WebSocket):
                     context_blocks.append(f"[ID: {report['id']}] {report['transcript']}")
             combined_context = "\n".join(context_blocks)
 
-            assessment_json = {
-                "threat_level": "UNKNOWN", "score": 0,
-                "reasoning": "LLM processing failed.",
-                "recommended_action": "MANUAL REVIEW REQUIRED.",
-            }
-            try:
-                groq_start = time.time()
-                chat_completion = groq_client.chat.completions.create(
-                    messages=[
-                        {"role": "system", "content": "You are an autonomous Threat Assessment Algorithm. You MUST output ONLY valid JSON. The JSON must contain exactly these keys: 'threat_level' (string: LOW, MED, HIGH, CRITICAL), 'score' (integer 0-100), 'reasoning' (string: 1 short sentence), 'recommended_action' (string: 1 short sentence). Base the assessment on the provided radar telemetry and SIGINT evidence."},
-                        {"role": "user", "content": f"Telemetry: {trigger_class} detected moving {direction} at {speed}km/h.\nSIGINT Evidence:\n{combined_context}"},
-                    ],
-                    model="llama-3.1-8b-instant",
-                    temperature=0.1,
-                    response_format={"type": "json_object"},
-                )
-                assessment_json = json.loads(chat_completion.choices[0].message.content)
-                print(f"[GROQ LATENCY] {time.time() - groq_start:.2f}s")
-                assessment_json["previous_incidents"] = incident_memory.find_previous_incidents(trigger_class)
-            except Exception as e:
-                print(f"Groq Threat Engine Error: {e}")
+            assessment_json = assess_threat(
+                trigger_class, speed, direction, combined_context, retrieved_reports
+            )
+            assessment_json["previous_incidents"] = incident_memory.find_previous_incidents(trigger_class)
 
             # Return original telemetry untouched.
             # Frontend uses these coordinates as authoritative threat position.
