@@ -109,25 +109,25 @@ Operator dashboard + incident memory
 
 ### Perception
 
-The frontend replays `frontend/public/drone_feed.mp4` and uses the matching `frontend/public/detections.json` timeline to render object detections over the video.
+The frontend streams canonical video feeds configured in `frontend/public/feeds/index.json` (such as `uav-alpha/video.mp4`) and uses the matching `detections.json` timeline to render object detections over the video with calibrated letterbox/pillarbox offset scaling.
 
-Each event can carry class, confidence, bounding-box coordinates, movement information and projected map coordinates.
+Each event carries class, confidence, bounding-box coordinates, movement velocity/heading, and projected tactical coordinates.
 
 ### Event transport
 
-Threat assessment is asynchronous. The dashboard maintains a WebSocket connection to `/ws/threat-engine` so perception events can trigger downstream reasoning without blocking the UI.
+Threat assessment is asynchronous. The dashboard connects directly via WebSockets to `/ws/threat-engine` (reading `NEXT_PUBLIC_WS_URL` or `NEXT_PUBLIC_BACKEND_URL`), ensuring real-time perception triggers stream to the backend without blocking UI rendering.
 
 ### Retrieval
 
-The intelligence layer uses `all-MiniLM-L6-v2` embeddings with a 384-dimensional FAISS index. Retrieval happens before generation so the language model receives relevant evidence instead of acting as the database itself.
+The intelligence layer uses `all-MiniLM-L6-v2` embeddings (or the zero-dependency MD5 hash encoder in `LOW_MEMORY_MODE`) with a 384-dimensional FAISS index. Honest retrieval pre-filtering and score normalization ensure irrelevant queries (such as out-of-domain words) return explicit empty responses instead of top-k hallucinated noise.
 
 ### Grounded reasoning
 
-The assessment layer returns reasoning, threat level/score and a recommended action while retaining the evidence context used to reach the assessment.
+The assessment layer utilizes Groq (`qwen/qwen3.8-27b`) to return evidence-grounded threat levels, scores, reasoning, and recommended actions. If the LLM is unavailable, timed out, or unconfigured, the system automatically falls back to an evidence-grounded deterministic rule-based engine, clearly labeling the assessment source in the UI.
 
 ### Incident memory
 
-Threat assessments can be persisted and reviewed later, allowing the operator workflow to retain an inspectable history rather than treating each event as ephemeral.
+Threat assessments are persistently deduplicated and logged in SQLite via `IncidentMemory`. Operators can inspect complete historical logs across feeds without duplicate frame flooding.
 
 ---
 
@@ -137,13 +137,13 @@ Threat assessments can be persisted and reviewed later, allowing the operator wo
 
 Detection timestamps are ordered and searched with a binary-search style lookup rather than scanning every frame on every update.
 
-### 🔄 Asynchronous threat flow
+### 🔄 Asynchronous threat flow & connection health
 
-The frontend uses WebSockets with reconnect handling and in-flight request protection so model latency does not become a UI lock-up.
+The frontend monitors WebSocket readiness, displaying real-time connection status (`LIVE`, `DEGRADED`, or `OFFLINE`) with automatic reconnection backoff and graceful local fallback.
 
-### 🗺️ Bounded geo-projection
+### 🗺️ Bounded geo-projection & uniform box rendering
 
-Video detections contain pixel coordinates rather than GPS coordinates. A deterministic projection maps detection centers into a bounded tactical operating box while clamping extreme values.
+Video detections contain pixel coordinates. A deterministic projection maps detection centers into bounded tactical operating coordinates, while uniform aspect-ratio scaling eliminates letterbox drift across desktop, tablet, and mobile displays.
 
 ### 🧠 Retrieval before generation
 
@@ -155,7 +155,7 @@ Relevant evidence is retrieved first and then supplied to the reasoning layer, r
 
 <div align="center">
 
-`Next.js` · `React` · `TypeScript` · `Python` · `FastAPI` · `WebSockets` · `YOLOv8` · `FAISS` · `SentenceTransformers` · `Groq` · `Docker`
+`Next.js 16` · `React 19` · `TypeScript` · `Python 3.11+` · `FastAPI` · `WebSockets` · `YOLOv8` · `FAISS` · `SentenceTransformers` · `Groq` · `Docker`
 
 </div>
 
@@ -165,48 +165,64 @@ Relevant evidence is retrieved first and then supplied to the reasoning layer, r
 
 ```text
 Aegis-Command/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
 ├── assets/
 │   ├── architecture.svg
 │   ├── demo-video-placeholder.svg
 │   └── screenshots/
-│       ├── dashboard.jpg
-│       ├── video-feed.jpg
-│       ├── tactical-map.jpg
-│       └── intel-feed.jpg
-│
 ├── backend/
 │   ├── main.py
 │   ├── incident_memory.py
-│   ├── data_forger.py
 │   ├── mock_intel.json
+│   ├── test_ai_layer.py
+│   ├── test_honest_retrieval.py
 │   └── requirements.txt
-│
 ├── frontend/
 │   ├── src/
+│   │   ├── app/
+│   │   │   ├── api/
+│   │   │   │   ├── incidents/history/route.ts
+│   │   │   │   └── intel/search/route.ts
+│   │   │   └── page.tsx
+│   │   ├── components/
+│   │   ├── hooks/
+│   │   └── lib/
 │   ├── public/
-│   │   ├── feeds/
-│   │   │   ├── index.json
-│   │   │   └── uav-alpha/
-│   │   │       ├── video.mp4
-│   │   │       └── detections.json
-│   │   ├── drone_feed.mp4
-│   │   └── detections.json
+│   │   └── feeds/
+│   │       ├── index.json
+│   │       ├── uav-alpha/
+│   │       │   ├── video.mp4
+│   │       │   └── detections.json
+│   │       ├── cctv-bravo/
+│   │       │   └── detections.json
+│   │       └── bodycam-charlie/
+│   │           └── detections.json
 │   └── package.json
-│
 ├── vision/
-│   ├── source/
-│   │   └── drone_feed.mp4
+│   ├── eval/
+│   ├── tests/
 │   ├── vision_engine.py
-│   ├── yolo_extractor.py
 │   ├── ingest_target.py
-│   ├── viewer.html
-│   ├── requirements.txt
-│   └── README.md
-│
+│   └── requirements.txt
 ├── docs/
+│   └── RENDER_DEPLOY.md
 ├── docker-compose.yml
+├── render.yaml
 └── README.md
 ```
+
+---
+
+## Surveillance Feeds & Video Assets
+
+Aegis Command supports multi-feed operational switching:
+- **`uav-alpha` (Canonical Primary Feed):** Tracked directly in git (`frontend/public/feeds/uav-alpha/video.mp4` and `detections.json`). Ready out-of-the-box on clone.
+- **`cctv-bravo` & `bodycam-charlie` (Secondary Feeds):** Detection timelines are committed in git. Binary `video.mp4` files are gitignored (via `*.mp4`) to keep repository size lean. To populate these feeds locally:
+  - Copy any MP4 footage to `frontend/public/feeds/cctv-bravo/video.mp4` or `frontend/public/feeds/bodycam-charlie/video.mp4`.
+  - Or run the vision ingestion pipeline: `python vision/ingest_target.py path/to/raw_video.mp4`.
+- **Dynamic Operator Uploads:** Operators can click **"UPLOAD SURVEILLANCE FEED"** in the dashboard header to drop any `.mp4` video. The client-side feed manager instantiates an object URL, extracts video dimensions, and renders detections without server-side storage overhead.
 
 ---
 

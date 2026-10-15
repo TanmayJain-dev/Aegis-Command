@@ -5,3 +5,5 @@ sentence-transformers
 pydantic
 groq
 python-dotenv
+httpx
+pytest

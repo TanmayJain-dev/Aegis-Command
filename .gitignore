@@ -60,6 +60,7 @@ extract_venv/
 frontend/.vercel/
 .shots/
 frontend/.shots/
+audit_shots/
 
 # Evaluation dataset images and draft labels (untracked)
 vision/eval/images/
