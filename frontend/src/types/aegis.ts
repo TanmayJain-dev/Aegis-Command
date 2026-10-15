@@ -6,6 +6,7 @@ export interface ThreatAssessment {
   reasoning?: string;
   recommended_action?: string;
   previous_incidents?: number;
+  assessment_source?: "llm" | "rule-based" | string;
 }
 
 export interface IntelRecord {

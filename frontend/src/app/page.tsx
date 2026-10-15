@@ -52,7 +52,6 @@ export default function AegisDashboard() {
   const [localAssessment, setLocalAssessment] = useState<ThreatAssessment | null>(null);
 
   // Cloud backend cold-start & probing state
-  const [standbyElapsed, setStandbyElapsed] = useState(false);
   const [isProbingBackend, setIsProbingBackend] = useState(false);
 
   // Dev-only Perf Probe (?perf=1)
@@ -120,7 +119,22 @@ export default function AegisDashboard() {
   } = useThreatSocket({ onThreatAssessed: handleThreatAssessed });
 
   const activeAssessment = localAssessment || latestAssessment;
-  const isBackendWaking = !socketReady && standbyElapsed;
+
+  const [standbySeconds, setStandbySeconds] = useState(0);
+
+  useEffect(() => {
+    if (socketReady) return;
+    const timer = setInterval(() => {
+      setStandbySeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [socketReady]);
+
+  const connectionStatus: "LIVE" | "DEGRADED" | "OFFLINE" = socketReady
+    ? "LIVE"
+    : standbySeconds >= 90
+    ? "OFFLINE"
+    : "DEGRADED";
 
   const triggerGateRef = useRef<TriggerGate>(new TriggerGate());
 
@@ -130,14 +144,6 @@ export default function AegisDashboard() {
     handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []);
-
-  // Monitor cloud backend connection and show waking indicator after initial delay
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setStandbyElapsed(true);
-    }, 4500);
-    return () => clearTimeout(timer);
   }, []);
 
   // Load feed manifest on startup
@@ -205,7 +211,7 @@ export default function AegisDashboard() {
     try {
       const res = await fetch("/api/health");
       if (res.ok) {
-        setStandbyElapsed(false);
+        setStandbySeconds(0);
       }
     } catch {
       // Still spinning up
@@ -330,10 +336,12 @@ export default function AegisDashboard() {
     const drillAssessment: ThreatAssessment = {
       threat_level: "CRITICAL",
       score: 96,
-      reasoning:
-        "Tactical Drill Verification: High-confidence anomaly correlation between EO/IR optronics and COMINT radio intercepts.",
+      reasoning: socketReady
+        ? "Tactical Drill Verification: High-confidence anomaly correlation between EO/IR optronics and COMINT radio intercepts."
+        : `[${connectionStatus} MODE] Autonomous backend unreachable. Threat assessed locally via deterministic rule-based heuristics.`,
       recommended_action:
         "Execute automated QRT alert vector. Command lockdown authorization granted.",
+      assessment_source: socketReady ? "llm" : "rule-based",
       previous_incidents: 4,
     };
     setLocalAssessment(drillAssessment);
@@ -382,7 +390,7 @@ export default function AegisDashboard() {
 
     setHistoryRecords((prev) => [newDrillIncident, ...prev]);
     setIsThreatModalOpen(true);
-  }, [socketReady, sendThreat]);
+  }, [socketReady, connectionStatus, sendThreat]);
 
   // Handle addition of custom uploaded surveillance video feed
   const handleFeedCreated = useCallback((newFeed: FeedManifestItem) => {
@@ -436,7 +444,30 @@ export default function AegisDashboard() {
             HISTORY
           </button>
 
-          <div className="flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs border border-slate-800 bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 rounded">
+          {/* CONNECTION STATUS BADGE */}
+          <div
+            className={`flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded border text-[9px] sm:text-[10px] font-bold tracking-widest font-mono transition-all flex-shrink-0 ${
+              connectionStatus === "LIVE"
+                ? "bg-emerald-950/40 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                : connectionStatus === "DEGRADED"
+                ? "bg-amber-950/40 border-amber-500/50 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                : "bg-rose-950/40 border-rose-500/50 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
+            }`}
+            title={`Telemetry & Threat Engine Status: ${connectionStatus}`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                connectionStatus === "LIVE"
+                  ? "bg-emerald-400 animate-pulse"
+                  : connectionStatus === "DEGRADED"
+                  ? "bg-amber-400 animate-pulse"
+                  : "bg-rose-500"
+              }`}
+            />
+            <span>{connectionStatus}</span>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs border border-slate-800 bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 rounded">
             <span className="flex items-center gap-1 sm:gap-2 text-slate-400">
               <Activity className={socketReady ? "text-cyan-400" : "text-amber-400"} size={12} />
               <span className="hidden sm:inline">SYS:</span>{" "}
@@ -452,13 +483,13 @@ export default function AegisDashboard() {
         </div>
       </header>
 
-      {/* RENDER BACKEND COLD START / CONNECTING BANNER */}
-      {isBackendWaking && (
+      {/* RENDER BACKEND DEGRADED / COLD START BANNER */}
+      {connectionStatus === "DEGRADED" && (
         <div className="bg-amber-950/70 border-b border-amber-500/40 px-3 py-1.5 flex items-center justify-between text-[10px] sm:text-xs text-amber-300 font-mono">
           <div className="flex items-center gap-2 truncate mr-2">
             <AlertTriangle size={13} className="text-amber-400 animate-pulse flex-shrink-0" />
             <span className="truncate">
-              NEURAL BACKEND: WAKING UP (~60s) // TELEMETRY PIPELINE OPERATING ON RESILIENT EDGE SYNTHESIS
+              AUTONOMOUS BACKEND WAKING UP (~60s) // ENGINE OPERATING IN DEGRADED DETERMINISTIC MODE
             </span>
           </div>
           <button
@@ -468,7 +499,28 @@ export default function AegisDashboard() {
             className="px-2 py-0.5 border border-amber-500/50 hover:bg-amber-900/40 rounded flex items-center gap-1 font-bold text-[9px] sm:text-[10px] flex-shrink-0 transition-colors"
           >
             <RefreshCw size={10} className={isProbingBackend ? "animate-spin" : ""} />
-            {isProbingBackend ? "PROBING..." : "PROBE ENGINE"}
+            {isProbingBackend ? "PROBING..." : "RETRY"}
+          </button>
+        </div>
+      )}
+
+      {/* RENDER BACKEND OFFLINE BANNER */}
+      {connectionStatus === "OFFLINE" && (
+        <div className="bg-rose-950/80 border-b border-rose-500/40 px-3 py-1.5 flex items-center justify-between text-[10px] sm:text-xs text-rose-300 font-mono">
+          <div className="flex items-center gap-2 truncate mr-2">
+            <AlertTriangle size={13} className="text-rose-400 flex-shrink-0" />
+            <span className="truncate">
+              AUTONOMOUS CLOUD BACKEND OFFLINE // LOCAL DETERMINISTIC RULE-BASED MODE ACTIVE
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={probeBackend}
+            disabled={isProbingBackend}
+            className="px-2 py-0.5 border border-rose-500/50 hover:bg-rose-900/40 rounded flex items-center gap-1 font-bold text-[9px] sm:text-[10px] flex-shrink-0 transition-colors"
+          >
+            <RefreshCw size={10} className={isProbingBackend ? "animate-spin" : ""} />
+            {isProbingBackend ? "PROBING..." : "RETRY"}
           </button>
         </div>
       )}

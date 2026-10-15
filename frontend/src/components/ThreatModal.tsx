@@ -68,7 +68,7 @@ export function ThreatModal({
 
         <div className="p-6 flex flex-col gap-6 text-sm">
           {threatAssessment && (
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-2 sm:gap-4">
               <div
                 className={`px-3 py-1 rounded border font-bold text-xs ${
                   isHighOrCritical
@@ -81,6 +81,18 @@ export function ThreatModal({
               <div className="px-3 py-1 rounded border border-cyan-900/50 bg-cyan-950/30 text-cyan-400 font-bold text-xs">
                 THREAT SCORE: {scoreDisplay}/100
               </div>
+              {threatAssessment.assessment_source === "rule-based" ||
+              threatAssessment.reasoning?.includes("[Rule-based]") ||
+              threatAssessment.reasoning?.includes("[DEGRADED") ||
+              threatAssessment.reasoning?.includes("[OFFLINE") ? (
+                <div className="px-3 py-1 rounded border border-amber-900/50 bg-amber-950/30 text-amber-400 font-bold text-xs flex items-center gap-1">
+                  SOURCE: RULE-BASED (FALLBACK)
+                </div>
+              ) : (
+                <div className="px-3 py-1 rounded border border-emerald-900/50 bg-emerald-950/30 text-emerald-400 font-bold text-xs flex items-center gap-1">
+                  SOURCE: NEURAL LLM
+                </div>
+              )}
             </div>
           )}
 

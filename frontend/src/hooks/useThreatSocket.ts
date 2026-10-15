@@ -33,6 +33,22 @@ export interface UseThreatSocketReturn {
 
 const TACTICAL_AUDIO_B64 = "data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU";
 
+export function getWebSocketUrl(): string {
+  if (process.env.NEXT_PUBLIC_WS_URL) {
+    return process.env.NEXT_PUBLIC_WS_URL;
+  }
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  if (backendUrl) {
+    const wsUrl = backendUrl.replace(/^http:\/\//, "ws://").replace(/^https:\/\//, "wss://");
+    return `${wsUrl.replace(/\/+$/, "")}/ws/threat-engine`;
+  }
+  if (typeof window !== "undefined") {
+    const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+    return `${protocol}//${window.location.host}/ws/threat-engine`;
+  }
+  return "ws://localhost:8000/ws/threat-engine";
+}
+
 export function useThreatSocket(options?: UseThreatSocketOptions): UseThreatSocketReturn {
   const [isConnected, setIsConnected] = useState(false);
   const [latestAssessment, setLatestAssessment] = useState<ThreatAssessment | null>(null);
@@ -54,8 +70,7 @@ export function useThreatSocket(options?: UseThreatSocketOptions): UseThreatSock
       if (cancelled) return;
       if (typeof window === "undefined") return;
 
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const url = `${protocol}//${window.location.host}/ws/threat-engine`;
+      const url = getWebSocketUrl();
       const ws = new WebSocket(url);
 
       ws.onopen = () => {
