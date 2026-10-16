@@ -1,11 +1,19 @@
 {
   "meta": {
-    "model": "yolov8s.pt",
-    "weights_sha256": "1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a",
+    "model": "yolov8m-aegis-cv",
+    "weights_sha256": "9fa52a9aef5aa7a76d5d4630508fba56b12f8ca52fbb8a186f4e552acff6573a",
     "imgsz": 1280,
     "conf": 0.35,
     "date": "2026-10-16",
     "evaluated": true,
+    "evaluation": "cross_validation",
+    "note": "Generalization evaluated via 5-fold contiguous holdout cross-validation: person AP50 = 85.9% +/- 5.4% (same-scene). Never score on training frames.",
+    "cv_metrics": {
+      "person_ap50_mean": 0.8591,
+      "person_ap50_std": 0.0543,
+      "vehicle_ap50_mean": 0.8042,
+      "vehicle_ap50_std": 0.2572
+    },
     "feed": "uav-alpha",
     "width": 1280,
     "height": 720,

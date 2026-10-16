@@ -32,6 +32,14 @@ export interface TimelineMeta {
   conf?: number;
   date?: string;
   evaluated?: boolean;
+  evaluation?: string;
+  note?: string;
+  cv_metrics?: {
+    person_ap50_mean?: number;
+    person_ap50_std?: number;
+    vehicle_ap50_mean?: number;
+    vehicle_ap50_std?: number;
+  };
   feed?: string;
   sahi?: boolean;
   tracker?: string;
@@ -383,6 +391,9 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
     conf: rawMeta?.conf,
     date: rawMeta?.date,
     evaluated: rawMeta?.evaluated,
+    evaluation: rawMeta?.evaluation,
+    note: rawMeta?.note,
+    cv_metrics: rawMeta?.cv_metrics,
     feed: rawMeta?.feed,
     sahi: rawMeta?.sahi,
     tracker: rawMeta?.tracker,
