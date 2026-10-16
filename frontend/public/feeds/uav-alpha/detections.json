@@ -1,12 +1,20 @@
 {
   "meta": {
-    "model": "yolov8s.pt",
-    "weights_sha256": "1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a",
+    "model": "aegis_demo_full_last.pt",
+    "weights_sha256": "93761a11017d11c93b8a64a57d6118d1e70b15b2f1c92e106c86d244cd15ce11",
     "imgsz": 1280,
     "conf": 0.35,
-    "date": "2026-10-16",
-    "evaluated": false,
-    "evaluation": "none",
+    "date": "2026-10-17",
+    "evaluated": true,
+    "evaluation": "cross_validation",
+    "note": "DEMO MODEL (trained on this footage; 5-fold CV last.pt: person AP50 82.8% ± 5.2%, same-scene)",
+    "cv_metrics": {
+      "folds_count": 5,
+      "person_ap50_mean": 0.8275,
+      "person_ap50_std": 0.0524,
+      "vehicle_ap50_mean": 0.7720,
+      "vehicle_ap50_std": 0.3615
+    },
     "feed": "uav-alpha",
     "width": 1280,
     "height": 720,

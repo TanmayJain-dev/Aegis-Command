@@ -19,7 +19,8 @@ KNOWN_WEIGHTS = {
     "demo_full": {
         "filename": "aegis_demo_full_last.pt",
         "description": "Full 155-frame fine-tuned demo model (fixed 50 epochs, val=False)",
-        "colab_path": "/content/checkpoints/aegis_demo_full_last.pt"
+        "sha256": "93761a11017d11c93b8a64a57d6118d1e70b15b2f1c92e106c86d244cd15ce11",
+        "url": "https://github.com/TanmayJain-dev/Aegis-Command/releases/download/v0.4.0/aegis_demo_full_last.pt"
     },
     "fold1_fixed50": {
         "filename": "aegis_5fold_fold1_last.pt",
