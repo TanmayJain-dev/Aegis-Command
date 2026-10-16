@@ -28,8 +28,10 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 IMAGES_DIR = REPO_ROOT / "vision" / "eval" / "images"
 LABELS_DIR = REPO_ROOT / "vision" / "eval" / "labels"
 DATA_DIR = REPO_ROOT / "vision" / "data"
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from class_map import CLASS_MAP, get_canonical_class_names
 
-CLASS_NAMES = ["person", "car", "truck", "bus"]
+CLASS_NAMES = get_canonical_class_names()
 
 
 def get_contiguous_splits(stems: list, num_folds: int = 2, buffer_frames: int = 4) -> dict:
@@ -190,16 +192,14 @@ def split_dataset(fold: int = 1, num_folds: Optional[int] = None, buffer_frames:
         json.dump(manifest_data, f, indent=2)
 
     # Write Ultralytics YAML
+    names_yaml = "\n".join([f"  {cid}: {name}" for cid, name in CLASS_MAP.items()])
     yaml_content = f"""# Aegis Command - YOLO Fine-Tuning Dataset Definition (Fold {fold})
 path: {DATA_DIR.resolve()}
 train: images/train
 val: images/val
 
 names:
-  0: person
-  1: car
-  2: truck
-  3: bus
+{names_yaml}
 """
     yaml_path = DATA_DIR / "aegis_data.yaml"
     with open(yaml_path, "w", encoding="utf-8") as f:

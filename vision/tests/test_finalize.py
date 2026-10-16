@@ -185,9 +185,17 @@ def test_convert_shapes_clamping():
 
 def test_convert_shapes_unknown_class():
     """Test conversion raises error on unknown class label."""
-    shapes = [{"label": "motorcycle", "points": [[10, 10], [50, 50]]}]
-    with pytest.raises(ValidationError, match="Unknown class label 'motorcycle'"):
+    shapes = [{"label": "airplane", "points": [[10, 10], [50, 50]]}]
+    with pytest.raises(ValidationError, match="Unknown class label 'airplane'"):
         convert_shapes_to_yolo(shapes)
+
+
+def test_convert_shapes_motorcycle():
+    """Test motorcycle converts to unified class ID 4."""
+    shapes = [{"label": "motorcycle", "points": [[10, 10], [50, 50]]}]
+    lines, _ = convert_shapes_to_yolo(shapes, img_w=100, img_h=100)
+    assert len(lines) == 1
+    assert lines[0].startswith("4 ")
 
 
 def test_write_verified_marker(tmp_path):

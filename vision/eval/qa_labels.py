@@ -28,12 +28,8 @@ REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_LABELS_DIR = REPO_ROOT / "vision" / "eval" / "labels"
 DEFAULT_IMAGES_DIR = REPO_ROOT / "vision" / "eval" / "images"
 
-CLASS_NAMES = {
-    0: "person",
-    1: "car",
-    2: "truck",
-    3: "bus"
-}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from class_map import CLASS_NAMES
 
 def box_iou(b1: List[float], b2: List[float]) -> float:
     """Computes IoU between two [x1, y1, x2, y2] normalized boxes."""

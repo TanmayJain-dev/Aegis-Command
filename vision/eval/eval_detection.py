@@ -27,19 +27,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from metrics import calculate_metrics_for_class, perform_error_analysis
 from finalize_labels import compute_labels_sha256
 
-CLASS_NAMES = {
-    0: "person",
-    1: "car",
-    2: "truck",
-    3: "bus"
-}
-
-COCO_TO_EVAL = {
-    0: 0,
-    2: 1,
-    7: 2,
-    5: 3
-}
+from class_map import CLASS_NAMES, CLASS_MAP, COCO_TO_EVAL
 
 def get_git_commit() -> str:
     try:

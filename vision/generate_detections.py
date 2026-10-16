@@ -35,8 +35,9 @@ from typing import Dict, List, Optional, Tuple
 
 import cv2
 
-# Standard product classes used in threat assessment and UI overlays
-ALLOWED_CLASSES = {"person", "car", "truck", "motorcycle", "bus"}
+# Add vision/eval to path
+sys.path.insert(0, str(Path(__file__).resolve().parent / "eval"))
+from class_map import ALLOWED_CLASSES
 
 FEED_PATHS = {
     "uav-alpha": {

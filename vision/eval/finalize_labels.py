@@ -30,8 +30,10 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Tuple, Optional
 
-CLASS_NAMES = ["person", "car", "truck", "bus"]
-CLASS_TO_ID = {name: i for i, name in enumerate(CLASS_NAMES)}
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from class_map import CLASS_TO_ID, get_canonical_class_names
+
+CLASS_NAMES = get_canonical_class_names()
 
 class ValidationError(Exception):
     """Raised when label files violate formatting or geometric integrity."""
