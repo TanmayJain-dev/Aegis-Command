@@ -72,4 +72,8 @@ frontend/public/detections.json
 # Scratch and diagnostic runs
 scratch/
 
+# Kaggle credentials
+kaggle.json
+.kaggle/
+
 
