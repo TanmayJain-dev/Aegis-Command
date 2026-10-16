@@ -1,0 +1,991 @@
+{
+  "height_bucket_recall": {
+    "summary": {
+      "baseline": {
+        "<16px": {
+          "gt_count": 8,
+          "tp_count": 0,
+          "recall": 0.0
+        },
+        "16-32px": {
+          "gt_count": 87,
+          "tp_count": 15,
+          "recall": 0.1724
+        },
+        "32-64px": {
+          "gt_count": 773,
+          "tp_count": 350,
+          "recall": 0.4528
+        },
+        ">64px": {
+          "gt_count": 869,
+          "tp_count": 490,
+          "recall": 0.5639
+        }
+      },
+      "finetuned": {
+        "<16px": {
+          "gt_count": 8,
+          "tp_count": 0,
+          "recall": 0.0
+        },
+        "16-32px": {
+          "gt_count": 87,
+          "tp_count": 50,
+          "recall": 0.5747
+        },
+        "32-64px": {
+          "gt_count": 773,
+          "tp_count": 671,
+          "recall": 0.868
+        },
+        ">64px": {
+          "gt_count": 869,
+          "tp_count": 790,
+          "recall": 0.9091
+        }
+      }
+    },
+    "raw_counts": {
+      "baseline": {
+        "<16px": {
+          "gt": 8,
+          "tp": 0
+        },
+        "16-32px": {
+          "gt": 87,
+          "tp": 15
+        },
+        "32-64px": {
+          "gt": 773,
+          "tp": 350
+        },
+        ">64px": {
+          "gt": 869,
+          "tp": 490
+        }
+      },
+      "finetuned": {
+        "<16px": {
+          "gt": 8,
+          "tp": 0
+        },
+        "16-32px": {
+          "gt": 87,
+          "tp": 50
+        },
+        "32-64px": {
+          "gt": 773,
+          "tp": 671
+        },
+        ">64px": {
+          "gt": 869,
+          "tp": 790
+        }
+      },
+      "per_fold": {
+        "fold_1": {
+          "baseline": {
+            "<16px": {
+              "gt": 1,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 19,
+              "tp": 9
+            },
+            "32-64px": {
+              "gt": 234,
+              "tp": 156
+            },
+            ">64px": {
+              "gt": 218,
+              "tp": 129
+            }
+          },
+          "finetuned": {
+            "<16px": {
+              "gt": 1,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 19,
+              "tp": 13
+            },
+            "32-64px": {
+              "gt": 234,
+              "tp": 203
+            },
+            ">64px": {
+              "gt": 218,
+              "tp": 212
+            }
+          }
+        },
+        "fold_2": {
+          "baseline": {
+            "<16px": {
+              "gt": 5,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 31,
+              "tp": 5
+            },
+            "32-64px": {
+              "gt": 422,
+              "tp": 181
+            },
+            ">64px": {
+              "gt": 117,
+              "tp": 54
+            }
+          },
+          "finetuned": {
+            "<16px": {
+              "gt": 5,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 31,
+              "tp": 19
+            },
+            "32-64px": {
+              "gt": 422,
+              "tp": 376
+            },
+            ">64px": {
+              "gt": 117,
+              "tp": 86
+            }
+          }
+        },
+        "fold_3": {
+          "baseline": {
+            "<16px": {
+              "gt": 0,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 33,
+              "tp": 0
+            },
+            "32-64px": {
+              "gt": 113,
+              "tp": 13
+            },
+            ">64px": {
+              "gt": 220,
+              "tp": 69
+            }
+          },
+          "finetuned": {
+            "<16px": {
+              "gt": 0,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 33,
+              "tp": 17
+            },
+            "32-64px": {
+              "gt": 113,
+              "tp": 92
+            },
+            ">64px": {
+              "gt": 220,
+              "tp": 199
+            }
+          }
+        },
+        "fold_4": {
+          "baseline": {
+            "<16px": {
+              "gt": 1,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 3,
+              "tp": 0
+            },
+            "32-64px": {
+              "gt": 4,
+              "tp": 0
+            },
+            ">64px": {
+              "gt": 158,
+              "tp": 129
+            }
+          },
+          "finetuned": {
+            "<16px": {
+              "gt": 1,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 3,
+              "tp": 0
+            },
+            "32-64px": {
+              "gt": 4,
+              "tp": 0
+            },
+            ">64px": {
+              "gt": 158,
+              "tp": 142
+            }
+          }
+        },
+        "fold_5": {
+          "baseline": {
+            "<16px": {
+              "gt": 1,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 1,
+              "tp": 1
+            },
+            "32-64px": {
+              "gt": 0,
+              "tp": 0
+            },
+            ">64px": {
+              "gt": 156,
+              "tp": 109
+            }
+          },
+          "finetuned": {
+            "<16px": {
+              "gt": 1,
+              "tp": 0
+            },
+            "16-32px": {
+              "gt": 1,
+              "tp": 1
+            },
+            "32-64px": {
+              "gt": 0,
+              "tp": 0
+            },
+            ">64px": {
+              "gt": 156,
+              "tp": 151
+            }
+          }
+        }
+      }
+    }
+  },
+  "person_vehicle_overlap_qa": {
+    "total_flagged_overlaps": 78,
+    "frames_involved": 59,
+    "finetuned_person_recall_on_overlaps": 0.6154,
+    "baseline_person_recall_on_overlaps": 0.2949,
+    "finetuned_detected_count": 48,
+    "baseline_detected_count": 23,
+    "vehicle_confusion_overlap_count_ft": 9,
+    "vehicle_confusion_overlap_count_base": 2,
+    "sample_cases": [
+      {
+        "frame_id": "frame_000006",
+        "box": [
+          0.5421,
+          0.6192,
+          0.5733,
+          0.7577
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.07, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000019",
+        "box": [
+          0.5225,
+          0.6188,
+          0.5573,
+          0.7601
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.08, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000032",
+        "box": [
+          0.5077,
+          0.62,
+          0.5378,
+          0.7559
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.07, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000045",
+        "box": [
+          0.49,
+          0.6181,
+          0.5224,
+          0.7564
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.08, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000058",
+        "box": [
+          0.4711,
+          0.6176,
+          0.5056,
+          0.7549
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.08, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000071",
+        "box": [
+          0.4475,
+          0.6169,
+          0.4858,
+          0.7519
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.09, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000084",
+        "box": [
+          0.433,
+          0.6169,
+          0.4675,
+          0.7528
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.08, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000097",
+        "box": [
+          0.4185,
+          0.6218,
+          0.4524,
+          0.7464
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.07, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000110",
+        "box": [
+          0.398,
+          0.6207,
+          0.4329,
+          0.7503
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.07, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      },
+      {
+        "frame_id": "frame_000123",
+        "box": [
+          0.3813,
+          0.6182,
+          0.4157,
+          0.7589
+        ],
+        "description": "Person box heavily overlaps truck (box 0): IoU=0.07, containment=100.0%",
+        "finetuned_detected_person": true,
+        "baseline_detected_person": false
+      }
+    ]
+  },
+  "false_negatives_top10": {
+    "fold_1": {
+      "total_false_negatives": 44,
+      "top10": [
+        {
+          "frame_id": "frame_000396",
+          "box": [
+            4.4e-05,
+            0.550889,
+            0.020018,
+            0.736688
+          ],
+          "area": 0.0037111492260000012,
+          "height_px": 200.7,
+          "width_px": 38.4
+        },
+        {
+          "frame_id": "frame_000318",
+          "box": [
+            0.001866,
+            0.585407,
+            0.013682,
+            0.731344
+          ],
+          "area": 0.0017243915919999998,
+          "height_px": 157.6,
+          "width_px": 22.7
+        },
+        {
+          "frame_id": "frame_000006",
+          "box": [
+            0.656123,
+            0.522942,
+            0.676628,
+            0.619864
+          ],
+          "area": 0.001987385609999999,
+          "height_px": 104.7,
+          "width_px": 39.4
+        },
+        {
+          "frame_id": "frame_000266",
+          "box": [
+            0.077816,
+            0.573413,
+            0.098649,
+            0.645723
+          ],
+          "area": 0.0015064342300000024,
+          "height_px": 78.1,
+          "width_px": 40.0
+        },
+        {
+          "frame_id": "frame_000136",
+          "box": [
+            0.595278,
+            0.485285,
+            0.615907,
+            0.54637
+          ],
+          "area": 0.0012601224650000005,
+          "height_px": 66.0,
+          "width_px": 39.6
+        },
+        {
+          "frame_id": "frame_000279",
+          "box": [
+            0.054668,
+            0.56659,
+            0.072212,
+            0.627576
+          ],
+          "area": 0.0010699383839999996,
+          "height_px": 65.9,
+          "width_px": 33.7
+        },
+        {
+          "frame_id": "frame_000149",
+          "box": [
+            0.585784,
+            0.489954,
+            0.60403,
+            0.544662
+          ],
+          "area": 0.0009982021679999988,
+          "height_px": 59.1,
+          "width_px": 35.0
+        },
+        {
+          "frame_id": "frame_000292",
+          "box": [
+            0.019405,
+            0.556003,
+            0.035535,
+            0.609766
+          ],
+          "area": 0.00086719719,
+          "height_px": 58.1,
+          "width_px": 31.0
+        },
+        {
+          "frame_id": "frame_000214",
+          "box": [
+            0.994008,
+            0.275479,
+            0.999455,
+            0.326313
+          ],
+          "area": 0.0002768927979999992,
+          "height_px": 54.9,
+          "width_px": 10.5
+        },
+        {
+          "frame_id": "frame_000123",
+          "box": [
+            0.847302,
+            0.30143,
+            0.86321,
+            0.349915
+          ],
+          "area": 0.0007712993800000017,
+          "height_px": 52.4,
+          "width_px": 30.5
+        }
+      ]
+    },
+    "fold_2": {
+      "total_false_negatives": 94,
+      "top10": [
+        {
+          "frame_id": "frame_000773",
+          "box": [
+            0.231099,
+            0.814069,
+            0.290911,
+            0.995669
+          ],
+          "area": 0.010861859199999995,
+          "height_px": 196.1,
+          "width_px": 114.8
+        },
+        {
+          "frame_id": "frame_000695",
+          "box": [
+            0.504574,
+            0.58645,
+            0.543395,
+            0.733514
+          ],
+          "area": 0.005709171543999998,
+          "height_px": 158.8,
+          "width_px": 74.5
+        },
+        {
+          "frame_id": "frame_000708",
+          "box": [
+            0.465443,
+            0.624252,
+            0.507981,
+            0.771058
+          ],
+          "area": 0.006244833628000003,
+          "height_px": 158.6,
+          "width_px": 81.7
+        },
+        {
+          "frame_id": "frame_000747",
+          "box": [
+            0.331234,
+            0.771057,
+            0.382308,
+            0.909647
+          ],
+          "area": 0.007078345660000001,
+          "height_px": 149.7,
+          "width_px": 98.1
+        },
+        {
+          "frame_id": "frame_000786",
+          "box": [
+            0.176078,
+            0.86371,
+            0.24333,
+            0.999074
+          ],
+          "area": 0.009103499728,
+          "height_px": 146.2,
+          "width_px": 129.1
+        },
+        {
+          "frame_id": "frame_000682",
+          "box": [
+            0.552745,
+            0.565256,
+            0.578539,
+            0.698118
+          ],
+          "area": 0.0034270424279999987,
+          "height_px": 143.5,
+          "width_px": 49.5
+        },
+        {
+          "frame_id": "frame_000487",
+          "box": [
+            1e-06,
+            0.583483,
+            0.016046,
+            0.714905
+          ],
+          "area": 0.002108665990000001,
+          "height_px": 141.9,
+          "width_px": 30.8
+        },
+        {
+          "frame_id": "frame_000669",
+          "box": [
+            0.577153,
+            0.536296,
+            0.609931,
+            0.661728
+          ],
+          "area": 0.004111410095999996,
+          "height_px": 135.5,
+          "width_px": 62.9
+        },
+        {
+          "frame_id": "frame_000630",
+          "box": [
+            0.675991,
+            0.442503,
+            0.693465,
+            0.565562
+          ],
+          "area": 0.002150332965999999,
+          "height_px": 132.9,
+          "width_px": 33.6
+        },
+        {
+          "frame_id": "frame_000656",
+          "box": [
+            0.620098,
+            0.501733,
+            0.645324,
+            0.620552
+          ],
+          "area": 0.0029973280939999966,
+          "height_px": 128.3,
+          "width_px": 48.4
+        }
+      ]
+    },
+    "fold_3": {
+      "total_false_negatives": 58,
+      "top10": [
+        {
+          "frame_id": "frame_000968",
+          "box": [
+            0.361903,
+            0.376486,
+            0.379774,
+            0.472131
+          ],
+          "area": 0.0017092717950000032,
+          "height_px": 103.3,
+          "width_px": 34.3
+        },
+        {
+          "frame_id": "frame_000812",
+          "box": [
+            0.450785,
+            0.343218,
+            0.478938,
+            0.42863
+          ],
+          "area": 0.0024046040359999984,
+          "height_px": 92.2,
+          "width_px": 54.1
+        },
+        {
+          "frame_id": "frame_000838",
+          "box": [
+            0.432377,
+            0.339738,
+            0.464645,
+            0.424183
+          ],
+          "area": 0.0027248712599999966,
+          "height_px": 91.2,
+          "width_px": 62.0
+        },
+        {
+          "frame_id": "frame_001020",
+          "box": [
+            0.958249,
+            0.355287,
+            0.979083,
+            0.431751
+          ],
+          "area": 0.001593050976000001,
+          "height_px": 82.6,
+          "width_px": 40.0
+        },
+        {
+          "frame_id": "frame_001007",
+          "box": [
+            0.953545,
+            0.36365,
+            0.983787,
+            0.435335
+          ],
+          "area": 0.002167897770000001,
+          "height_px": 77.4,
+          "width_px": 58.1
+        },
+        {
+          "frame_id": "frame_001124",
+          "box": [
+            0.32225,
+            0.444672,
+            0.363411,
+            0.516172
+          ],
+          "area": 0.002943011499999998,
+          "height_px": 77.2,
+          "width_px": 79.0
+        },
+        {
+          "frame_id": "frame_001085",
+          "box": [
+            0.987454,
+            0.369154,
+            0.996578,
+            0.439714
+          ],
+          "area": 0.0006437894399999938,
+          "height_px": 76.2,
+          "width_px": 17.5
+        },
+        {
+          "frame_id": "frame_000812",
+          "box": [
+            0.052335,
+            0.927569,
+            0.113491,
+            0.996863
+          ],
+          "area": 0.004237743864000005,
+          "height_px": 74.8,
+          "width_px": 117.4
+        },
+        {
+          "frame_id": "frame_000955",
+          "box": [
+            0.575184,
+            0.372013,
+            0.594002,
+            0.440113
+          ],
+          "area": 0.0012815058,
+          "height_px": 73.5,
+          "width_px": 36.1
+        },
+        {
+          "frame_id": "frame_000955",
+          "box": [
+            0.715642,
+            0.338561,
+            0.742524,
+            0.406661
+          ],
+          "area": 0.001830664199999997,
+          "height_px": 73.5,
+          "width_px": 51.6
+        }
+      ]
+    },
+    "fold_4": {
+      "total_false_negatives": 24,
+      "top10": [
+        {
+          "frame_id": "frame_001462",
+          "box": [
+            0.474344,
+            0.495333,
+            0.511782,
+            0.640619
+          ],
+          "area": 0.005439217267999997,
+          "height_px": 156.9,
+          "width_px": 71.9
+        },
+        {
+          "frame_id": "frame_001306",
+          "box": [
+            0.426138,
+            0.432991,
+            0.44575,
+            0.553736
+          ],
+          "area": 0.0023680509399999954,
+          "height_px": 130.4,
+          "width_px": 37.7
+        },
+        {
+          "frame_id": "frame_001449",
+          "box": [
+            0.420538,
+            0.456606,
+            0.44291,
+            0.569891
+          ],
+          "area": 0.002534412020000001,
+          "height_px": 122.3,
+          "width_px": 43.0
+        },
+        {
+          "frame_id": "frame_001449",
+          "box": [
+            0.39208,
+            0.436394,
+            0.418772,
+            0.539651
+          ],
+          "area": 0.002756135843999999,
+          "height_px": 111.5,
+          "width_px": 51.2
+        },
+        {
+          "frame_id": "frame_001267",
+          "box": [
+            0.432291,
+            0.363576,
+            0.448317,
+            0.454306
+          ],
+          "area": 0.0014540389800000032,
+          "height_px": 98.0,
+          "width_px": 30.8
+        },
+        {
+          "frame_id": "frame_001280",
+          "box": [
+            0.44778,
+            0.44154,
+            0.465209,
+            0.52917
+          ],
+          "area": 0.0015273032699999983,
+          "height_px": 94.6,
+          "width_px": 33.5
+        },
+        {
+          "frame_id": "frame_001345",
+          "box": [
+            0.399109,
+            0.429361,
+            0.424647,
+            0.515383
+          ],
+          "area": 0.0021968298360000014,
+          "height_px": 92.9,
+          "width_px": 49.0
+        },
+        {
+          "frame_id": "frame_001267",
+          "box": [
+            0.456207,
+            0.425377,
+            0.479135,
+            0.509095
+          ],
+          "area": 0.0019194863039999994,
+          "height_px": 90.4,
+          "width_px": 44.0
+        },
+        {
+          "frame_id": "frame_001241",
+          "box": [
+            0.447455,
+            0.358865,
+            0.460276,
+            0.442144
+          ],
+          "area": 0.0010677200590000022,
+          "height_px": 89.9,
+          "width_px": 24.6
+        },
+        {
+          "frame_id": "frame_001280",
+          "box": [
+            0.443695,
+            0.428468,
+            0.457585,
+            0.507868
+          ],
+          "area": 0.0011028660000000007,
+          "height_px": 85.8,
+          "width_px": 26.7
+        }
+      ]
+    },
+    "fold_5": {
+      "total_false_negatives": 6,
+      "top10": [
+        {
+          "frame_id": "frame_001696",
+          "box": [
+            0.424613,
+            0.511046,
+            0.453595,
+            0.661574
+          ],
+          "area": 0.004362602496000001,
+          "height_px": 162.6,
+          "width_px": 55.6
+        },
+        {
+          "frame_id": "frame_001839",
+          "box": [
+            0.612727,
+            0.393222,
+            0.642415,
+            0.534644
+          ],
+          "area": 0.004198536335999991,
+          "height_px": 152.7,
+          "width_px": 57.0
+        },
+        {
+          "frame_id": "frame_002008",
+          "box": [
+            0.607258,
+            0.557431,
+            0.690416,
+            0.697553
+          ],
+          "area": 0.011652265276000006,
+          "height_px": 151.3,
+          "width_px": 159.7
+        },
+        {
+          "frame_id": "frame_001982",
+          "box": [
+            0.327161,
+            0.621551,
+            0.361607,
+            0.756213
+          ],
+          "area": 0.0046385672520000065,
+          "height_px": 145.4,
+          "width_px": 66.1
+        },
+        {
+          "frame_id": "frame_001696",
+          "box": [
+            0.229083,
+            0.466398,
+            0.262685,
+            0.564366
+          ],
+          "area": 0.0032919207360000012,
+          "height_px": 105.8,
+          "width_px": 64.5
+        },
+        {
+          "frame_id": "frame_001982",
+          "box": [
+            0.904355,
+            0.184429,
+            0.910927,
+            0.193527
+          ],
+          "area": 5.979205600000017e-05,
+          "height_px": 9.8,
+          "width_px": 12.6
+        }
+      ]
+    }
+  }
+}
