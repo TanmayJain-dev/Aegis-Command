@@ -329,6 +329,29 @@ That utility ingests into `frontend/public/feeds/uav-alpha/video.mp4` and `front
 
 ---
 
+## Methodological Scope & Limitations
+
+Aegis Command is engineered for transparent and accountable decision-support. In strict adherence to the project truth hierarchy (**Raw Evidence -> Deterministic Math -> Governed Reasoning -> Human Decision**), the following limitations govern the current deployment:
+
+1. **Homogeneous UAV Trajectory (Single Source Video)**:
+   All 155 certified ground-truth frames originate from a single continuous UAV flight over an industrial facility. While contiguous holdout splitting with 4-frame temporal buffers successfully prevents frame duplication leakage, the physical domain (sun elevation, asphalt surface reflectance, 15–25m flight ceiling, camera optical sensor) represents a single operational scenario. Cross-domain performance across adverse weather, low-light dawn/dusk conditions, or higher altitudes (>50m) remains unverified.
+
+2. **Same-Scene Cross-Validation**:
+   The reported 5-fold cross-validation metrics reflect holdout segments within the same operational flight sequence. They demonstrate temporal robustness across video intervals, but do not claim generalization to novel unseen geographical locations.
+
+3. **Secondary Feeds Unevaluated**:
+   Detections for secondary surveillance feeds (`cctv-bravo` and `bodycam-charlie`) are generated using zero-shot inference (`yolov8m.pt` @ 1280px) and have not been annotated with human-verified ground-truth bounding boxes. They are explicitly configured with `evaluated: false` and render a warning badge in the dashboard.
+
+4. **Precomputed Timeline Replay vs In-Browser Live Inference**:
+   To ensure reproducible sub-millisecond seeking and zero GPU load on resource-constrained operator workstations (e.g., dual-core client machines), the dashboard streams precomputed detection timelines (`detections.json`) over HTML5 video. Live perception events stream asynchronously to the FastAPI threat engine via WebSockets.
+
+5. **Resolution Impact vs The "Small-Object" Myth**:
+   Rigorous error analysis across all 1,737 human-verified ground-truth personnel reveals that **94.5% of people in this footage are $\ge 32\text{px}$ tall** (44.5% in the 32–64px bucket, 50.0% in the >64px bucket; only 0.46% are <16px). The poor recall of default stock detectors (e.g. legacy 8.8% recall) was caused by aggressive input downsampling (`imgsz=640px` collapsing 32px targets down to 10px blobs), a high confidence floor, and ByteTrack track eviction on 1.5s sampling gaps—not an intrinsic small-object resolution barrier. Evaluating at native 1280px resolution elevates zero-shot person recall from 8.8% to 49.2%, and fine-tuning reaches 87.0%.
+
+For full raw benchmark logs, bootstrap confidence intervals, and evaluation scripts, refer to [`docs/BENCHMARKS.md`](docs/BENCHMARKS.md).
+
+---
+
 ## Project Context
 
 Aegis Command was built for **HackerRank Infinity Hacks 2026**, where the team finished **#14 out of 6,000+ global participants**.
