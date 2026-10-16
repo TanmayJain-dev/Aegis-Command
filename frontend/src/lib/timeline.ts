@@ -20,7 +20,13 @@ export interface TimelineMeta {
   duration_s: number;
   stride?: number;
   model?: string;
+  weights_sha256?: string;
   imgsz?: number;
+  conf?: number;
+  date?: string;
+  evaluated?: boolean;
+  feed?: string;
+  sahi?: boolean;
   tracker?: string;
   generated_at?: string;
   git_commit?: string;
@@ -351,14 +357,28 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
 
   const duration_s = timesArray.length > 0 ? timesArray[timesArray.length - 1] : 0;
 
+  const rawMeta = (raw as Record<string, unknown>).meta as Partial<TimelineMeta> | undefined;
+
   const meta: TimelineMeta = {
-    feed_id: "legacy",
-    width: LEGACY_SOURCE_SIZE.width,
-    height: LEGACY_SOURCE_SIZE.height,
-    fps: LEGACY_FPS,
-    duration_s,
-    speed_is_simulated: true,
-    heading_frame: "image",
+    feed_id: rawMeta?.feed_id || "legacy",
+    width: rawMeta?.width || LEGACY_SOURCE_SIZE.width,
+    height: rawMeta?.height || LEGACY_SOURCE_SIZE.height,
+    fps: rawMeta?.fps || LEGACY_FPS,
+    duration_s: rawMeta?.duration_s || duration_s,
+    stride: rawMeta?.stride,
+    model: rawMeta?.model,
+    weights_sha256: rawMeta?.weights_sha256,
+    imgsz: rawMeta?.imgsz,
+    conf: rawMeta?.conf,
+    date: rawMeta?.date,
+    evaluated: rawMeta?.evaluated,
+    feed: rawMeta?.feed,
+    sahi: rawMeta?.sahi,
+    tracker: rawMeta?.tracker,
+    generated_at: rawMeta?.generated_at,
+    git_commit: rawMeta?.git_commit,
+    speed_is_simulated: rawMeta?.speed_is_simulated ?? true,
+    heading_frame: rawMeta?.heading_frame || "image",
   };
 
   const getScale = (targetWidth: number, targetHeight: number): ScaleFactors => ({
