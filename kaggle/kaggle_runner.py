@@ -42,20 +42,23 @@ def compute_sha256(filepath: Path) -> str:
 
 
 def find_dataset_dir() -> Path:
-    candidates = [
-        Path("/kaggle/input/aegis-command-dataset"),
-        Path("/kaggle/input/aegis_command_dataset"),
-    ]
-    # Scan /kaggle/input for any dir containing images and labels
     input_root = Path("/kaggle/input")
-    if input_root.exists():
-        for d in input_root.iterdir():
-            if (d / "images").exists() and (d / "labels").exists():
+    if not input_root.exists():
+        raise FileNotFoundError("Could not locate /kaggle/input")
+
+    entries = list(input_root.iterdir())
+    log(f"Entries in /kaggle/input: {[p.name for p in entries]}")
+    for d in entries:
+        if d.is_dir():
+            if (d / "images.zip").exists() or (d / "images").exists() or (d / "yolov8m.pt").exists():
                 return d
-    for c in candidates:
+    subdirs = [d for d in entries if d.is_dir()]
+    if len(subdirs) == 1:
+        return subdirs[0]
+    for c in [input_root / "aegis-command-dataset", input_root / "aegis_command_dataset"]:
         if c.exists():
             return c
-    raise FileNotFoundError("Could not locate Aegis dataset in /kaggle/input")
+    raise FileNotFoundError(f"Could not locate Aegis dataset in /kaggle/input: {[p.name for p in entries]}")
 
 
 def main():
@@ -81,7 +84,7 @@ def main():
     run_cmd([sys.executable, "-m", "pip", "install", "-q", "ultralytics==8.4.175"])
 
     # 4. Clone repo
-    repo_dir = work_dir / "repo"
+    repo_dir = Path("/tmp/repo")
     branch = os.environ.get("GIT_BRANCH", "feat/detection-v4")
     if not repo_dir.exists():
         log(f"Cloning repo into {repo_dir} (branch: {branch})...")
