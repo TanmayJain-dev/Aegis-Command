@@ -146,14 +146,15 @@ def run_bakeoff(repo_dir: Path):
     sahi_dir = repo_dir / "docs" / "results" / "raw" / "sahi_yolov8m_640px_all"
     if (sahi_dir / "predictions.json").exists():
         log(f"Skipping SAHI (already completed: {sahi_dir / 'predictions.json'}).")
-    else:
-        log("Evaluating SAHI with yolov8m (slice=640x640, overlap=0.2)...")
-        detection_model = AutoDetectionModel.from_pretrained(
-            model_type="yolov8",
-            model_path="yolov8m.pt",
-            confidence_threshold=0.001,
-            device="cuda:0"
-        )
+        return
+
+    log("Evaluating SAHI with yolov8m (slice=640x640, overlap=0.2)...")
+    detection_model = AutoDetectionModel.from_pretrained(
+        model_type="yolov8",
+        model_path="yolov8m.pt",
+        confidence_threshold=0.001,
+        device="cuda:0"
+    )
 
     images_dir = repo_dir / "vision" / "eval" / "images"
     labels_path = repo_dir / "vision" / "eval" / "labels"
