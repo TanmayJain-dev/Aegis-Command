@@ -41,24 +41,54 @@ def compute_sha256(filepath: Path) -> str:
     return h.hexdigest()
 
 
-def find_dataset_dir() -> Path:
-    input_root = Path("/kaggle/input")
-    if not input_root.exists():
-        raise FileNotFoundError("Could not locate /kaggle/input")
+def safe_link_or_copy(src: Path, dst: Path):
+    if dst.exists():
+        return
+    try:
+        os.symlink(src.resolve(), dst)
+    except OSError:
+        shutil.copy2(src, dst)
 
-    entries = list(input_root.iterdir())
-    log(f"Entries in /kaggle/input: {[p.name for p in entries]}")
-    for d in entries:
-        if d.is_dir():
-            if (d / "images.zip").exists() or (d / "images").exists() or (d / "yolov8m.pt").exists():
-                return d
-    subdirs = [d for d in entries if d.is_dir()]
-    if len(subdirs) == 1:
-        return subdirs[0]
-    for c in [input_root / "aegis-command-dataset", input_root / "aegis_command_dataset"]:
-        if c.exists():
-            return c
-    raise FileNotFoundError(f"Could not locate Aegis dataset in /kaggle/input: {[p.name for p in entries]}")
+
+def find_dataset_files(input_root: Path):
+    images_dir = None
+    labels_dir = None
+    yolov8m_path = None
+    images_zip = None
+    labels_zip = None
+
+    log(f"Recursively scanning {input_root}...")
+    for root, dirs, files in os.walk(input_root):
+        r_path = Path(root)
+        if "yolov8m.pt" in files and yolov8m_path is None:
+            yolov8m_path = r_path / "yolov8m.pt"
+            log(f"Found yolov8m.pt at: {yolov8m_path}")
+        if "images.zip" in files and images_zip is None:
+            images_zip = r_path / "images.zip"
+            log(f"Found images.zip at: {images_zip}")
+        if "labels.zip" in files and labels_zip is None:
+            labels_zip = r_path / "labels.zip"
+            log(f"Found labels.zip at: {labels_zip}")
+        if r_path.name == "images" and any(f.endswith(".jpg") for f in files):
+            images_dir = r_path
+            log(f"Found images dir at: {images_dir} ({len(files)} files)")
+        elif "images" in dirs and any((r_path / "images").glob("*.jpg")) and images_dir is None:
+            images_dir = r_path / "images"
+            log(f"Found images dir child at: {images_dir}")
+        if r_path.name == "labels" and any(f.endswith(".txt") for f in files):
+            labels_dir = r_path
+            log(f"Found labels dir at: {labels_dir} ({len(files)} files)")
+        elif "labels" in dirs and any((r_path / "labels").glob("*.txt")) and labels_dir is None:
+            labels_dir = r_path / "labels"
+            log(f"Found labels dir child at: {labels_dir}")
+
+    return {
+        "images_dir": images_dir,
+        "labels_dir": labels_dir,
+        "yolov8m_path": yolov8m_path,
+        "images_zip": images_zip,
+        "labels_zip": labels_zip
+    }
 
 
 def main():
@@ -93,8 +123,9 @@ def main():
         log(f"Repo already exists at {repo_dir}")
 
     # 5. Locate dataset and link into repo
-    dataset_dir = find_dataset_dir()
-    log(f"Found input dataset at: {dataset_dir}")
+    input_root = Path("/kaggle/input")
+    assert input_root.exists(), "Missing /kaggle/input"
+    found = find_dataset_files(input_root)
 
     eval_images_dir = repo_dir / "vision" / "eval" / "images"
     eval_labels_dir = repo_dir / "vision" / "eval" / "labels"
@@ -102,37 +133,46 @@ def main():
     eval_labels_dir.mkdir(parents=True, exist_ok=True)
 
     import zipfile
-    if (dataset_dir / "images.zip").exists():
-        log("Extracting images.zip...")
-        with zipfile.ZipFile(dataset_dir / "images.zip", "r") as z:
+    if found["images_zip"]:
+        log(f"Extracting {found['images_zip']}...")
+        with zipfile.ZipFile(found["images_zip"], "r") as z:
             z.extractall(eval_images_dir.parent)
-    elif (dataset_dir / "images").exists():
-        for img in (dataset_dir / "images").glob("*.jpg"):
-            dst = eval_images_dir / img.name
-            if not dst.exists():
-                os.symlink(img.resolve(), dst)
+    elif found["images_dir"]:
+        log(f"Copying images from {found['images_dir']} to {eval_images_dir}...")
+        for img in found["images_dir"].glob("*.jpg"):
+            safe_link_or_copy(img, eval_images_dir / img.name)
+    else:
+        log("Searching for all .jpg files under /kaggle/input...")
+        for root, _, files in os.walk(input_root):
+            for f in files:
+                if f.endswith(".jpg"):
+                    safe_link_or_copy(Path(root) / f, eval_images_dir / f)
 
-    if (dataset_dir / "labels.zip").exists():
-        log("Extracting labels.zip...")
-        with zipfile.ZipFile(dataset_dir / "labels.zip", "r") as z:
+    if found["labels_zip"]:
+        log(f"Extracting {found['labels_zip']}...")
+        with zipfile.ZipFile(found["labels_zip"], "r") as z:
             z.extractall(eval_labels_dir.parent)
-    elif (dataset_dir / "labels").exists():
-        for lbl in (dataset_dir / "labels").glob("*.txt"):
-            dst = eval_labels_dir / lbl.name
-            if not dst.exists():
-                os.symlink(lbl.resolve(), dst)
+    elif found["labels_dir"]:
+        log(f"Copying labels from {found['labels_dir']} to {eval_labels_dir}...")
+        for lbl in found["labels_dir"].glob("*.txt"):
+            safe_link_or_copy(lbl, eval_labels_dir / lbl.name)
 
-    log(f"Verified dataset: {len(list(eval_images_dir.glob('*.jpg')))} images and {len(list(eval_labels_dir.glob('*.txt')))} labels.")
+    img_count = len(list(eval_images_dir.glob("*.jpg")))
+    lbl_count = len(list(eval_labels_dir.glob("*.txt")))
+    log(f"Verified dataset: {img_count} images and {lbl_count} labels.")
+    assert img_count == 155, f"Expected 155 images in {eval_images_dir}, found {img_count}"
+    assert lbl_count == 155, f"Expected 155 labels in {eval_labels_dir}, found {lbl_count}"
 
     # Base model weights
     weights_dir = repo_dir / "weights"
     weights_dir.mkdir(parents=True, exist_ok=True)
-    src_weights = dataset_dir / "yolov8m.pt"
-    if src_weights.exists():
+    if found["yolov8m_path"]:
         dst_weights = weights_dir / "yolov8m.pt"
         if not dst_weights.exists():
-            shutil.copy2(src_weights, dst_weights)
+            shutil.copy2(found["yolov8m_path"], dst_weights)
         log(f"Verified yolov8m.pt baseline (SHA-256: {compute_sha256(dst_weights)})")
+    else:
+        raise FileNotFoundError("Could not find yolov8m.pt in /kaggle/input")
 
     # Add repo to sys.path
     os.chdir(str(repo_dir))
@@ -180,7 +220,7 @@ def main():
             log(f"Training Fold {fold} fixed-epoch model (val=False, seed=42)...")
             model = YOLO(FIXED_CONFIG["base_model"])
             train_fixed = model.train(
-                data="vision/data/aegis_data.yaml",
+                data=str(repo_dir / "vision" / "data" / "aegis_data.yaml"),
                 epochs=FIXED_CONFIG["epochs"],
                 imgsz=FIXED_CONFIG["imgsz"],
                 batch=FIXED_CONFIG["batch"],
@@ -219,6 +259,9 @@ def main():
         # Evaluate on holdout val split
         log(f"Evaluating Fold {fold} last.pt on holdout val split...")
         run_evaluation(
+            images_dir=str(eval_images_dir),
+            labels_dir=str(eval_labels_dir),
+            manifest_path=str(repo_dir / "vision" / "data" / "split_manifest.json"),
             model_path=str(last_weights_path),
             split="val",
             fold=fold,
@@ -247,9 +290,9 @@ def main():
         for img_path in eval_images:
             stem = img_path.stem
             lbl_path = eval_labels_dir / f"{stem}.txt"
-            os.symlink(img_path.resolve(), demo_data_dir / "images" / "train" / f"{stem}.jpg")
+            safe_link_or_copy(img_path, demo_data_dir / "images" / "train" / f"{stem}.jpg")
             if lbl_path.exists():
-                os.symlink(lbl_path.resolve(), demo_data_dir / "labels" / "train" / f"{stem}.txt")
+                safe_link_or_copy(lbl_path, demo_data_dir / "labels" / "train" / f"{stem}.txt")
             else:
                 (demo_data_dir / "labels" / "train" / f"{stem}.txt").touch()
 
