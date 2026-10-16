@@ -1,0 +1,169 @@
+{
+  "frame_000136": {
+    "timestamp_s": 2.2689,
+    "gt_count": 19,
+    "gt_classes": [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      2,
+      0,
+      0,
+      1,
+      0,
+      1,
+      0,
+      0,
+      0,
+      0
+    ],
+    "detections_key": "2.27",
+    "detections_count": 3,
+    "detections": [
+      {
+        "id": "Vehicle-100",
+        "class": "person",
+        "confidence": 0.5,
+        "box": [
+          1799.5,
+          334.0,
+          1829.7,
+          385.6
+        ],
+        "speed_kmh": 9,
+        "direction": "NW"
+      },
+      {
+        "id": "Vehicle-78",
+        "class": "person",
+        "confidence": 0.4,
+        "box": [
+          1727.6,
+          326.0,
+          1755.6,
+          378.5
+        ],
+        "speed_kmh": 30,
+        "direction": "NW"
+      },
+      {
+        "id": "Vehicle-108",
+        "class": "person",
+        "confidence": 0.44,
+        "box": [
+          1137.7,
+          524.6,
+          1194.2,
+          629.9
+        ],
+        "speed_kmh": 0,
+        "direction": "-"
+      }
+    ]
+  },
+  "frame_000630": {
+    "timestamp_s": 10.5105,
+    "gt_count": 21,
+    "gt_classes": [
+      2,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1
+    ],
+    "detections_key": "10.51",
+    "detections_count": 3,
+    "detections": [
+      {
+        "id": "Vehicle-294",
+        "class": "truck",
+        "confidence": 0.41,
+        "box": [
+          966.8,
+          523.0,
+          1344.2,
+          795.0
+        ],
+        "speed_kmh": 33,
+        "direction": "SW"
+      },
+      {
+        "id": "Vehicle-579",
+        "class": "person",
+        "confidence": 0.47,
+        "box": [
+          1201.2,
+          314.6,
+          1230.0,
+          379.5
+        ],
+        "speed_kmh": 17,
+        "direction": "NW"
+      },
+      {
+        "id": "Vehicle-564",
+        "class": "person",
+        "confidence": 0.54,
+        "box": [
+          1170.5,
+          313.7,
+          1201.7,
+          375.3
+        ],
+        "speed_kmh": 48,
+        "direction": "NW"
+      }
+    ]
+  },
+  "frame_001202": {
+    "timestamp_s": 20.0534,
+    "gt_count": 6,
+    "gt_classes": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      2
+    ],
+    "detections_key": "20.15",
+    "detections_count": 1,
+    "detections": [
+      {
+        "id": "Vehicle-986",
+        "class": "person",
+        "confidence": 0.41,
+        "box": [
+          957.6,
+          254.9,
+          982.3,
+          307.9
+        ],
+        "speed_kmh": 0,
+        "direction": "-"
+      }
+    ]
+  }
+}

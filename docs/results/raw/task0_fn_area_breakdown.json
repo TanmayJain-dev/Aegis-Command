@@ -1,0 +1,13 @@
+{
+  "total_gt": 1948,
+  "total_fn": 1757,
+  "fn_share_pct": 90.2,
+  "fn_by_area": {
+    "small": 411,
+    "medium": 1112,
+    "large": 234
+  },
+  "small_object_share_of_fn_pct": 23.39,
+  "medium_object_share_of_fn_pct": 63.29,
+  "large_object_share_of_fn_pct": 13.32
+}
