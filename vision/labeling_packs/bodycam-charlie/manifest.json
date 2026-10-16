@@ -1,0 +1,382 @@
+{
+  "feed": "bodycam-charlie",
+  "source_video": "frontend/public/feeds/bodycam-charlie/video.mp4",
+  "total_frames_sampled": 40,
+  "source_total_frames": 805,
+  "source_fps": 29.97,
+  "source_duration_s": 26.86,
+  "reviewed": false,
+  "annotator": null,
+  "verification_date": null,
+  "classes": [
+    "person",
+    "car",
+    "truck",
+    "motorcycle",
+    "bus"
+  ],
+  "prelabels_used": false,
+  "invariant": "Zero model pre-labels. Human ground-truth verification only.",
+  "frames": [
+    {
+      "pack_index": 0,
+      "video_frame_index": 0,
+      "timestamp_seconds": 0.0,
+      "image_filename": "bodycam-charlie_frame_00_0000.jpg",
+      "label_filename": "bodycam-charlie_frame_00_0000.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 1,
+      "video_frame_index": 21,
+      "timestamp_seconds": 0.701,
+      "image_filename": "bodycam-charlie_frame_01_0021.jpg",
+      "label_filename": "bodycam-charlie_frame_01_0021.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 2,
+      "video_frame_index": 41,
+      "timestamp_seconds": 1.368,
+      "image_filename": "bodycam-charlie_frame_02_0041.jpg",
+      "label_filename": "bodycam-charlie_frame_02_0041.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 3,
+      "video_frame_index": 62,
+      "timestamp_seconds": 2.069,
+      "image_filename": "bodycam-charlie_frame_03_0062.jpg",
+      "label_filename": "bodycam-charlie_frame_03_0062.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 4,
+      "video_frame_index": 82,
+      "timestamp_seconds": 2.736,
+      "image_filename": "bodycam-charlie_frame_04_0082.jpg",
+      "label_filename": "bodycam-charlie_frame_04_0082.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 5,
+      "video_frame_index": 103,
+      "timestamp_seconds": 3.437,
+      "image_filename": "bodycam-charlie_frame_05_0103.jpg",
+      "label_filename": "bodycam-charlie_frame_05_0103.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 6,
+      "video_frame_index": 124,
+      "timestamp_seconds": 4.137,
+      "image_filename": "bodycam-charlie_frame_06_0124.jpg",
+      "label_filename": "bodycam-charlie_frame_06_0124.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 7,
+      "video_frame_index": 144,
+      "timestamp_seconds": 4.805,
+      "image_filename": "bodycam-charlie_frame_07_0144.jpg",
+      "label_filename": "bodycam-charlie_frame_07_0144.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 8,
+      "video_frame_index": 165,
+      "timestamp_seconds": 5.506,
+      "image_filename": "bodycam-charlie_frame_08_0165.jpg",
+      "label_filename": "bodycam-charlie_frame_08_0165.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 9,
+      "video_frame_index": 186,
+      "timestamp_seconds": 6.206,
+      "image_filename": "bodycam-charlie_frame_09_0186.jpg",
+      "label_filename": "bodycam-charlie_frame_09_0186.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 10,
+      "video_frame_index": 206,
+      "timestamp_seconds": 6.874,
+      "image_filename": "bodycam-charlie_frame_10_0206.jpg",
+      "label_filename": "bodycam-charlie_frame_10_0206.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 11,
+      "video_frame_index": 227,
+      "timestamp_seconds": 7.574,
+      "image_filename": "bodycam-charlie_frame_11_0227.jpg",
+      "label_filename": "bodycam-charlie_frame_11_0227.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 12,
+      "video_frame_index": 247,
+      "timestamp_seconds": 8.242,
+      "image_filename": "bodycam-charlie_frame_12_0247.jpg",
+      "label_filename": "bodycam-charlie_frame_12_0247.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 13,
+      "video_frame_index": 268,
+      "timestamp_seconds": 8.942,
+      "image_filename": "bodycam-charlie_frame_13_0268.jpg",
+      "label_filename": "bodycam-charlie_frame_13_0268.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 14,
+      "video_frame_index": 289,
+      "timestamp_seconds": 9.643,
+      "image_filename": "bodycam-charlie_frame_14_0289.jpg",
+      "label_filename": "bodycam-charlie_frame_14_0289.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 15,
+      "video_frame_index": 309,
+      "timestamp_seconds": 10.31,
+      "image_filename": "bodycam-charlie_frame_15_0309.jpg",
+      "label_filename": "bodycam-charlie_frame_15_0309.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 16,
+      "video_frame_index": 330,
+      "timestamp_seconds": 11.011,
+      "image_filename": "bodycam-charlie_frame_16_0330.jpg",
+      "label_filename": "bodycam-charlie_frame_16_0330.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 17,
+      "video_frame_index": 350,
+      "timestamp_seconds": 11.678,
+      "image_filename": "bodycam-charlie_frame_17_0350.jpg",
+      "label_filename": "bodycam-charlie_frame_17_0350.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 18,
+      "video_frame_index": 371,
+      "timestamp_seconds": 12.379,
+      "image_filename": "bodycam-charlie_frame_18_0371.jpg",
+      "label_filename": "bodycam-charlie_frame_18_0371.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 19,
+      "video_frame_index": 392,
+      "timestamp_seconds": 13.08,
+      "image_filename": "bodycam-charlie_frame_19_0392.jpg",
+      "label_filename": "bodycam-charlie_frame_19_0392.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 20,
+      "video_frame_index": 412,
+      "timestamp_seconds": 13.747,
+      "image_filename": "bodycam-charlie_frame_20_0412.jpg",
+      "label_filename": "bodycam-charlie_frame_20_0412.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 21,
+      "video_frame_index": 433,
+      "timestamp_seconds": 14.448,
+      "image_filename": "bodycam-charlie_frame_21_0433.jpg",
+      "label_filename": "bodycam-charlie_frame_21_0433.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 22,
+      "video_frame_index": 454,
+      "timestamp_seconds": 15.148,
+      "image_filename": "bodycam-charlie_frame_22_0454.jpg",
+      "label_filename": "bodycam-charlie_frame_22_0454.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 23,
+      "video_frame_index": 474,
+      "timestamp_seconds": 15.816,
+      "image_filename": "bodycam-charlie_frame_23_0474.jpg",
+      "label_filename": "bodycam-charlie_frame_23_0474.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 24,
+      "video_frame_index": 495,
+      "timestamp_seconds": 16.517,
+      "image_filename": "bodycam-charlie_frame_24_0495.jpg",
+      "label_filename": "bodycam-charlie_frame_24_0495.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 25,
+      "video_frame_index": 515,
+      "timestamp_seconds": 17.184,
+      "image_filename": "bodycam-charlie_frame_25_0515.jpg",
+      "label_filename": "bodycam-charlie_frame_25_0515.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 26,
+      "video_frame_index": 536,
+      "timestamp_seconds": 17.885,
+      "image_filename": "bodycam-charlie_frame_26_0536.jpg",
+      "label_filename": "bodycam-charlie_frame_26_0536.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 27,
+      "video_frame_index": 557,
+      "timestamp_seconds": 18.585,
+      "image_filename": "bodycam-charlie_frame_27_0557.jpg",
+      "label_filename": "bodycam-charlie_frame_27_0557.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 28,
+      "video_frame_index": 577,
+      "timestamp_seconds": 19.253,
+      "image_filename": "bodycam-charlie_frame_28_0577.jpg",
+      "label_filename": "bodycam-charlie_frame_28_0577.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 29,
+      "video_frame_index": 598,
+      "timestamp_seconds": 19.953,
+      "image_filename": "bodycam-charlie_frame_29_0598.jpg",
+      "label_filename": "bodycam-charlie_frame_29_0598.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 30,
+      "video_frame_index": 618,
+      "timestamp_seconds": 20.621,
+      "image_filename": "bodycam-charlie_frame_30_0618.jpg",
+      "label_filename": "bodycam-charlie_frame_30_0618.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 31,
+      "video_frame_index": 639,
+      "timestamp_seconds": 21.321,
+      "image_filename": "bodycam-charlie_frame_31_0639.jpg",
+      "label_filename": "bodycam-charlie_frame_31_0639.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 32,
+      "video_frame_index": 660,
+      "timestamp_seconds": 22.022,
+      "image_filename": "bodycam-charlie_frame_32_0660.jpg",
+      "label_filename": "bodycam-charlie_frame_32_0660.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 33,
+      "video_frame_index": 680,
+      "timestamp_seconds": 22.689,
+      "image_filename": "bodycam-charlie_frame_33_0680.jpg",
+      "label_filename": "bodycam-charlie_frame_33_0680.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 34,
+      "video_frame_index": 701,
+      "timestamp_seconds": 23.39,
+      "image_filename": "bodycam-charlie_frame_34_0701.jpg",
+      "label_filename": "bodycam-charlie_frame_34_0701.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 35,
+      "video_frame_index": 722,
+      "timestamp_seconds": 24.091,
+      "image_filename": "bodycam-charlie_frame_35_0722.jpg",
+      "label_filename": "bodycam-charlie_frame_35_0722.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 36,
+      "video_frame_index": 742,
+      "timestamp_seconds": 24.758,
+      "image_filename": "bodycam-charlie_frame_36_0742.jpg",
+      "label_filename": "bodycam-charlie_frame_36_0742.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 37,
+      "video_frame_index": 763,
+      "timestamp_seconds": 25.459,
+      "image_filename": "bodycam-charlie_frame_37_0763.jpg",
+      "label_filename": "bodycam-charlie_frame_37_0763.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 38,
+      "video_frame_index": 783,
+      "timestamp_seconds": 26.126,
+      "image_filename": "bodycam-charlie_frame_38_0783.jpg",
+      "label_filename": "bodycam-charlie_frame_38_0783.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 39,
+      "video_frame_index": 804,
+      "timestamp_seconds": 26.827,
+      "image_filename": "bodycam-charlie_frame_39_0804.jpg",
+      "label_filename": "bodycam-charlie_frame_39_0804.txt",
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}

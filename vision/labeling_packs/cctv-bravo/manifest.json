@@ -1,0 +1,382 @@
+{
+  "feed": "cctv-bravo",
+  "source_video": "frontend/public/feeds/cctv-bravo/video.mp4",
+  "total_frames_sampled": 40,
+  "source_total_frames": 714,
+  "source_fps": 25.0,
+  "source_duration_s": 28.56,
+  "reviewed": false,
+  "annotator": null,
+  "verification_date": null,
+  "classes": [
+    "person",
+    "car",
+    "truck",
+    "motorcycle",
+    "bus"
+  ],
+  "prelabels_used": false,
+  "invariant": "Zero model pre-labels. Human ground-truth verification only.",
+  "frames": [
+    {
+      "pack_index": 0,
+      "video_frame_index": 0,
+      "timestamp_seconds": 0.0,
+      "image_filename": "cctv-bravo_frame_00_0000.jpg",
+      "label_filename": "cctv-bravo_frame_00_0000.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 1,
+      "video_frame_index": 18,
+      "timestamp_seconds": 0.72,
+      "image_filename": "cctv-bravo_frame_01_0018.jpg",
+      "label_filename": "cctv-bravo_frame_01_0018.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 2,
+      "video_frame_index": 37,
+      "timestamp_seconds": 1.48,
+      "image_filename": "cctv-bravo_frame_02_0037.jpg",
+      "label_filename": "cctv-bravo_frame_02_0037.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 3,
+      "video_frame_index": 55,
+      "timestamp_seconds": 2.2,
+      "image_filename": "cctv-bravo_frame_03_0055.jpg",
+      "label_filename": "cctv-bravo_frame_03_0055.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 4,
+      "video_frame_index": 73,
+      "timestamp_seconds": 2.92,
+      "image_filename": "cctv-bravo_frame_04_0073.jpg",
+      "label_filename": "cctv-bravo_frame_04_0073.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 5,
+      "video_frame_index": 91,
+      "timestamp_seconds": 3.64,
+      "image_filename": "cctv-bravo_frame_05_0091.jpg",
+      "label_filename": "cctv-bravo_frame_05_0091.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 6,
+      "video_frame_index": 110,
+      "timestamp_seconds": 4.4,
+      "image_filename": "cctv-bravo_frame_06_0110.jpg",
+      "label_filename": "cctv-bravo_frame_06_0110.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 7,
+      "video_frame_index": 128,
+      "timestamp_seconds": 5.12,
+      "image_filename": "cctv-bravo_frame_07_0128.jpg",
+      "label_filename": "cctv-bravo_frame_07_0128.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 8,
+      "video_frame_index": 146,
+      "timestamp_seconds": 5.84,
+      "image_filename": "cctv-bravo_frame_08_0146.jpg",
+      "label_filename": "cctv-bravo_frame_08_0146.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 9,
+      "video_frame_index": 165,
+      "timestamp_seconds": 6.6,
+      "image_filename": "cctv-bravo_frame_09_0165.jpg",
+      "label_filename": "cctv-bravo_frame_09_0165.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 10,
+      "video_frame_index": 183,
+      "timestamp_seconds": 7.32,
+      "image_filename": "cctv-bravo_frame_10_0183.jpg",
+      "label_filename": "cctv-bravo_frame_10_0183.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 11,
+      "video_frame_index": 201,
+      "timestamp_seconds": 8.04,
+      "image_filename": "cctv-bravo_frame_11_0201.jpg",
+      "label_filename": "cctv-bravo_frame_11_0201.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 12,
+      "video_frame_index": 219,
+      "timestamp_seconds": 8.76,
+      "image_filename": "cctv-bravo_frame_12_0219.jpg",
+      "label_filename": "cctv-bravo_frame_12_0219.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 13,
+      "video_frame_index": 238,
+      "timestamp_seconds": 9.52,
+      "image_filename": "cctv-bravo_frame_13_0238.jpg",
+      "label_filename": "cctv-bravo_frame_13_0238.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 14,
+      "video_frame_index": 256,
+      "timestamp_seconds": 10.24,
+      "image_filename": "cctv-bravo_frame_14_0256.jpg",
+      "label_filename": "cctv-bravo_frame_14_0256.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 15,
+      "video_frame_index": 274,
+      "timestamp_seconds": 10.96,
+      "image_filename": "cctv-bravo_frame_15_0274.jpg",
+      "label_filename": "cctv-bravo_frame_15_0274.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 16,
+      "video_frame_index": 293,
+      "timestamp_seconds": 11.72,
+      "image_filename": "cctv-bravo_frame_16_0293.jpg",
+      "label_filename": "cctv-bravo_frame_16_0293.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 17,
+      "video_frame_index": 311,
+      "timestamp_seconds": 12.44,
+      "image_filename": "cctv-bravo_frame_17_0311.jpg",
+      "label_filename": "cctv-bravo_frame_17_0311.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 18,
+      "video_frame_index": 329,
+      "timestamp_seconds": 13.16,
+      "image_filename": "cctv-bravo_frame_18_0329.jpg",
+      "label_filename": "cctv-bravo_frame_18_0329.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 19,
+      "video_frame_index": 347,
+      "timestamp_seconds": 13.88,
+      "image_filename": "cctv-bravo_frame_19_0347.jpg",
+      "label_filename": "cctv-bravo_frame_19_0347.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 20,
+      "video_frame_index": 366,
+      "timestamp_seconds": 14.64,
+      "image_filename": "cctv-bravo_frame_20_0366.jpg",
+      "label_filename": "cctv-bravo_frame_20_0366.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 21,
+      "video_frame_index": 384,
+      "timestamp_seconds": 15.36,
+      "image_filename": "cctv-bravo_frame_21_0384.jpg",
+      "label_filename": "cctv-bravo_frame_21_0384.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 22,
+      "video_frame_index": 402,
+      "timestamp_seconds": 16.08,
+      "image_filename": "cctv-bravo_frame_22_0402.jpg",
+      "label_filename": "cctv-bravo_frame_22_0402.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 23,
+      "video_frame_index": 420,
+      "timestamp_seconds": 16.8,
+      "image_filename": "cctv-bravo_frame_23_0420.jpg",
+      "label_filename": "cctv-bravo_frame_23_0420.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 24,
+      "video_frame_index": 439,
+      "timestamp_seconds": 17.56,
+      "image_filename": "cctv-bravo_frame_24_0439.jpg",
+      "label_filename": "cctv-bravo_frame_24_0439.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 25,
+      "video_frame_index": 457,
+      "timestamp_seconds": 18.28,
+      "image_filename": "cctv-bravo_frame_25_0457.jpg",
+      "label_filename": "cctv-bravo_frame_25_0457.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 26,
+      "video_frame_index": 475,
+      "timestamp_seconds": 19.0,
+      "image_filename": "cctv-bravo_frame_26_0475.jpg",
+      "label_filename": "cctv-bravo_frame_26_0475.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 27,
+      "video_frame_index": 494,
+      "timestamp_seconds": 19.76,
+      "image_filename": "cctv-bravo_frame_27_0494.jpg",
+      "label_filename": "cctv-bravo_frame_27_0494.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 28,
+      "video_frame_index": 512,
+      "timestamp_seconds": 20.48,
+      "image_filename": "cctv-bravo_frame_28_0512.jpg",
+      "label_filename": "cctv-bravo_frame_28_0512.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 29,
+      "video_frame_index": 530,
+      "timestamp_seconds": 21.2,
+      "image_filename": "cctv-bravo_frame_29_0530.jpg",
+      "label_filename": "cctv-bravo_frame_29_0530.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 30,
+      "video_frame_index": 548,
+      "timestamp_seconds": 21.92,
+      "image_filename": "cctv-bravo_frame_30_0548.jpg",
+      "label_filename": "cctv-bravo_frame_30_0548.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 31,
+      "video_frame_index": 567,
+      "timestamp_seconds": 22.68,
+      "image_filename": "cctv-bravo_frame_31_0567.jpg",
+      "label_filename": "cctv-bravo_frame_31_0567.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 32,
+      "video_frame_index": 585,
+      "timestamp_seconds": 23.4,
+      "image_filename": "cctv-bravo_frame_32_0585.jpg",
+      "label_filename": "cctv-bravo_frame_32_0585.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 33,
+      "video_frame_index": 603,
+      "timestamp_seconds": 24.12,
+      "image_filename": "cctv-bravo_frame_33_0603.jpg",
+      "label_filename": "cctv-bravo_frame_33_0603.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 34,
+      "video_frame_index": 622,
+      "timestamp_seconds": 24.88,
+      "image_filename": "cctv-bravo_frame_34_0622.jpg",
+      "label_filename": "cctv-bravo_frame_34_0622.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 35,
+      "video_frame_index": 640,
+      "timestamp_seconds": 25.6,
+      "image_filename": "cctv-bravo_frame_35_0640.jpg",
+      "label_filename": "cctv-bravo_frame_35_0640.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 36,
+      "video_frame_index": 658,
+      "timestamp_seconds": 26.32,
+      "image_filename": "cctv-bravo_frame_36_0658.jpg",
+      "label_filename": "cctv-bravo_frame_36_0658.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 37,
+      "video_frame_index": 676,
+      "timestamp_seconds": 27.04,
+      "image_filename": "cctv-bravo_frame_37_0676.jpg",
+      "label_filename": "cctv-bravo_frame_37_0676.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 38,
+      "video_frame_index": 695,
+      "timestamp_seconds": 27.8,
+      "image_filename": "cctv-bravo_frame_38_0695.jpg",
+      "label_filename": "cctv-bravo_frame_38_0695.txt",
+      "width": 1280,
+      "height": 720
+    },
+    {
+      "pack_index": 39,
+      "video_frame_index": 713,
+      "timestamp_seconds": 28.52,
+      "image_filename": "cctv-bravo_frame_39_0713.jpg",
+      "label_filename": "cctv-bravo_frame_39_0713.txt",
+      "width": 1280,
+      "height": 720
+    }
+  ]
+}
