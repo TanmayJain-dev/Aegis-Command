@@ -98,17 +98,28 @@ def main():
     eval_images_dir.mkdir(parents=True, exist_ok=True)
     eval_labels_dir.mkdir(parents=True, exist_ok=True)
 
-    for img in (dataset_dir / "images").glob("*.jpg"):
-        dst = eval_images_dir / img.name
-        if not dst.exists():
-            os.symlink(img.resolve(), dst)
+    import zipfile
+    if (dataset_dir / "images.zip").exists():
+        log("Extracting images.zip...")
+        with zipfile.ZipFile(dataset_dir / "images.zip", "r") as z:
+            z.extractall(eval_images_dir.parent)
+    elif (dataset_dir / "images").exists():
+        for img in (dataset_dir / "images").glob("*.jpg"):
+            dst = eval_images_dir / img.name
+            if not dst.exists():
+                os.symlink(img.resolve(), dst)
 
-    for lbl in (dataset_dir / "labels").glob("*.txt"):
-        dst = eval_labels_dir / lbl.name
-        if not dst.exists():
-            os.symlink(lbl.resolve(), dst)
+    if (dataset_dir / "labels.zip").exists():
+        log("Extracting labels.zip...")
+        with zipfile.ZipFile(dataset_dir / "labels.zip", "r") as z:
+            z.extractall(eval_labels_dir.parent)
+    elif (dataset_dir / "labels").exists():
+        for lbl in (dataset_dir / "labels").glob("*.txt"):
+            dst = eval_labels_dir / lbl.name
+            if not dst.exists():
+                os.symlink(lbl.resolve(), dst)
 
-    log(f"Linked {len(list(eval_images_dir.glob('*.jpg')))} images and {len(list(eval_labels_dir.glob('*.txt')))} labels.")
+    log(f"Verified dataset: {len(list(eval_images_dir.glob('*.jpg')))} images and {len(list(eval_labels_dir.glob('*.txt')))} labels.")
 
     # Base model weights
     weights_dir = repo_dir / "weights"

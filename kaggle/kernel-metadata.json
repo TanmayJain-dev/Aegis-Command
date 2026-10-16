@@ -1,5 +1,5 @@
 {
-  "id": "tanmayjain/aegis-command-runner",
+  "id": "tanmayjaindev/aegis-command-runner",
   "title": "Aegis Command Runner",
   "code_file": "kaggle_runner.py",
   "language": "python",
@@ -9,7 +9,7 @@
   "enable_tpu": "false",
   "enable_internet": "true",
   "dataset_sources": [
-    "tanmayjain/aegis-command-dataset"
+    "tanmayjaindev/aegis-command-dataset"
   ],
   "competition_sources": [],
   "kernel_sources": [],
