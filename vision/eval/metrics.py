@@ -175,6 +175,11 @@ def calculate_metrics_for_class(
     # Sort predictions by confidence descending
     sorted_preds = sorted(class_preds, key=lambda p: p.get("conf", 1.0), reverse=True)
 
+    # Pre-group ground truths by image_id for O(1) frame lookup
+    gts_by_image = {}
+    for g in class_gts:
+        gts_by_image.setdefault(g.get("image_id", ""), []).append(g)
+
     ap_per_threshold = []
 
     for iou_thresh in iou_thresholds:
@@ -186,7 +191,10 @@ def calculate_metrics_for_class(
 
         for p_idx, pred in enumerate(sorted_preds):
             img_id = pred.get("image_id", "")
-            img_gts = [g for g in class_gts if g.get("image_id", "") == img_id]
+            img_gts = gts_by_image.get(img_id, [])
+            if not img_gts:
+                fp[p_idx] = 1
+                continue
 
             if img_id not in image_gt_matched:
                 image_gt_matched[img_id] = [False] * len(img_gts)
@@ -230,7 +238,11 @@ def calculate_metrics_for_class(
 
     for pred in sorted_preds:
         img_id = pred.get("image_id", "")
-        img_gts = [g for g in class_gts if g.get("image_id", "") == img_id]
+        img_gts = gts_by_image.get(img_id, [])
+        if not img_gts:
+            fp_count += 1
+            continue
+
         if img_id not in img_gt_matched:
             img_gt_matched[img_id] = [False] * len(img_gts)
 
@@ -396,7 +408,7 @@ def bootstrap_metric_ci(
                 g_copy["image_id"] = virtual_id
                 sampled_gts.append(g_copy)
 
-        m = calculate_metrics_for_class(sampled_preds, sampled_gts, target_class=target_class)
+        m = calculate_metrics_for_class(sampled_preds, sampled_gts, target_class=target_class, iou_thresholds=[0.5])
         ap50_samples.append(m["ap50"])
         recall_samples.append(m["recall"])
 
