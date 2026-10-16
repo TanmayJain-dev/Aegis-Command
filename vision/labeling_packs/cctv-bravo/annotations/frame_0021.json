@@ -1,0 +1,242 @@
+{
+  "version": "4.1.0",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "car",
+      "score": 0.73,
+      "points": [
+        [
+          998.9,
+          0.0
+        ],
+        [
+          1043.8,
+          0.0
+        ],
+        [
+          1043.8,
+          18.0
+        ],
+        [
+          998.9,
+          18.0
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.59,
+      "points": [
+        [
+          873.5,
+          82.4
+        ],
+        [
+          890.6,
+          82.4
+        ],
+        [
+          890.6,
+          121.4
+        ],
+        [
+          873.5,
+          121.4
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.89,
+      "points": [
+        [
+          1012.7,
+          25.9
+        ],
+        [
+          1089.2,
+          25.9
+        ],
+        [
+          1089.2,
+          71.5
+        ],
+        [
+          1012.7,
+          71.5
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.87,
+      "points": [
+        [
+          1076.3,
+          73.7
+        ],
+        [
+          1152.1,
+          73.7
+        ],
+        [
+          1152.1,
+          133.5
+        ],
+        [
+          1076.3,
+          133.5
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.88,
+      "points": [
+        [
+          633.9,
+          196.4
+        ],
+        [
+          779.2,
+          196.4
+        ],
+        [
+          779.2,
+          276.4
+        ],
+        [
+          633.9,
+          276.4
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.9,
+      "points": [
+        [
+          1146.5,
+          132.3
+        ],
+        [
+          1209.3,
+          132.3
+        ],
+        [
+          1209.3,
+          209.8
+        ],
+        [
+          1146.5,
+          209.8
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.85,
+      "points": [
+        [
+          618.3,
+          271.7
+        ],
+        [
+          770.0,
+          271.7
+        ],
+        [
+          770.0,
+          368.7
+        ],
+        [
+          618.3,
+          368.7
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.55,
+      "points": [
+        [
+          655.0,
+          553.2
+        ],
+        [
+          973.0,
+          553.2
+        ],
+        [
+          973.0,
+          698.9
+        ],
+        [
+          655.0,
+          698.9
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0021.jpg",
+  "imageHeight": 720,
+  "imageWidth": 1280
+}

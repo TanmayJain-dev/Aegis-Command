@@ -1,5 +1,4 @@
 person
 car
 truck
-motorcycle
 bus

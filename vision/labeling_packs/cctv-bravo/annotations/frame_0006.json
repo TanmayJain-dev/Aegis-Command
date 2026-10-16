@@ -1,0 +1,242 @@
+{
+  "version": "4.1.0",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "car",
+      "score": 0.82,
+      "points": [
+        [
+          533.7,
+          5.7
+        ],
+        [
+          621.5,
+          5.7
+        ],
+        [
+          621.5,
+          49.2
+        ],
+        [
+          533.7,
+          49.2
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "truck",
+      "score": 0.85,
+      "points": [
+        [
+          659.3,
+          8.5
+        ],
+        [
+          748.5,
+          8.5
+        ],
+        [
+          748.5,
+          99.7
+        ],
+        [
+          659.3,
+          99.7
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.91,
+      "points": [
+        [
+          606.4,
+          135.5
+        ],
+        [
+          735.7,
+          135.5
+        ],
+        [
+          735.7,
+          210.7
+        ],
+        [
+          606.4,
+          210.7
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.84,
+      "points": [
+        [
+          617.9,
+          63.9
+        ],
+        [
+          635.8,
+          63.9
+        ],
+        [
+          635.8,
+          110.0
+        ],
+        [
+          617.9,
+          110.0
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.78,
+      "points": [
+        [
+          438.4,
+          27.0
+        ],
+        [
+          552.7,
+          27.0
+        ],
+        [
+          552.7,
+          89.9
+        ],
+        [
+          438.4,
+          89.9
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "truck",
+      "score": 0.51,
+      "points": [
+        [
+          579.5,
+          12.9
+        ],
+        [
+          649.8,
+          12.9
+        ],
+        [
+          649.8,
+          65.7
+        ],
+        [
+          579.5,
+          65.7
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.65,
+      "points": [
+        [
+          554.5,
+          197.2
+        ],
+        [
+          722.0,
+          197.2
+        ],
+        [
+          722.0,
+          287.6
+        ],
+        [
+          554.5,
+          287.6
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "truck",
+      "score": 0.65,
+      "points": [
+        [
+          517.4,
+          261.0
+        ],
+        [
+          694.4,
+          261.0
+        ],
+        [
+          694.4,
+          363.3
+        ],
+        [
+          517.4,
+          363.3
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0006.jpg",
+  "imageHeight": 720,
+  "imageWidth": 1280
+}

@@ -1,0 +1,39 @@
+{
+  "version": "4.1.0",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "person",
+      "score": 0.9,
+      "points": [
+        [
+          18.0,
+          419.2
+        ],
+        [
+          145.6,
+          419.2
+        ],
+        [
+          145.6,
+          679.3
+        ],
+        [
+          18.0,
+          679.3
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0022.jpg",
+  "imageHeight": 720,
+  "imageWidth": 1280
+}
