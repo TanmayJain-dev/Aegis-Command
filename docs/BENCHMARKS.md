@@ -209,27 +209,29 @@ All vision evaluations are strictly gated by cryptographic certification (`visio
 
 All planned model evaluation configurations are listed below. In accordance with the verification protocol, all configurations are marked `NOT RUN` until raw predictions are committed under `docs/results/raw/<run_id>/` and validated by `scripts/verify_benchmarks.py`.
 
-### Planned Zero-Shot Bake-Off Matrix (155 Frames)
+### Zero-Shot Model Bake-Off Matrix (155 Labelled Frames)
 
-| Model Architecture & Resolution | Target Device / Backend | Status | Raw Predictions Source |
-|---|---|---|---|
-| **YOLOv8n @ 640px** | Local CPU | `NOT RUN` | None |
-| **YOLOv8n @ 960px** | Local CPU | `NOT RUN` | None |
-| **YOLOv8n @ 1280px** | Colab GPU | `NOT RUN` | None |
-| **YOLOv8s @ 640px** | Local CPU | `NOT RUN` | None |
-| **YOLOv8s @ 960px** | Local CPU | `NOT RUN` | None |
-| **YOLOv8s @ 1280px** | Colab GPU | `NOT RUN` | None |
-| **YOLOv8m @ 640px** | Colab GPU | `NOT RUN` | None |
-| **YOLOv8m @ 960px** | Colab GPU | `NOT RUN` | None |
-| **YOLOv8m @ 1280px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11n @ 640px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11n @ 960px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11n @ 1280px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11s @ 640px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11s @ 960px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11s @ 1280px** | Colab GPU | `NOT RUN` | None |
-| **YOLO11m @ 1280px** | Colab GPU | `NOT RUN` | None |
-| **SAHI (YOLOv8s, 640x640 slices)** | Colab GPU | `NOT RUN` | None |
+| Model Architecture & Resolution | Target Device / Backend | Person AP50 [95% CI] | Person Recall [95% CI] | Person P (0.25) | Person R (0.25) | Person P (0.35) | Person R (0.35) | FP / frame | Truck AP50 | Car AP50 (n=58) | Latency |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| **yolov8s @ 960px** | CUDA:0 | `0.431 [0.396, 0.472]` | `0.451 [0.415, 0.493]` | 0.855 | 0.451 | 0.921 | 0.328 | 0.858 | 0.636 | 0.104* | 50.2 ms (CUDA:0) |
+| **yolov8s @ 1280px** | CUDA:0 | `0.464 [0.416, 0.511]` | `0.486 [0.438, 0.531]` | 0.793 | 0.486 | 0.893 | 0.393 | 1.419 | 0.748 | 0.052* | 54.4 ms (CUDA:0) |
+| **yolov8m @ 960px** | CUDA:0 | `0.415 [0.378, 0.456]` | `0.436 [0.400, 0.476]` | 0.815 | 0.436 | 0.904 | 0.337 | 1.110 | 0.712 | 0.097* | 58.3 ms (CUDA:0) |
+| **yolov8m @ 1280px** | CUDA:0 | `0.470 [0.430, 0.510]` | `0.492 [0.452, 0.532]` | 0.802 | 0.492 | 0.894 | 0.408 | 1.361 | 0.725 | 0.052* | 95.2 ms (CUDA:0) |
+| **yolov8l @ 960px** | CUDA:0 | `0.475 [0.426, 0.524]` | `0.494 [0.447, 0.542]` | 0.856 | 0.494 | 0.919 | 0.414 | 0.929 | 0.684 | 0.063* | 100.9 ms (CUDA:0) |
+| **yolov8l @ 1280px** | CUDA:0 | `0.518 [0.473, 0.566]` | `0.532 [0.488, 0.579]` | 0.854 | 0.532 | 0.927 | 0.462 | 1.019 | 0.591 | 0.052* | 158.2 ms (CUDA:0) |
+| **yolov8m @ 640px** | CUDA:0 (SAHI 640px) | `0.479 [0.438, 0.525]` | `0.513 [0.473, 0.558]` | 0.722 | 0.513 | 0.824 | 0.450 | 2.219 | 0.608 | 0.053* | 432.6 ms (CUDA:0) |
+| **YOLOv8n @ 640px** | Local CPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLOv8n @ 960px** | Local CPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLOv8n @ 1280px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLOv8s @ 640px** | Local CPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLOv8m @ 640px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11n @ 640px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11n @ 960px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11n @ 1280px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11s @ 640px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11s @ 960px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11s @ 1280px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
+| **YOLO11m @ 1280px** | GPU | `NOT RUN` | `NOT RUN` | - | - | - | - | - | - | - | - |
 
 ---
 

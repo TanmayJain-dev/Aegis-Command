@@ -271,70 +271,100 @@ def run_finetuning_5fold(repo_dir: Path):
     fold_results = []
 
     for fold in range(1, 6):
-        log(f"--- STARTING FOLD {fold} / 5 (50 Epochs, {TRAIN_CONFIG['base_model']} @ {TRAIN_CONFIG['imgsz']}px) ---")
+        log(f"--- FOLD {fold} / 5 (50 Epochs, {TRAIN_CONFIG['base_model']} @ {TRAIN_CONFIG['imgsz']}px) ---")
         split_manifest = split_dataset(fold=fold, num_folds=5, buffer_frames=TRAIN_CONFIG["temporal_purge_buffer_frames"])
 
-        model = YOLO(TRAIN_CONFIG["base_model"])
-        train_run = model.train(
-            data="vision/data/aegis_data.yaml",
-            epochs=TRAIN_CONFIG["epochs"],
-            imgsz=TRAIN_CONFIG["imgsz"],
-            batch=TRAIN_CONFIG["batch"],
-            device=0,
-            workers=4,
-            lr0=TRAIN_CONFIG["lr0"],
-            lrf=TRAIN_CONFIG["lrf"],
-            mosaic=TRAIN_CONFIG["mosaic"],
-            mixup=TRAIN_CONFIG["mixup"],
-            box=TRAIN_CONFIG["box"],
-            cls=TRAIN_CONFIG["cls"],
-            project="runs/train",
-            name=f"aegis_fold{fold}",
-            save=True,
-            plots=True
-        )
+        # Check for existing checkpoint
+        possible_weights = [
+            repo_dir / "runs" / "detect" / "runs" / "train" / f"aegis_fold{fold}" / "weights" / "best.pt",
+            repo_dir / "runs" / "train" / f"aegis_fold{fold}" / "weights" / "best.pt",
+            checkpoint_dir / f"aegis_5fold_fold{fold}_best.pt",
+        ]
+        best_weights_path = None
+        for p in possible_weights:
+            if p.exists():
+                best_weights_path = p
+                break
 
-        best_weights_path = repo_dir / "runs" / "train" / f"aegis_fold{fold}" / "weights" / "best.pt"
+        if best_weights_path:
+            log(f"[RESUME] Using existing trained weights for Fold {fold}: {best_weights_path}")
+        else:
+            model = YOLO(TRAIN_CONFIG["base_model"])
+            train_run = model.train(
+                data="vision/data/aegis_data.yaml",
+                epochs=TRAIN_CONFIG["epochs"],
+                imgsz=TRAIN_CONFIG["imgsz"],
+                batch=TRAIN_CONFIG["batch"],
+                device=0,
+                workers=4,
+                lr0=TRAIN_CONFIG["lr0"],
+                lrf=TRAIN_CONFIG["lrf"],
+                mosaic=TRAIN_CONFIG["mosaic"],
+                mixup=TRAIN_CONFIG["mixup"],
+                box=TRAIN_CONFIG["box"],
+                cls=TRAIN_CONFIG["cls"],
+                project="runs/train",
+                name=f"aegis_fold{fold}",
+                save=True,
+                plots=True
+            )
+            candidates = [
+                Path(train_run.save_dir) / "weights" / "best.pt",
+                repo_dir / "runs" / "detect" / "runs" / "train" / f"aegis_fold{fold}" / "weights" / "best.pt",
+                repo_dir / "runs" / "train" / f"aegis_fold{fold}" / "weights" / "best.pt",
+            ]
+            for p in candidates:
+                if p.exists():
+                    best_weights_path = p
+                    break
+
         weight_sha256 = "N/A"
-        if best_weights_path.exists():
+        if best_weights_path and best_weights_path.exists():
             weight_sha256 = hashlib.sha256(best_weights_path.read_bytes()).hexdigest()
             checkpoint_dst = checkpoint_dir / f"aegis_5fold_fold{fold}_best.pt"
-            shutil.copy(best_weights_path, checkpoint_dst)
-            log(f"Fold {fold} checkpoint saved to {checkpoint_dst} (SHA-256: {weight_sha256})")
+            if not checkpoint_dst.exists() or checkpoint_dst != best_weights_path:
+                shutil.copy(best_weights_path, checkpoint_dst)
+            log(f"Fold {fold} checkpoint verified: {checkpoint_dst} (SHA-256: {weight_sha256})")
 
         # Evaluate fine-tuned model on holdout val
         run_id_ft = f"yolov8m_1280px_val_fold{fold}_finetuned"
         eval_out_ft = f"docs/results/raw/{run_id_ft}/eval_results.json"
-        log(f"Evaluating Fold {fold} fine-tuned model on val split...")
-        run_evaluation(
-            model_path=str(best_weights_path),
-            split="val",
-            fold=fold,
-            imgsz=TRAIN_CONFIG["imgsz"],
-            device="cuda:0",
-            native_classes=True,
-            save_raw=True,
-            raw_root="docs/results/raw",
-            run_id=run_id_ft,
-            out_results=eval_out_ft
-        )
+        if not Path(eval_out_ft).exists():
+            log(f"Evaluating Fold {fold} fine-tuned model on val split...")
+            run_evaluation(
+                model_path=str(best_weights_path),
+                split="val",
+                fold=fold,
+                imgsz=TRAIN_CONFIG["imgsz"],
+                device="cuda:0",
+                native_classes=True,
+                save_raw=True,
+                raw_root="docs/results/raw",
+                run_id=run_id_ft,
+                out_results=eval_out_ft
+            )
+        else:
+            log(f"Fold {fold} fine-tuned evaluation already exists: {eval_out_ft}")
 
         # Evaluate pre-trained baseline on same holdout val
         run_id_base = f"yolov8m_1280px_val_fold{fold}_baseline"
         eval_out_base = f"docs/results/raw/{run_id_base}/eval_results.json"
-        log(f"Evaluating Fold {fold} pretrained baseline on val split...")
-        run_evaluation(
-            model_path=TRAIN_CONFIG["base_model"],
-            split="val",
-            fold=fold,
-            imgsz=TRAIN_CONFIG["imgsz"],
-            device="cuda:0",
-            native_classes=False,
-            save_raw=True,
-            raw_root="docs/results/raw",
-            run_id=run_id_base,
-            out_results=eval_out_base
-        )
+        if not Path(eval_out_base).exists():
+            log(f"Evaluating Fold {fold} pretrained baseline on val split...")
+            run_evaluation(
+                model_path=TRAIN_CONFIG["base_model"],
+                split="val",
+                fold=fold,
+                imgsz=TRAIN_CONFIG["imgsz"],
+                device="cuda:0",
+                native_classes=False,
+                save_raw=True,
+                raw_root="docs/results/raw",
+                run_id=run_id_base,
+                out_results=eval_out_base
+            )
+        else:
+            log(f"Fold {fold} baseline evaluation already exists: {eval_out_base}")
 
         with open(eval_out_ft, "r", encoding="utf-8") as f:
             ft_data = json.load(f)
