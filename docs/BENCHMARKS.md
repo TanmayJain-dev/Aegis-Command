@@ -260,6 +260,9 @@ Previous random or interleaved 1-in-5 splits caused severe temporal leakage betw
 | **best @ 1280px** (Fold 5 Fine-Tuned) | CUDA:0 | `0.947 [0.905, 0.985]` | `0.956 [0.918, 0.987]` | 0.844 | 0.956 | 0.893 | 0.949 | 0.903 | 0.996 | 0.000* | 101.1 ms (CUDA:0) |
 
 ### 5-Fold Cross-Validation Aggregate Performance
+> [!NOTE]
+> **Evaluation Framing**: The 5-fold cross-validation figure (**$82.8\% \pm 5.2\%$ Person $\text{AP}_{50}$**) is an estimate of same-scene performance evaluated on held-out temporal slices across the flight sequence. The primary demo feed in the web UI (`uav-alpha`) displays predictions from `aegis_demo_full_last.pt` (trained on all 155 frames of this flight). The boxes displayed in the interface demonstrate tracking and HUD mechanics, not an accuracy test on the demo video itself.
+
 - **Baseline (Pretrained YOLOv8m @ 1280px)**:
   - Mean Person AP50 across 5 folds: **0.5272 ± 0.2321** (Range: 0.2157 – 0.7722) [MEASURED]
   - Mean Person Recall @ 0.25: **0.5475 ± 0.2248** (Range: 0.2240 – 0.7771) [MEASURED]
@@ -283,4 +286,7 @@ Previous random or interleaved 1-in-5 splits caused severe temporal leakage betw
    All 155 annotated frames originate from a single continuous UAV flight operation over an industrial complex. While contiguous holdout splitting with 5-frame temporal buffers successfully prevents frame-to-frame duplication leakage, the environmental distribution (sun angle, asphalt contrast, altitude range of 15–25m, camera lens optics) represents a single operational domain. Performance under differing weather, dawn/dusk illumination, or higher altitudes (>50m) remains unverified.
 3. **Edge CPU Deployment Reality**:
    On resource-constrained hardware lacking AVX2/VNNI vector extensions (such as the 2-core development machine), fp32 PyTorch inference requires $\approx 45$ seconds per 1080p frame. Real-time tactical edge deployment on aerial platforms mandates INT8 quantization via OpenVINO or ONNX Runtime and dedicated VPU/Edge TPU accelerators (e.g. Hailo-8, Coral Edge TPU, or NVIDIA Jetson Orin Nano).
+4. **Demo Model vs Held-Out Cross-Validation Framing**:
+   The live demonstration model (`aegis_demo_full_last.pt`) was trained on all 155 annotated frames of the demo flight sequence to provide maximum tracking continuity across the demonstration. The bounding boxes rendered on `uav-alpha` are not an independent accuracy test. The reported cross-validation metric ($82.8\% \pm 5.2\%$ Person $\text{AP}_{50}$) measures same-scene generalization to held-out temporal blocks under strict leakage-free temporal buffers, rather than performance on the training video itself.
+
 

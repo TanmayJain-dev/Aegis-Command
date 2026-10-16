@@ -46,6 +46,8 @@ export interface TimelineMeta {
   tracker?: string;
   generated_at?: string;
   git_commit?: string;
+  generator_commit?: string;
+  detections_sha256?: string;
   speed_is_simulated: boolean;
   heading_frame?: string;
 }
@@ -400,6 +402,8 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
     tracker: rawMeta?.tracker,
     generated_at: rawMeta?.generated_at,
     git_commit: rawMeta?.git_commit,
+    generator_commit: rawMeta?.generator_commit,
+    detections_sha256: rawMeta?.detections_sha256,
     speed_is_simulated: rawMeta?.speed_is_simulated ?? true,
     heading_frame: rawMeta?.heading_frame || "image",
   };

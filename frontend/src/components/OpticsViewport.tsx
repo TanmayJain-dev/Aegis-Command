@@ -236,8 +236,8 @@ export function OpticsViewport({
           ? ` ± ${(cvMetrics.person_ap50_std * 100).toFixed(1)}%`
           : "";
         return {
-          text: `DEMO MODEL (trained on this footage; 5-fold CV last.pt: person AP50 ${meanPct}%${stdPct}, same-scene)`,
-          shortText: `DEMO MODEL (CV last.pt: ${meanPct}%${stdPct})`,
+          text: `DEMO MODEL (trained on this footage; boxes here are not a test. Held-out 5-fold CV, same scene: person AP50 ${meanPct}%${stdPct})`,
+          shortText: `DEMO MODEL (Held-out CV: ${meanPct}%${stdPct})`,
           isEvaluated: true,
           className: "bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.2)]",
         };
@@ -322,6 +322,7 @@ export function OpticsViewport({
         </div>
         <div className="flex-shrink-0">
           <span
+            title={timeline?.meta?.note || evalBadge.text}
             className={`px-2 py-0.5 rounded border text-[9px] sm:text-[10px] font-semibold tracking-tight inline-flex items-center gap-1 ${evalBadge.className}`}
           >
             <span className="hidden md:inline">{evalBadge.text}</span>
