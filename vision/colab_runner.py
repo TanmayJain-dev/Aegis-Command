@@ -124,6 +124,11 @@ def run_bakeoff(repo_dir: Path):
     for model_name, imgsz in CONFIGURATIONS:
         stem = Path(model_name).stem
         run_id = f"{stem}_{imgsz}px_all"
+        target_pred_file = repo_dir / "docs" / "results" / "raw" / run_id / "predictions.json"
+        if target_pred_file.exists():
+            log(f"Skipping {run_id} (already completed: {target_pred_file}).")
+            continue
+
         log(f"Evaluating {model_name} @ {imgsz}px (run_id: {run_id})...")
         run_evaluation(
             images_dir="vision/eval/images",
@@ -137,13 +142,17 @@ def run_bakeoff(repo_dir: Path):
         )
 
     # SAHI Sliced Evaluation with yolov8m
-    log("Evaluating SAHI with yolov8m (slice=640x640, overlap=0.2)...")
-    detection_model = AutoDetectionModel.from_pretrained(
-        model_type="yolov8",
-        model_path="yolov8m.pt",
-        confidence_threshold=0.001,
-        device="cuda:0"
-    )
+    sahi_dir = repo_dir / "docs" / "results" / "raw" / "sahi_yolov8m_640px_all"
+    if (sahi_dir / "predictions.json").exists():
+        log(f"Skipping SAHI (already completed: {sahi_dir / 'predictions.json'}).")
+    else:
+        log("Evaluating SAHI with yolov8m (slice=640x640, overlap=0.2)...")
+        detection_model = AutoDetectionModel.from_pretrained(
+            model_type="yolov8",
+            model_path="yolov8m.pt",
+            confidence_threshold=0.001,
+            device="cuda:0"
+        )
 
     images_dir = repo_dir / "vision" / "eval" / "images"
     labels_path = repo_dir / "vision" / "eval" / "labels"
