@@ -288,8 +288,13 @@ def run_finetuning_5fold(repo_dir: Path):
                 best_weights_path = p
                 break
 
+        run_id_ft = f"yolov8m_1280px_val_fold{fold}_finetuned"
+        eval_out_ft = f"docs/results/raw/{run_id_ft}/eval_results.json"
+
         if best_weights_path:
             log(f"[RESUME] Using existing trained weights for Fold {fold}: {best_weights_path}")
+        elif Path(eval_out_ft).exists():
+            log(f"Fold {fold} fine-tuned evaluation already exists: {eval_out_ft}. Skipping redundant best.pt training.")
         else:
             model = YOLO(TRAIN_CONFIG["base_model"])
             train_run = model.train(
