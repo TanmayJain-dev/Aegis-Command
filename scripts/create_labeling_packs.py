@@ -128,7 +128,7 @@ def process_feed(feed_name: str, num_samples: int = 30):
     height = int(meta.get("height", 720))
     duration_s = float(meta.get("duration_s", 25.0))
 
-    out_feed_dir = OUTPUT_ROOT / feed_name
+    out_feed_dir = OUTPUT_ROOT / feed_name / "zero_shot_sample"
     images_dir = out_feed_dir / "images"
     labels_dir = out_feed_dir / "labels"
     annotations_dir = out_feed_dir / "annotations"
