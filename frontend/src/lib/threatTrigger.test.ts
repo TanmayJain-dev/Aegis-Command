@@ -3,6 +3,9 @@ import {
   TriggerGate,
   projectGeoCoordinates,
   DEFAULT_GEO_PARAMS,
+  isVehicleClass,
+  ALLOWED_THREAT_CLASSES,
+  VEHICLE_CLASSES,
 } from "./threatTrigger";
 import { DrawableDetection } from "./timeline";
 
@@ -125,15 +128,40 @@ describe("Threat Trigger Gate (TriggerGate)", () => {
     expect(gate.evaluate(21.0, det, false)).not.toBeNull();
   });
 
-  it("filters unapproved object classes", () => {
-    const dog = [createDetection("animal-1", "dog", 0.99)];
+  it("filters unapproved object classes like clock and dog", () => {
+    const unapproved = [
+      createDetection("animal-1", "dog", 0.99),
+      createDetection("item-1", "clock", 0.95),
+      createDetection("item-2", "chair", 0.90),
+    ];
 
-    gate.evaluate(0.0, dog, false);
-    gate.evaluate(0.25, dog, false);
-    gate.evaluate(0.50, dog, false);
-    gate.evaluate(1.00, dog, false);
+    gate.evaluate(0.0, unapproved, false);
+    gate.evaluate(0.25, unapproved, false);
+    gate.evaluate(0.50, unapproved, false);
+    gate.evaluate(1.00, unapproved, false);
 
-    expect(gate.evaluate(2.00, dog, false)).toBeNull();
+    expect(gate.evaluate(2.00, unapproved, false)).toBeNull();
+  });
+
+  it("treats motorcycle as an approved vehicle class and triggers threat gate", () => {
+    expect(ALLOWED_THREAT_CLASSES.has("motorcycle")).toBe(true);
+    expect(VEHICLE_CLASSES.has("motorcycle")).toBe(true);
+    expect(isVehicleClass("motorcycle")).toBe(true);
+    expect(isVehicleClass("Motorcycle")).toBe(true);
+    expect(isVehicleClass("car")).toBe(true);
+    expect(isVehicleClass("truck")).toBe(true);
+    expect(isVehicleClass("person")).toBe(false);
+    expect(isVehicleClass("clock")).toBe(false);
+
+    const moto = [createDetection("moto-1", "motorcycle", 0.85)];
+    expect(gate.evaluate(0.00, moto, false)).toBeNull();
+    expect(gate.evaluate(0.25, moto, false)).toBeNull();
+
+    // At t=0.50s (>= 0.5s continuous visibility, conf 0.85 >= 0.5), triggers gate
+    const payload = gate.evaluate(0.50, moto, false);
+    expect(payload).not.toBeNull();
+    expect(payload?.track_id).toBe("moto-1");
+    expect(payload?.class).toBe("motorcycle");
   });
 
   it("filters low-confidence detections (< 0.5 mean)", () => {

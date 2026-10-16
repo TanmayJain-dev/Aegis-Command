@@ -12,6 +12,13 @@ export const LEGACY_SOURCE_SIZE = { width: 1920, height: 1080 } as const;
 export const LEGACY_FPS = 59.94;
 export const LEGACY_TOLERANCE_S = 0.05;
 
+export const ALLOWED_PRODUCT_CLASSES = new Set(["person", "car", "truck", "motorcycle", "bus"]);
+export const VEHICLE_CLASSES = new Set(["car", "truck", "motorcycle", "bus"]);
+
+export function isVehicleClass(cls: string): boolean {
+  return VEHICLE_CLASSES.has((cls || "").toLowerCase());
+}
+
 export interface TimelineMeta {
   feed_id: string;
   width: number;
@@ -166,15 +173,17 @@ export function createV2Timeline(raw: {
     heading_frame: raw.meta.heading_frame ?? "image",
   };
 
-  const tracks: V2ParsedTrack[] = (raw.tracks || []).map((tr) => ({
-    id: tr.id,
-    cls: tr.cls,
-    t: new Float64Array(tr.t),
-    box: tr.box,
-    conf: new Float64Array(tr.conf),
-    spd_kmh: tr.spd_kmh ? new Float64Array(tr.spd_kmh) : undefined,
-    dir: tr.dir,
-  }));
+  const tracks: V2ParsedTrack[] = (raw.tracks || [])
+    .filter((tr) => ALLOWED_PRODUCT_CLASSES.has((tr.cls || "").toLowerCase()))
+    .map((tr) => ({
+      id: tr.id,
+      cls: tr.cls,
+      t: new Float64Array(tr.t),
+      box: tr.box,
+      conf: new Float64Array(tr.conf),
+      spd_kmh: tr.spd_kmh ? new Float64Array(tr.spd_kmh) : undefined,
+      dir: tr.dir,
+    }));
 
   // Collect unique keyframe timestamps for threat scrub markers
   const uniqueTimes = new Set<number>();
@@ -344,15 +353,17 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
   for (let i = 0; i < parsedTimes.length; i++) {
     const key = String(parsedTimes[i]);
     const items = raw[key] || raw[rawKeys.find((k) => Number(k) === parsedTimes[i]) || ""] || [];
-    frameDetections[i] = items.map((item) => ({
-      id: item.id || "target",
-      class: item.class || "unknown",
-      confidence: item.confidence ?? 0,
-      box: item.box,
-      speed_kmh: item.speed_kmh ?? 0,
-      direction: item.direction || "-",
-      interpolated: false,
-    }));
+    frameDetections[i] = items
+      .filter((item) => ALLOWED_PRODUCT_CLASSES.has((item.class || "").toLowerCase()))
+      .map((item) => ({
+        id: item.id || "target",
+        class: item.class || "unknown",
+        confidence: item.confidence ?? 0,
+        box: item.box,
+        speed_kmh: item.speed_kmh ?? 0,
+        direction: item.direction || "-",
+        interpolated: false,
+      }));
   }
 
   const duration_s = timesArray.length > 0 ? timesArray[timesArray.length - 1] : 0;

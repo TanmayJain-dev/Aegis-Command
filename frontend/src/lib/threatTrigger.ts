@@ -13,7 +13,12 @@
 
 import { DrawableDetection } from "./timeline";
 
-export const ALLOWED_THREAT_CLASSES = new Set(["person", "car", "truck", "bus"]);
+export const ALLOWED_THREAT_CLASSES = new Set(["person", "car", "truck", "motorcycle", "bus"]);
+export const VEHICLE_CLASSES = new Set(["car", "truck", "motorcycle", "bus"]);
+
+export function isVehicleClass(cls: string): boolean {
+  return VEHICLE_CLASSES.has((cls || "").toLowerCase());
+}
 
 export const PER_TRACK_COOLDOWN_S = 20.0;
 export const GLOBAL_MIN_INTERVAL_S = 5.0;

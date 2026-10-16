@@ -107,9 +107,15 @@ Evidence-grounded LLM assessment
 Operator dashboard + incident memory
 ```
 
-### Perception
+### Perception & Detection Replay Architecture
 
 The frontend streams canonical video feeds configured in `frontend/public/feeds/index.json` (such as `uav-alpha/video.mp4`) and uses the matching `detections.json` timeline to render object detections over the video with calibrated letterbox/pillarbox offset scaling.
+
+> [!NOTE]
+> **Deterministic Replay vs Live Inference Architecture**:
+> To guarantee deterministic evaluation telemetry, sub-millisecond timeline sampling, and zero client GPU overhead on low-resource hardware, the web console replays **precomputed detection timelines** (`detections.json` generated via `vision/generate_detections.py` with YOLOv8 + ByteTrack) rather than running in-browser live inference. Live perception events stream asynchronously to the FastAPI threat engine via WebSockets.
+>
+> All benchmark and accuracy metrics strictly adhere to the project's zero-unverified-numbers policy: no accuracy number may be claimed without raw candidate predictions recorded in `docs/results/raw/` and verified by `scripts/verify_benchmarks.py`.
 
 Each event carries class, confidence, bounding-box coordinates, movement velocity/heading, and projected tactical coordinates.
 

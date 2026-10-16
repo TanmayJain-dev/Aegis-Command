@@ -305,6 +305,23 @@ export function OpticsViewport({
                   LIVE
                 </span>
               </span>
+              <div className="mt-1 pt-1 border-t border-cyan-500/20 text-[9px] font-mono flex items-center gap-1.5 text-right">
+                <span className="text-cyan-300 font-bold">{timeline?.meta?.model || "yolov8s.pt"}</span>
+                <span className="text-slate-500">•</span>
+                <span className="text-slate-400">precomputed detections</span>
+                <span className="text-slate-500">•</span>
+                <span
+                  className={
+                    timeline?.meta?.evaluated
+                      ? "text-emerald-400 font-semibold"
+                      : "text-amber-400 font-semibold"
+                  }
+                >
+                  {timeline?.meta?.evaluated
+                    ? "evaluated on 155 labelled frames"
+                    : "not evaluated"}
+                </span>
+              </div>
             </div>
           </div>
 

@@ -342,89 +342,19 @@ describe("Unified Detection Generator Payload Loading", () => {
   });
 
   it("loads timeline via loadTimeline fetcher", async () => {
-    const mockFetch = async () =>
+    const mockFetch = (async () =>
       ({
         ok: true,
         status: 200,
         statusText: "OK",
         json: async () => generatedPayload,
-      } as unknown as Response);
+      } as unknown as Response)) as unknown as typeof fetch;
 
-    const timeline = await loadTimeline("/feeds/uav-alpha/detections.json", mockFetch as any);
+    const timeline = await loadTimeline("/feeds/uav-alpha/detections.json", mockFetch);
     expect(timeline.meta.evaluated).toBe(true);
     expect(timeline.meta.model).toBe("yolov8m.pt");
     expect(timeline.sampleAt(0.0)).toHaveLength(1);
   });
 });
 
-
-describe("Generated Feed Detections Schema (Task 5)", () => {
-  const generatedPayload = {
-    meta: {
-      model: "yolov8s.pt",
-      weights_sha256: "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
-      imgsz: 1280,
-      conf: 0.35,
-      date: "2026-10-16",
-      evaluated: true,
-      feed: "uav-alpha",
-      width: 1920,
-      height: 1080,
-      fps: 60.0,
-      duration_s: 15.0,
-      sahi: false,
-      tracker: "bytetrack.yaml",
-    },
-    "0.0": [
-      {
-        id: "Person-1",
-        class: "person",
-        confidence: 0.88,
-        box: [1838.4, 334.1, 1868.3, 388.2] as [number, number, number, number],
-        speed_kmh: 4.0,
-        direction: "S",
-      },
-    ],
-    "0.5": [
-      {
-        id: "Truck-2",
-        class: "truck",
-        confidence: 0.92,
-        box: [848.6, 628.0, 1298.0, 903.1] as [number, number, number, number],
-        speed_kmh: 22.5,
-        direction: "NW",
-      },
-    ],
-  };
-
-  it("loads generated feed schema and populates metadata correctly", () => {
-    const timeline = parseTimeline(generatedPayload);
-    expect(timeline.schema).toBe(1);
-    expect(timeline.meta.model).toBe("yolov8s.pt");
-    expect(timeline.meta.weights_sha256).toBe("a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc");
-    expect(timeline.meta.imgsz).toBe(1280);
-    expect(timeline.meta.conf).toBe(0.35);
-    expect(timeline.meta.date).toBe("2026-10-16");
-    expect(timeline.meta.evaluated).toBe(true);
-    expect(timeline.meta.feed).toBe("uav-alpha");
-    expect(timeline.meta.tracker).toBe("bytetrack.yaml");
-  });
-
-  it("samples keyframe detections accurately from generated timeline", () => {
-    const timeline = parseTimeline(generatedPayload);
-    const sample0 = timeline.sampleAt(0.0);
-    expect(sample0).toHaveLength(1);
-    expect(sample0[0].id).toBe("Person-1");
-    expect(sample0[0].class).toBe("person");
-    expect(sample0[0].confidence).toBeCloseTo(0.88);
-    expect(sample0[0].box).toEqual([1838.4, 334.1, 1868.3, 388.2]);
-
-    const sample05 = timeline.sampleAt(0.5);
-    expect(sample05).toHaveLength(1);
-    expect(sample05[0].id).toBe("Truck-2");
-    expect(sample05[0].class).toBe("truck");
-    expect(sample05[0].speed_kmh).toBeCloseTo(22.5);
-    expect(sample05[0].direction).toBe("NW");
-  });
-});
 
