@@ -373,22 +373,19 @@ def package_artifacts(repo_dir: Path):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Aegis Command Colab Runner")
-    parser.add_argument("--repo-dir", default="/content/Aegis-Command", help="Local repo clone path")
-    parser.add_argument("--phase", choices=["all", "bakeoff", "feeds", "train"], default="all")
-    args = parser.parse_args()
-
-    repo_dir = Path(args.repo_dir)
+    repo_dir = Path(os.environ.get("REPO_DIR", "/content/Aegis-Command"))
+    phase = os.environ.get("PHASE", "bakeoff").lower()
+    log(f"Starting Aegis Colab Runner | Repo: {repo_dir} | Phase: {phase}")
 
     bootstrap_environment(repo_dir)
 
-    if args.phase in ("all", "bakeoff"):
+    if phase in ("all", "bakeoff"):
         run_bakeoff(repo_dir)
 
-    if args.phase in ("all", "feeds", "bakeoff"):
+    if phase in ("all", "feeds", "bakeoff"):
         run_feed_detections(repo_dir)
 
-    if args.phase in ("all", "train"):
+    if phase in ("all", "train"):
         run_finetuning_5fold(repo_dir)
 
     package_artifacts(repo_dir)
