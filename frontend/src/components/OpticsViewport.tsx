@@ -242,8 +242,8 @@ export function OpticsViewport({
         };
       }
       return {
-        text: "DEMO MODEL (trained on this footage; 5-fold CV: person AP50 82.3% ± 2.6%, same-scene)",
-        shortText: "DEMO MODEL (5-fold CV: 82.3%)",
+        text: "DEMO MODEL (trained on this footage; CV INCOMPLETE)",
+        shortText: "DEMO MODEL (CV INCOMPLETE)",
         isEvaluated: true,
         className: "bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.2)]",
       };
