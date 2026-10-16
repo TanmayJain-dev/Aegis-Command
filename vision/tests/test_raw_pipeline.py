@@ -183,3 +183,21 @@ def test_verify_benchmarks_unrun_passes(tmp_path):
 
     ok = verify_benchmarks(benchmarks_path=md_file, raw_root=empty_raw, labels_dir=labels_dir)
     assert ok is True
+
+
+def test_demo_weights_provenance():
+    """Asserts that uav-alpha meta.weights_sha256 appears in checkpoints_manifest.json when evaluated: true."""
+    uav_json = PROJECT_ROOT / "frontend" / "public" / "feeds" / "uav-alpha" / "detections.json"
+    manifest_json = PROJECT_ROOT / "docs" / "results" / "raw" / "checkpoints_manifest.json"
+
+    with open(uav_json, "r", encoding="utf-8") as f:
+        uav_data = json.load(f)
+    meta = uav_data.get("meta", {})
+
+    if meta.get("evaluated"):
+        assert manifest_json.exists(), "checkpoints_manifest.json must exist when feed is evaluated"
+        with open(manifest_json, "r", encoding="utf-8") as f:
+            manifest = json.load(f)
+        assert meta.get("weights_sha256") in manifest.values(), (
+            f"Weights SHA-256 {meta.get('weights_sha256')} not found in {manifest_json}"
+        )

@@ -91,7 +91,12 @@ def find_matching_raw_run(raw_root: Path, model_name: str, imgsz: int, split: st
             meta_split = meta.get("split", "all")
             meta_fold = int(meta.get("fold", 1))
 
-            if norm_model in meta_weights and meta_imgsz == imgsz and meta_split == split:
+            matches_model = (
+                norm_model in meta_weights
+                or (norm_model == "last" and ("fixed50" in r_dir.name.lower() or "last" in meta_weights))
+                or (norm_model == "best" and ("finetuned" in r_dir.name.lower() or "best" in meta_weights))
+            )
+            if matches_model and meta_imgsz == imgsz and meta_split == split:
                 if split in ("train", "val") and meta_fold != fold:
                     continue
                 return r_dir

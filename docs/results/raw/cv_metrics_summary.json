@@ -1,0 +1,14 @@
+{
+  "headline_model": "last.pt (fixed 50 epochs, val=False, zero holdout snooping)",
+  "folds_evaluated": 5,
+  "person_ap50_mean": 0.8275,
+  "person_ap50_std": 0.0524,
+  "person_recall_mean": 0.8458,
+  "person_recall_std": 0.0439,
+  "vehicle_ap50_mean": 0.772,
+  "vehicle_ap50_std": 0.3615,
+  "optimistic_best_comparison": {
+    "person_ap50_mean": 0.8591,
+    "person_ap50_std": 0.0612
+  }
+}

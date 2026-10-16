@@ -92,3 +92,20 @@ def test_extract_floats():
 def test_find_matching_raw_run_missing_dir():
     res = find_matching_raw_run(Path("/tmp/nonexistent_raw_dir"), "yolov8m", 1280)
     assert res is None
+
+
+def test_find_matching_raw_run_last_and_best(tmp_path):
+    run_dir = tmp_path / "yolov8m_1280px_val_fold1_fixed50"
+    run_dir.mkdir()
+    meta = {
+        "weights": "/kaggle/working/checkpoints/aegis_5fold_fold1_last.pt",
+        "imgsz": 1280,
+        "split": "val",
+        "fold": 1
+    }
+    with open(run_dir / "run_meta.json", "w") as f:
+        import json
+        json.dump(meta, f)
+
+    res = find_matching_raw_run(tmp_path, "last", 1280, split="val", fold=1)
+    assert res == run_dir
