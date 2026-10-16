@@ -28,11 +28,16 @@ def compute_metrics_for_run(
     labels_dir: Path = PROJECT_ROOT / "vision" / "eval" / "labels",
     manifest_path: Path = PROJECT_ROOT / "vision" / "data" / "split_manifest.json",
     n_bootstraps: int = 1000,
-    seed: int = 42
+    seed: int = 42,
+    fast: bool = False
 ) -> Dict[str, Any]:
     """
     Recomputes metrics from raw run directory containing predictions.json and run_meta.json.
+    When fast=True, uses 50 bootstrap resamples (reduced for rapid local/CI execution).
     """
+    if fast:
+        n_bootstraps = 50
+
     preds_file = run_dir / "predictions.json"
     meta_file = run_dir / "run_meta.json"
 
@@ -194,11 +199,15 @@ def main():
     parser.add_argument("--labels-dir", default=str(PROJECT_ROOT / "vision" / "eval" / "labels"), help="Path to labels directory")
     parser.add_argument("--manifest", default=str(PROJECT_ROOT / "vision" / "data" / "split_manifest.json"), help="Path to split manifest")
     parser.add_argument("--out", default=None, help="Optional output JSON path for computed metrics")
+    parser.add_argument("--fast", action="store_true", help="Fast mode: 50 bootstrap resamples instead of 1,000 for local/CI use")
     args = parser.parse_args()
 
     raw_root = Path(args.raw_root)
     labels_path = Path(args.labels_dir)
     manifest_path = Path(args.manifest)
+
+    if args.fast:
+        print("[FAST MODE] Active: bootstrap resamples set to 50 for rapid CI/local execution.")
 
     if args.run_dir:
         run_dirs = [Path(args.run_dir)]
@@ -217,7 +226,7 @@ def main():
 
     for r_dir in run_dirs:
         try:
-            res = compute_metrics_for_run(r_dir, labels_dir=labels_path, manifest_path=manifest_path)
+            res = compute_metrics_for_run(r_dir, labels_dir=labels_path, manifest_path=manifest_path, fast=args.fast)
             computed_results.append(res)
             print(f"✓ Recomputed: {r_dir.name}")
             print("  Markdown row:")

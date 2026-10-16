@@ -105,9 +105,16 @@ def verify_benchmarks(
     raw_root: Path = PROJECT_ROOT / "docs" / "results" / "raw",
     labels_dir: Path = PROJECT_ROOT / "vision" / "eval" / "labels",
     manifest_path: Path = PROJECT_ROOT / "vision" / "data" / "split_manifest.json",
-    tolerance: float = 0.001
+    tolerance: float = 0.001,
+    fast: bool = False
 ) -> bool:
     print(f"Verifying benchmarks in {benchmarks_path}...")
+    if fast:
+        print("[FAST MODE] Active: bootstrap resamples set to 50 for rapid CI/local execution. Release gate requires full mode (1,000 resamples).")
+        ci_tolerance = 0.05
+    else:
+        ci_tolerance = tolerance
+
     if not benchmarks_path.exists():
         print(f"ERROR: {benchmarks_path} does not exist!", file=sys.stderr)
         return False
@@ -180,7 +187,7 @@ def verify_benchmarks(
 
         # Recompute from raw
         try:
-            computed = compute_metrics_for_run(raw_run_dir, labels_dir=labels_dir, manifest_path=manifest_path)
+            computed = compute_metrics_for_run(raw_run_dir, labels_dir=labels_dir, manifest_path=manifest_path, fast=fast)
         except Exception as e:
             print(f"ERROR: Failed to recompute metrics for {raw_run_dir}: {e}", file=sys.stderr)
             return False
@@ -214,11 +221,12 @@ def verify_benchmarks(
             if len(floats_ap50) >= 3:
                 ci_md = (floats_ap50[1], floats_ap50[2])
                 ci_expected = computed["bootstrap_ci_95_person"]["ap50_ci"]
-                if abs(ci_md[0] - ci_expected[0]) > tolerance or abs(ci_md[1] - ci_expected[1]) > tolerance:
+                if abs(ci_md[0] - ci_expected[0]) > ci_tolerance or abs(ci_md[1] - ci_expected[1]) > ci_tolerance:
                     print(
                         f"ERROR: Mismatch in Person AP50 CI for {model_name}@{imgsz}px:\n"
                         f"  Markdown: {ci_md}\n"
-                        f"  Computed: {ci_expected}",
+                        f"  Computed: {ci_expected}\n"
+                        f"  Diff:     max({abs(ci_md[0] - ci_expected[0]):.4f}, {abs(ci_md[1] - ci_expected[1]):.4f}) > {ci_tolerance}",
                         file=sys.stderr
                     )
                     return False
@@ -283,11 +291,13 @@ def main():
     parser = argparse.ArgumentParser(description="Verify benchmark numbers in documentation against raw outputs.")
     parser.add_argument("--benchmarks", default=str(PROJECT_ROOT / "docs" / "BENCHMARKS.md"), help="Path to BENCHMARKS.md")
     parser.add_argument("--raw-root", default=str(PROJECT_ROOT / "docs" / "results" / "raw"), help="Path to raw results directory")
+    parser.add_argument("--fast", action="store_true", help="Fast mode: 50 bootstrap resamples instead of 1,000 for local/CI use")
     args = parser.parse_args()
 
     success = verify_benchmarks(
         benchmarks_path=Path(args.benchmarks),
-        raw_root=Path(args.raw_root)
+        raw_root=Path(args.raw_root),
+        fast=args.fast
     )
 
     if not success:
