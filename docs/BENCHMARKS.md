@@ -261,13 +261,17 @@ Previous random or interleaved 1-in-5 splits caused severe temporal leakage betw
 
 ### 5-Fold Cross-Validation Aggregate Performance
 - **Baseline (Pretrained YOLOv8m @ 1280px)**:
-  - Mean Person AP50 across 5 folds: **0.527** (Range: 0.216 – 0.772)
-  - Mean Person Recall @ 0.25: **0.547** (Range: 0.224 – 0.777)
-- **Fine-Tuned (Aegis 5-Fold Contiguous Checkpoints)**:
-  - Mean Person AP50 across 5 folds: **0.859** (Range: 0.789 – 0.947)
-  - Mean Person Recall @ 0.25: **0.879** (Range: 0.835 – 0.956)
-- **Net Operational Gain**: **+33.2% AP50** (+33.2 percentage points) and **+33.2% Recall** improvement on unseen contiguous drone video sequences.
-- **Checkpoints**: Stored locally in `vision/weights/checkpoints/` with cryptographic SHA-256 signatures recorded in `task4_5fold_finetune_summary.json`.
+  - Mean Person AP50 across 5 folds: **0.5272 ± 0.2321** (Range: 0.2157 – 0.7722) [MEASURED]
+  - Mean Person Recall @ 0.25: **0.5475 ± 0.2248** (Range: 0.2240 – 0.7771) [MEASURED]
+- **Headline Fixed-Epoch Model (`last.pt`, 50 Epochs, `val=False`, Zero Snooping)**:
+  - Mean Person AP50 across 5 folds: **0.8275 ± 0.0524** (Range: 0.7541 – 0.8913) [MEASURED]
+  - Mean Person Recall @ 0.25: **0.8458 ± 0.0439** (Range: 0.7814 – 0.8987) [MEASURED]
+  - Net Operational Gain: **+30.04 pp AP50** and **+29.83 pp Recall** over baseline without holdout snooping bias.
+- **Fine-Tuned `best.pt` (Optimistic Baseline, Validation-Selected)**:
+  - Mean Person AP50 across 5 folds: **0.8591 ± 0.0612** (Range: 0.7891 – 0.9474) [MEASURED]
+  - Mean Person Recall @ 0.25: **0.8788 ± 0.0514** (Range: 0.8348 – 0.9557) [MEASURED]
+  - *Snooping Bias*: Selecting checkpoints by holdout validation fitness inflates AP50 by **+3.16 pp** (0.8591 vs 0.8275) and Recall by **+3.30 pp** (0.8788 vs 0.8458).
+- **Checkpoints & Provenance**: Checkpoint SHA-256 signatures recorded in `docs/results/raw/checkpoints_manifest.json`. Full like-for-like comparison documented in [`docs/results/raw/task1_5fold_comparison.md`](results/raw/task1_5fold_comparison.md).
 
 ---
 

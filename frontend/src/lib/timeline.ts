@@ -35,6 +35,7 @@ export interface TimelineMeta {
   evaluation?: string;
   note?: string;
   cv_metrics?: {
+    folds_count?: number;
     person_ap50_mean?: number;
     person_ap50_std?: number;
     vehicle_ap50_mean?: number;

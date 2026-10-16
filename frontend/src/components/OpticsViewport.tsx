@@ -229,14 +229,15 @@ export function OpticsViewport({
     const isEvaluated = Boolean(timeline.meta?.evaluated);
     if (isEvaluated) {
       const cvMetrics = timeline.meta?.cv_metrics;
-      if (cvMetrics?.person_ap50_mean !== undefined) {
+      const isComplete = cvMetrics?.folds_count === undefined || cvMetrics.folds_count >= 5;
+      if (cvMetrics?.person_ap50_mean !== undefined && isComplete) {
         const meanPct = (cvMetrics.person_ap50_mean * 100).toFixed(1);
         const stdPct = cvMetrics.person_ap50_std !== undefined
           ? ` ± ${(cvMetrics.person_ap50_std * 100).toFixed(1)}%`
           : "";
         return {
-          text: `DEMO MODEL (trained on this footage; 5-fold CV: person AP50 ${meanPct}%${stdPct}, same-scene)`,
-          shortText: `DEMO MODEL (CV: ${meanPct}%${stdPct})`,
+          text: `DEMO MODEL (trained on this footage; 5-fold CV last.pt: person AP50 ${meanPct}%${stdPct}, same-scene)`,
+          shortText: `DEMO MODEL (CV last.pt: ${meanPct}%${stdPct})`,
           isEvaluated: true,
           className: "bg-emerald-950/80 border-emerald-500/60 text-emerald-300 shadow-[0_0_8px_rgba(16,185,129,0.2)]",
         };
