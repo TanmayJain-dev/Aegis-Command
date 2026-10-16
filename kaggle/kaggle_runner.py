@@ -91,6 +91,70 @@ def find_dataset_files(input_root: Path):
     }
 
 
+def generate_demo_feed_detections(repo_dir: Path, work_dir: Path):
+    """
+    Kaggle GPU step:
+    1. Download v0.4.0 release asset 'aegis_demo_full_last.pt'
+    2. Verify SHA-256 checksum against checkpoints_manifest.json
+    3. Run scripts/generate_feed_detections.py on frontend/public/feeds/uav-alpha/video.mp4
+       with imgsz=1280, conf=0.35, tracker=bytetrack.yaml, sample_interval=0.5, device=cuda:0
+    4. Save to /kaggle/working/uav-alpha/detections.json and /kaggle/working/detections.json
+    """
+    log("\n=================== GENERATING DEMO FEED DETECTIONS ON GPU ===================")
+    checkpoints_dir = work_dir / "checkpoints"
+    checkpoints_dir.mkdir(parents=True, exist_ok=True)
+    weights_path = checkpoints_dir / "aegis_demo_full_last.pt"
+
+    manifest_path = repo_dir / "docs" / "results" / "raw" / "checkpoints_manifest.json"
+    assert manifest_path.exists(), f"checkpoints_manifest.json missing at {manifest_path}"
+    with open(manifest_path, "r", encoding="utf-8") as f:
+        manifest = json.load(f)
+    expected_sha256 = manifest.get("aegis_demo_full_last")
+    assert expected_sha256, "aegis_demo_full_last key missing in checkpoints_manifest.json"
+
+    # Download from v0.4.0 release asset if not present or corrupt
+    if not weights_path.exists() or compute_sha256(weights_path) != expected_sha256:
+        asset_url = "https://github.com/TanmayJain-dev/Aegis-Command/releases/download/v0.4.0/aegis_demo_full_last.pt"
+        log(f"Downloading release asset: {asset_url} -> {weights_path}...")
+        run_cmd(["curl", "-fsSL", "-o", str(weights_path), asset_url])
+
+    actual_sha256 = compute_sha256(weights_path)
+    log(f"Verified weights SHA-256: {actual_sha256}")
+    assert actual_sha256 == expected_sha256, (
+        f"Checksum mismatch: expected {expected_sha256}, got {actual_sha256}"
+    )
+
+    video_path = repo_dir / "frontend" / "public" / "feeds" / "uav-alpha" / "video.mp4"
+    assert video_path.exists(), f"Video file missing: {video_path}"
+
+    out_dir = work_dir / "uav-alpha"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_json = out_dir / "detections.json"
+    root_out_json = work_dir / "detections.json"
+
+    gen_script = repo_dir / "scripts" / "generate_feed_detections.py"
+    cmd = [
+        sys.executable,
+        str(gen_script),
+        "--video", str(video_path),
+        "--weights", str(weights_path),
+        "--out", str(out_json),
+        "--imgsz", "1280",
+        "--conf", "0.35",
+        "--tracker", "bytetrack.yaml",
+        "--sample-interval", "0.5",
+        "--device", "cuda:0",
+        "--feed", "uav-alpha",
+        "--evaluated",
+    ]
+    log(f"Executing: {' '.join(cmd)}")
+    run_cmd(cmd, cwd=str(repo_dir))
+
+    # Also copy to root of working directory so it's readily accessible in kernel output
+    shutil.copy2(out_json, root_out_json)
+    log(f"Generated uav-alpha detections exported to {out_json} and {root_out_json}")
+
+
 def main():
     log("=== AEGIS COMMAND - KAGGLE GPU RUNNER START ===")
 
@@ -122,7 +186,16 @@ def main():
     else:
         log(f"Repo already exists at {repo_dir}")
 
-    # 5. Locate dataset and link into repo
+    # 5. Generate Demo Feed Detections on GPU
+    generate_demo_feed_detections(repo_dir=repo_dir, work_dir=work_dir)
+
+    runner_mode = os.environ.get("RUNNER_MODE", "feed_only")
+    if runner_mode != "full_cv":
+        log("Feed generation complete. Default RUNNER_MODE=feed_only; skipping 5-fold CV rerun.")
+        log("=== AEGIS COMMAND - KAGGLE GPU RUNNER COMPLETE ===")
+        return
+
+    # 6. Locate dataset and link into repo (for full_cv mode)
     input_root = Path("/kaggle/input")
     assert input_root.exists(), "Missing /kaggle/input"
     found = find_dataset_files(input_root)
