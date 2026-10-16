@@ -42,7 +42,7 @@ def extract_table_rows(markdown_path: Path, section_header: str) -> List[List[st
         if stripped.startswith("#"):
             if section_header.lower() in stripped.lower():
                 in_section = True
-            elif in_section and in_table and stripped.startswith("##"):
+            elif in_section and (stripped.startswith("## ") or stripped.startswith("# ")):
                 break # Reached next major section
 
         if in_section and stripped.startswith("|"):
@@ -164,12 +164,10 @@ def verify_benchmarks(
         # Check split / fold
         split = "all"
         fold = 1
-        if "fold 1" in row_str.lower():
+        match_fold = re.search(r"fold\s*(\d+)", row_str, re.IGNORECASE)
+        if match_fold:
             split = "val"
-            fold = 1
-        elif "fold 2" in row_str.lower():
-            split = "val"
-            fold = 2
+            fold = int(match_fold.group(1))
 
         raw_run_dir = find_matching_raw_run(raw_root, model_name, imgsz, split=split, fold=fold)
         if not raw_run_dir:

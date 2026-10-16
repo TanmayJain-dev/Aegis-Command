@@ -1,0 +1,135 @@
+{
+  "protocol": "5-fold contiguous holdout cross-validation",
+  "evaluation_scope": "same-scene performance (single source video)",
+  "train_config": {
+    "base_model": "yolov8m.pt",
+    "epochs": 50,
+    "imgsz": 1280,
+    "batch": 8,
+    "lr0": 0.01,
+    "lrf": 0.01,
+    "mosaic": 1.0,
+    "mixup": 0.15,
+    "box": 7.5,
+    "cls": 0.5,
+    "temporal_purge_buffer_frames": 4,
+    "eval_scope": "same-scene performance (single source video)"
+  },
+  "folds": [
+    {
+      "fold": 1,
+      "train_count": 120,
+      "buffer_count": 4,
+      "val_count": 31,
+      "weight_sha256": "9fa52a9aef5aa7a76d5d4630508fba56b12f8ca52fbb8a186f4e552acff6573a",
+      "training_args": {
+        "base_model": "yolov8m.pt",
+        "epochs": 50,
+        "imgsz": 1280,
+        "batch": 8,
+        "lr0": 0.01,
+        "lrf": 0.01,
+        "mosaic": 1.0,
+        "mixup": 0.15,
+        "box": 7.5,
+        "cls": 0.5,
+        "temporal_purge_buffer_frames": 4,
+        "eval_scope": "same-scene performance (single source video)"
+      },
+      "finetuned_metrics": {},
+      "baseline_metrics": {}
+    },
+    {
+      "fold": 2,
+      "train_count": 116,
+      "buffer_count": 8,
+      "val_count": 31,
+      "weight_sha256": "27d12f6862d2c5ce15107760c8aa7f4adb504210941e5efc473c87225852400e",
+      "training_args": {
+        "base_model": "yolov8m.pt",
+        "epochs": 50,
+        "imgsz": 1280,
+        "batch": 8,
+        "lr0": 0.01,
+        "lrf": 0.01,
+        "mosaic": 1.0,
+        "mixup": 0.15,
+        "box": 7.5,
+        "cls": 0.5,
+        "temporal_purge_buffer_frames": 4,
+        "eval_scope": "same-scene performance (single source video)"
+      },
+      "finetuned_metrics": {},
+      "baseline_metrics": {}
+    },
+    {
+      "fold": 3,
+      "train_count": 116,
+      "buffer_count": 8,
+      "val_count": 31,
+      "weight_sha256": "1311f3e8f9b25d60cc6f95d550e8ad178bd47528772798a675e239d1f4f1bd9a",
+      "training_args": {
+        "base_model": "yolov8m.pt",
+        "epochs": 50,
+        "imgsz": 1280,
+        "batch": 8,
+        "lr0": 0.01,
+        "lrf": 0.01,
+        "mosaic": 1.0,
+        "mixup": 0.15,
+        "box": 7.5,
+        "cls": 0.5,
+        "temporal_purge_buffer_frames": 4,
+        "eval_scope": "same-scene performance (single source video)"
+      },
+      "finetuned_metrics": {},
+      "baseline_metrics": {}
+    },
+    {
+      "fold": 4,
+      "train_count": 116,
+      "buffer_count": 8,
+      "val_count": 31,
+      "weight_sha256": "d107793ced9bbb903510573b7b78262b12b78374922dee584d29d18eddc4ea0d",
+      "training_args": {
+        "base_model": "yolov8m.pt",
+        "epochs": 50,
+        "imgsz": 1280,
+        "batch": 8,
+        "lr0": 0.01,
+        "lrf": 0.01,
+        "mosaic": 1.0,
+        "mixup": 0.15,
+        "box": 7.5,
+        "cls": 0.5,
+        "temporal_purge_buffer_frames": 4,
+        "eval_scope": "same-scene performance (single source video)"
+      },
+      "finetuned_metrics": {},
+      "baseline_metrics": {}
+    },
+    {
+      "fold": 5,
+      "train_count": 120,
+      "buffer_count": 4,
+      "val_count": 31,
+      "weight_sha256": "b6ec497dce28d33f2aed383e6c99ee01823b7fc8e3f0f6b27e8c45908754eed4",
+      "training_args": {
+        "base_model": "yolov8m.pt",
+        "epochs": 50,
+        "imgsz": 1280,
+        "batch": 8,
+        "lr0": 0.01,
+        "lrf": 0.01,
+        "mosaic": 1.0,
+        "mixup": 0.15,
+        "box": 7.5,
+        "cls": 0.5,
+        "temporal_purge_buffer_frames": 4,
+        "eval_scope": "same-scene performance (single source video)"
+      },
+      "finetuned_metrics": {},
+      "baseline_metrics": {}
+    }
+  ]
+}

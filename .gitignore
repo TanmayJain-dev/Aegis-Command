@@ -69,3 +69,7 @@ vision/eval/labels_draft/
 # Local compatibility symlinks
 frontend/public/detections.json
 
+# Scratch and diagnostic runs
+scratch/
+
+

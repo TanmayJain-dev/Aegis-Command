@@ -235,21 +235,39 @@ All planned model evaluation configurations are listed below. In accordance with
 
 ---
 
-## Time-Based Contiguous Holdout Fine-Tuning (Task 3)
+## Time-Based Contiguous Holdout Fine-Tuning (Task 4)
 
 ### Temporal Leakage Prevention Architecture
-Previous random or interleaved 1-in-5 splits caused severe temporal leakage between near-duplicate adjacent frames. The evaluation protocol enforces strict **Time-Based Contiguous Splitting** with a 5-frame temporal purge buffer:
-- **Fold 1**: Train on first ~70% (frames `0..107`, $n=108$), purge temporal buffer (frames `108..112`, $n=5$), holdout test on last ~25% (frames `113..154`, $n=42$).
-- **Fold 2 (Reverse)**: Holdout test on first ~25% (frames `0..41`, $n=42$), purge temporal buffer (frames `42..46`, $n=5$), train on last ~70% (frames `47..154`, $n=108$).
+Previous random or interleaved 1-in-5 splits caused severe temporal leakage between near-duplicate adjacent frames. The evaluation protocol enforces strict **Time-Based Contiguous Splitting** with a 4-frame temporal purge buffer between train and holdout splits across 5 folds:
+- **Dataset**: 155 certified frames divided into 5 contiguous 31-frame blocks.
+- **Protocol**: 5-fold contiguous cross-validation, 50 epochs per fold, multi-scale 1280px, batch size 8, initialized from `yolov8m.pt`.
+- **Buffer**: 4-frame temporal purge buffer on boundaries to guarantee zero adjacent-frame leakage.
+- **Evaluation**: Each model evaluated on its corresponding unseen contiguous holdout split at both confidence 0.25 and 0.35 with 1,000 bootstrap resamples for 95% confidence intervals.
 
-### Holdout Fine-Tuning Status (50 Epochs, Multi-scale 1280px)
+### 5-Fold Contiguous Holdout Matrix (1280px, 50 Epochs, Tesla T4 GPU)
 
-| Evaluation Split | Model Configuration | Status | Raw Predictions Source |
-|---|---|---|---|
-| **Fold 1 Holdout** (Frames 113..154) | Pretrained Baseline (`yolov8s` @ 1280px) | `NOT RUN` | None |
-| **Fold 1 Holdout** (Frames 113..154) | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | `NOT RUN` | None |
-| **Fold 2 Holdout** (Frames 0..41) | Pretrained Baseline (`yolov8s` @ 1280px) | `NOT RUN` | None |
-| **Fold 2 Holdout** (Frames 0..41) | **Fine-Tuned** (`yolov8s` @ 1280px, 50 ep) | `NOT RUN` | None |
+| Model Architecture & Resolution | Target Device / Backend | Person AP50 [95% CI] | Person Recall [95% CI] | Person P (0.25) | Person R (0.25) | Person P (0.35) | Person R (0.35) | FP / frame | Truck AP50 | Car AP50 (n=58) | Latency |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| **yolov8m @ 1280px** (Fold 1 Baseline) | CUDA:0 | `0.600 [0.537, 0.662]` | `0.623 [0.562, 0.685]` | 0.799 | 0.623 | 0.911 | 0.523 | 2.387 | 0.870 | 0.058* | 100.0 ms (CUDA:0) |
+| **best @ 1280px** (Fold 1 Fine-Tuned) | CUDA:0 | `0.887 [0.858, 0.915]` | `0.907 [0.881, 0.932]` | 0.823 | 0.907 | 0.882 | 0.886 | 2.968 | 0.435 | 0.000* | 98.3 ms (CUDA:0) |
+| **yolov8m @ 1280px** (Fold 2 Baseline) | CUDA:0 | `0.361 [0.330, 0.399]` | `0.417 [0.387, 0.451]` | 0.730 | 0.417 | 0.798 | 0.303 | 2.871 | 0.935 | 0.000* | 100.4 ms (CUDA:0) |
+| **best @ 1280px** (Fold 2 Fine-Tuned) | CUDA:0 | `0.789 [0.761, 0.818]` | `0.835 [0.813, 0.856]` | 0.783 | 0.835 | 0.853 | 0.786 | 4.290 | 0.633 | 0.125* | 100.8 ms (CUDA:0) |
+| **yolov8m @ 1280px** (Fold 3 Baseline) | CUDA:0 | `0.216 [0.178, 0.258]` | `0.224 [0.185, 0.268]` | 0.820 | 0.224 | 0.940 | 0.172 | 0.581 | 0.000 | 0.000* | 99.9 ms (CUDA:0) |
+| **best @ 1280px** (Fold 3 Fine-Tuned) | CUDA:0 | `0.821 [0.781, 0.855]` | `0.842 [0.803, 0.873]` | 0.868 | 0.842 | 0.906 | 0.790 | 1.516 | 0.958 | 0.000* | 98.4 ms (CUDA:0) |
+| **yolov8m @ 1280px** (Fold 4 Baseline) | CUDA:0 | `0.772 [0.673, 0.866]` | `0.777 [0.677, 0.870]` | 0.908 | 0.777 | 0.967 | 0.711 | 0.419 | 0.548 | 0.000* | 99.6 ms (CUDA:0) |
+| **best @ 1280px** (Fold 4 Fine-Tuned) | CUDA:0 | `0.851 [0.780, 0.922]` | `0.855 [0.785, 0.925]` | 0.934 | 0.855 | 0.939 | 0.837 | 0.323 | 1.000 | 0.000* | 100.2 ms (CUDA:0) |
+| **yolov8m @ 1280px** (Fold 5 Baseline) | CUDA:0 | `0.687 [0.589, 0.785]` | `0.696 [0.601, 0.792]` | 0.866 | 0.696 | 0.930 | 0.671 | 0.548 | 0.581 | 0.000* | 100.7 ms (CUDA:0) |
+| **best @ 1280px** (Fold 5 Fine-Tuned) | CUDA:0 | `0.947 [0.905, 0.985]` | `0.956 [0.918, 0.987]` | 0.844 | 0.956 | 0.893 | 0.949 | 0.903 | 0.996 | 0.000* | 101.1 ms (CUDA:0) |
+
+### 5-Fold Cross-Validation Aggregate Performance
+- **Baseline (Pretrained YOLOv8m @ 1280px)**:
+  - Mean Person AP50 across 5 folds: **0.527** (Range: 0.216 – 0.772)
+  - Mean Person Recall @ 0.25: **0.547** (Range: 0.224 – 0.777)
+- **Fine-Tuned (Aegis 5-Fold Contiguous Checkpoints)**:
+  - Mean Person AP50 across 5 folds: **0.859** (Range: 0.789 – 0.947)
+  - Mean Person Recall @ 0.25: **0.879** (Range: 0.835 – 0.956)
+- **Net Operational Gain**: **+33.2% AP50** (+33.2 percentage points) and **+33.2% Recall** improvement on unseen contiguous drone video sequences.
+- **Checkpoints**: Stored locally in `vision/weights/checkpoints/` with cryptographic SHA-256 signatures recorded in `task4_5fold_finetune_summary.json`.
 
 ---
 

@@ -1,0 +1,181 @@
+{
+  "evaluated_at": "2026-10-16T12:17:14Z",
+  "model": "yolov8m.pt",
+  "split": "val",
+  "fold": 5,
+  "native_classes": false,
+  "imgsz": 1280,
+  "device": "cuda:0",
+  "num_images": 31,
+  "latency_ms": {
+    "mean_ms": 100.67,
+    "p50_ms": 100.07,
+    "p95_ms": 106.67
+  },
+  "bootstrap_ci_95_person": {
+    "ap50_ci": [
+      0.5887,
+      0.7855
+    ],
+    "recall_ci": [
+      0.6012,
+      0.7923
+    ],
+    "ap50_mean": 0.6857,
+    "recall_mean": 0.6948
+  },
+  "metrics_at_conf_0.25": {
+    "person": {
+      "n_gt": 158,
+      "n_pred": 127,
+      "tp": 110,
+      "fp": 17,
+      "fp_per_frame": 0.5484,
+      "precision": 0.8661,
+      "recall": 0.6962,
+      "f1": 0.7719,
+      "ap50": 0.6872,
+      "ap50_95": 0.4511
+    },
+    "car": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0,
+      "note": "n=58, unreliable"
+    },
+    "truck": {
+      "n_gt": 31,
+      "n_pred": 18,
+      "tp": 18,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 0.5806,
+      "f1": 0.7347,
+      "ap50": 0.5806,
+      "ap50_95": 0.4221
+    },
+    "bus": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0,
+      "note": "n=0, excluded"
+    }
+  },
+  "metrics_at_conf_0.35": {
+    "person": {
+      "n_gt": 158,
+      "n_pred": 114,
+      "tp": 106,
+      "fp": 8,
+      "fp_per_frame": 0.2581,
+      "precision": 0.9298,
+      "recall": 0.6709,
+      "f1": 0.7794,
+      "ap50": 0.6642,
+      "ap50_95": 0.4346
+    },
+    "car": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0,
+      "note": "n=58, unreliable"
+    },
+    "truck": {
+      "n_gt": 31,
+      "n_pred": 15,
+      "tp": 15,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 0.4839,
+      "f1": 0.6522,
+      "ap50": 0.4839,
+      "ap50_95": 0.3472
+    },
+    "bus": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0,
+      "note": "n=0, excluded"
+    }
+  },
+  "error_analysis": {
+    "confusion_matrix": [
+      [
+        110,
+        0,
+        0,
+        0,
+        48
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        18,
+        0,
+        13
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        17,
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "fp_breakdown": {
+      "background": 10,
+      "wrong_class": 0,
+      "duplicate": 7
+    },
+    "fn_by_area": {
+      "small": 1,
+      "medium": 11,
+      "large": 49
+    }
+  },
+  "raw_dir": "docs/results/raw/yolov8m_1280px_val_fold5_baseline"
+}

@@ -1,0 +1,15 @@
+{
+  "run_id": "sahi_yolov8m_640px_all",
+  "command": "SAHI get_sliced_prediction yolov8m.pt (640x640 slices, overlap=0.2)",
+  "device": "cuda:0",
+  "imgsz": 640,
+  "weights": "yolov8m.pt",
+  "timestamp": "2026-10-16T09:05:47Z",
+  "wall_seconds": 67.17,
+  "labels_sha256": "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
+  "num_frames": 155,
+  "split": "all",
+  "fold": 1,
+  "latency_mean_ms": 432.58,
+  "latency_p50_ms": 428.4
+}
