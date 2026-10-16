@@ -30,6 +30,7 @@ import json
 import math
 import os
 from pathlib import Path
+import subprocess
 import sys
 from typing import Dict, List, Optional, Tuple
 
@@ -68,6 +69,30 @@ def compute_weights_sha256(weights_path: str) -> str:
                 h.update(chunk)
         return h.hexdigest()
     return "built-in-weights"
+
+
+def compute_detections_sha256(body_data: Dict) -> str:
+    """Compute canonical SHA-256 hash across sorted JSON detection bodies (excluding meta)."""
+    serialized = json.dumps(body_data, sort_keys=True)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
+def get_generator_commit() -> str:
+    """Obtain current git commit hash."""
+    try:
+        res = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        return res.stdout.strip()
+    except Exception:
+        env_commit = os.environ.get("GIT_COMMIT")
+        if env_commit:
+            return env_commit.strip()
+        return "uncommitted-workspace"
+
 
 
 def compute_kinematics(
@@ -271,9 +296,14 @@ def generate_feed_detections(
     cap.release()
 
     # Build metadata block
+    detections_sha256 = compute_detections_sha256(timeline_data)
+    generator_commit = get_generator_commit()
+
     meta = {
         "model": Path(weights).name,
         "weights_sha256": weight_hash,
+        "generator_commit": generator_commit,
+        "detections_sha256": detections_sha256,
         "imgsz": imgsz,
         "conf": conf,
         "date": datetime.now(timezone.utc).strftime("%Y-%m-%d"),

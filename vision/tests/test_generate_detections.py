@@ -12,6 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from generate_detections import (
     ALLOWED_CLASSES,
     compute_weights_sha256,
+    compute_detections_sha256,
     compute_kinematics,
     FEED_PATHS
 )
@@ -139,3 +140,28 @@ def test_generated_detections_schema_contract():
             assert d["id"].startswith(d["class"].capitalize())
             assert isinstance(d["speed_kmh"], (int, float))
             assert isinstance(d["direction"], str)
+
+
+def test_compute_detections_sha256():
+    sample_body = {
+        "0.0": [{"id": "Person-1", "class": "person", "confidence": 0.88}],
+        "0.5": [{"id": "Truck-1", "class": "truck", "confidence": 0.75}]
+    }
+    h1 = compute_detections_sha256(sample_body)
+    assert len(h1) == 64
+
+    # Identical content in different key order must produce identical hash (sorted_keys)
+    sample_body_rev = {
+        "0.5": [{"id": "Truck-1", "class": "truck", "confidence": 0.75}],
+        "0.0": [{"id": "Person-1", "class": "person", "confidence": 0.88}]
+    }
+    h2 = compute_detections_sha256(sample_body_rev)
+    assert h1 == h2
+
+    # Different content produces different hash
+    sample_body_alt = {
+        "0.0": [{"id": "Person-1", "class": "person", "confidence": 0.89}]
+    }
+    h3 = compute_detections_sha256(sample_body_alt)
+    assert h1 != h3
+
