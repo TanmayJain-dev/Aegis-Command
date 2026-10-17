@@ -304,7 +304,7 @@ def generate_feed_detections(
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
-        json.dump(output_payload, f, indent=2)
+        json.dump(output_payload, f, separators=(",", ":"))
 
     print(f"[DONE] Successfully generated {len(timeline_data)} frames -> {out_path}")
     return output_payload
