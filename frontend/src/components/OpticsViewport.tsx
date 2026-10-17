@@ -55,7 +55,7 @@ export function OpticsViewport({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
-  const [videoError, setVideoError] = useState(false);
+  const [failedVideoSrc, setFailedVideoSrc] = useState<string | null>(null);
 
   // Benchmarking refs
   const perfDrawTimes = useRef<number[]>([]);
@@ -73,10 +73,7 @@ export function OpticsViewport({
   });
 
   const videoSrc = activeFeed?.video || "/feeds/uav-alpha/video.mp4";
-
-  useEffect(() => {
-    setVideoError(false);
-  }, [videoSrc]);
+  const videoError = failedVideoSrc === videoSrc;
 
   const handleFrame = useCallback(
     (mediaTime: number, obs: DrawableDetection[]) => {
@@ -401,7 +398,7 @@ export function OpticsViewport({
           className="absolute inset-0 w-full h-full object-contain filter contrast-125 brightness-90 grayscale-[20%]"
           muted={isMuted}
           playsInline
-          onError={() => setVideoError(true)}
+          onError={() => setFailedVideoSrc(videoSrc)}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
           onClick={handleTogglePlay}
