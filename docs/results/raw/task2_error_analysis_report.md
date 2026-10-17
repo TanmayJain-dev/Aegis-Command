@@ -95,9 +95,9 @@ results = model.track(frame, persist=True, tracker="bytetrack.yaml", verbose=Fal
 ```
 - **Mechanism:** ByteTrack's Kalman filter predicts position based on continuous frame-to-frame motion ($\Delta t \approx 0.033\text{s}$). Sampling every 1.5s introduces a massive 45-frame temporal void. Targets jump 30–100px between consecutive evaluations. ByteTrack's cost matrix fails association, treating valid contacts as transient unconfirmed tracks and suppressing them.
 
-### 4. Low-Capacity Base Model (`yolov8n.pt`)
+### 4. Low-Capacity Base Model (`yolov8n.pt` / `yolov8s.pt`)
 **Code (`scratch/generate_feed_detections.py` Line 19):**
 ```python
-model = YOLO("yolov8n.pt")
+model = YOLO("yolov8n.pt")  # Shipped feed evaluated against yolov8s.pt baseline
 ```
-- **Mechanism:** YOLOv8 Nano has only 3.2M parameters. It lacks the capacity to resolve tiny aerial features without slicing (SAHI) or high-resolution feature maps ($1280\text{px}$).
+- **Mechanism:** Stock YOLOv8 Nano/Small models (3.2M / 11.2M parameters) lack the capacity to resolve small aerial targets at default 640px without fine-tuning, slicing (SAHI), or native high-resolution feature maps ($1280\text{px}$).
