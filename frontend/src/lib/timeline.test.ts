@@ -292,6 +292,96 @@ describe("Schema v1 Gap Bridging and Linear Interpolation", () => {
     // At 1.06 (outside tolerance) -> returns empty
     expect(largeTimeline.sampleAt(1.06)).toEqual([]);
   });
+
+  it("(f) rejects bridging pairs whose center distance exceeds 0.2 * meta.width (falls back to +/-0.15s rule)", () => {
+    // meta.width = 1280 -> cap is 0.2 * 1280 = 256px
+    // Person-Left center: (150, 150), Person-Right center: (850, 150) -> distance = 700px > 256px
+    const overCapData = {
+      meta: {
+        feed_id: "cctv-bravo",
+        width: 1280,
+        height: 720,
+      },
+      "1.00": [
+        {
+          id: "Person-Left",
+          class: "person",
+          confidence: 0.85,
+          box: [100, 100, 200, 200] as [number, number, number, number],
+          speed_kmh: 5,
+          direction: "E",
+        },
+      ],
+      "1.50": [
+        {
+          id: "Person-Right",
+          class: "person",
+          confidence: 0.88,
+          box: [800, 100, 900, 200] as [number, number, number, number],
+          speed_kmh: 6,
+          direction: "E",
+        },
+      ],
+    };
+    const timeline = parseTimeline(overCapData);
+
+    // At mid-gap t=1.25 (dt = 0.25s > 0.15s): over-cap pair must NOT be bridged -> returns empty
+    expect(timeline.sampleAt(1.25)).toEqual([]);
+
+    // Within +/-0.15s of sample A (e.g. t=1.10, diff = 0.10s <= 0.15s): visible as unmatched Person-Left
+    const nearA = timeline.sampleAt(1.10);
+    expect(nearA).toHaveLength(1);
+    expect(nearA[0].id).toBe("Person-Left");
+    expect(nearA[0].interpolated).toBe(false);
+
+    // Within +/-0.15s of sample B (e.g. t=1.40, diff = 0.10s <= 0.15s): visible as unmatched Person-Right
+    const nearB = timeline.sampleAt(1.40);
+    expect(nearB).toHaveLength(1);
+    expect(nearB[0].id).toBe("Person-Right");
+    expect(nearB[0].interpolated).toBe(false);
+  });
+
+  it("(g) normal pairs within 0.2 * meta.width are unaffected and bridge normally", () => {
+    // meta.width = 1280 -> cap is 0.2 * 1280 = 256px
+    // Person-1 center: (150, 150), Person-2 center: (210, 150) -> distance = 60px <= 256px
+    const normalData = {
+      meta: {
+        feed_id: "cctv-bravo",
+        width: 1280,
+        height: 720,
+      },
+      "1.00": [
+        {
+          id: "Person-1",
+          class: "person",
+          confidence: 0.85,
+          box: [100, 100, 200, 200] as [number, number, number, number],
+          speed_kmh: 5,
+          direction: "E",
+        },
+      ],
+      "1.50": [
+        {
+          id: "Person-2",
+          class: "person",
+          confidence: 0.90,
+          box: [160, 100, 260, 200] as [number, number, number, number],
+          speed_kmh: 6,
+          direction: "E",
+        },
+      ],
+    };
+    const timeline = parseTimeline(normalData);
+
+    // At mid-gap t=1.25: pair is matched and linearly interpolated
+    const mid = timeline.sampleAt(1.25);
+    expect(mid).toHaveLength(1);
+    expect(mid[0].interpolated).toBe(true);
+    expect(mid[0].box[0]).toBeCloseTo(130);
+    expect(mid[0].box[1]).toBeCloseTo(100);
+    expect(mid[0].box[2]).toBeCloseTo(230);
+    expect(mid[0].box[3]).toBeCloseTo(200);
+  });
 });
 
 describe("Resolution-Decoupled Scaling", () => {

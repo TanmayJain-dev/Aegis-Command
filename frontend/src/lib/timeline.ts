@@ -350,6 +350,7 @@ export const MAX_BRIDGE_S = 1.0;
 export const UNMATCHED_TOLERANCE_S = 0.15;
 export const MIN_IOU_THRESHOLD = 0.05;
 export const MAX_CENTER_DIST_FACTOR = 1.5;
+export const MAX_CENTER_DIST_RATIO = 0.2; // Reject bridging if center distance > 0.2 * meta.width
 
 export function computeBoxIoU(
   a: [number, number, number, number],
@@ -394,9 +395,10 @@ interface IntervalBridge {
   unmatchedB: DrawableDetection[];
 }
 
-function matchSampleBoxes(
+export function matchSampleBoxes(
   detsA: DrawableDetection[],
-  detsB: DrawableDetection[]
+  detsB: DrawableDetection[],
+  maxCenterDistCap?: number
 ): IntervalBridge {
   const lenA = detsA.length;
   const lenB = detsB.length;
@@ -404,13 +406,17 @@ function matchSampleBoxes(
   const matchedB = new Uint8Array(lenB);
   const matched: Array<{ a: DrawableDetection; b: DrawableDetection }> = [];
 
-  // Pass 1: Greedy match by highest IoU (IoU >= 0.05) among same class
+  // Pass 1: Greedy match by highest IoU (IoU >= 0.05) among same class, respecting distance cap
   const iouCandidates: Array<{ j: number; k: number; iou: number }> = [];
   for (let j = 0; j < lenA; j++) {
     const clsA = (detsA[j].class || "").toLowerCase();
     for (let k = 0; k < lenB; k++) {
       const clsB = (detsB[k].class || "").toLowerCase();
       if (clsA !== clsB) continue;
+
+      const dist = computeBoxCenterDist(detsA[j].box, detsB[k].box);
+      if (maxCenterDistCap !== undefined && dist > maxCenterDistCap) continue;
+
       const iou = computeBoxIoU(detsA[j].box, detsB[k].box);
       if (iou >= MIN_IOU_THRESHOLD) {
         iouCandidates.push({ j, k, iou });
@@ -428,7 +434,7 @@ function matchSampleBoxes(
     }
   }
 
-  // Pass 2: Fallback to nearest center distance <= 1.5 * max(box w, h) among remaining unmatched of same class
+  // Pass 2: Fallback to nearest center distance <= min(1.5 * max(box w, h), maxCenterDistCap) among remaining unmatched of same class
   const distCandidates: Array<{ j: number; k: number; dist: number }> = [];
   for (let j = 0; j < lenA; j++) {
     if (matchedA[j] === 1) continue;
@@ -443,11 +449,13 @@ function matchSampleBoxes(
       if (clsA !== clsB) continue;
 
       const boxB = detsB[k].box;
+      const dist = computeBoxCenterDist(boxA, boxB);
+      if (maxCenterDistCap !== undefined && dist > maxCenterDistCap) continue;
+
       const wB = boxB[2] - boxB[0];
       const hB = boxB[3] - boxB[1];
       const maxDim = Math.max(wA, hA, wB, hB);
 
-      const dist = computeBoxCenterDist(boxA, boxB);
       if (dist <= MAX_CENTER_DIST_FACTOR * maxDim) {
         distCandidates.push({ j, k, dist });
       }
@@ -512,23 +520,7 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
       }));
   }
 
-  // Precompute bridges between consecutive samples i and i+1 at load time
-  const intervalBridges: IntervalBridge[] = new Array(Math.max(0, parsedTimes.length - 1));
-  for (let i = 0; i < parsedTimes.length - 1; i++) {
-    const gap = timesArray[i + 1] - timesArray[i];
-    if (gap <= MAX_BRIDGE_S && gap > 0) {
-      intervalBridges[i] = matchSampleBoxes(frameDetections[i], frameDetections[i + 1]);
-    } else {
-      intervalBridges[i] = {
-        matched: [],
-        unmatchedA: frameDetections[i],
-        unmatchedB: frameDetections[i + 1],
-      };
-    }
-  }
-
   const duration_s = timesArray.length > 0 ? timesArray[timesArray.length - 1] : 0;
-
   const rawMeta = (raw as Record<string, unknown>).meta as Partial<TimelineMeta> | undefined;
 
   const meta: TimelineMeta = {
@@ -557,6 +549,23 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
     speed_is_simulated: rawMeta?.speed_is_simulated ?? true,
     heading_frame: rawMeta?.heading_frame || "image",
   };
+
+  const maxCenterDistCap = MAX_CENTER_DIST_RATIO * meta.width;
+
+  // Precompute bridges between consecutive samples i and i+1 at load time
+  const intervalBridges: IntervalBridge[] = new Array(Math.max(0, parsedTimes.length - 1));
+  for (let i = 0; i < parsedTimes.length - 1; i++) {
+    const gap = timesArray[i + 1] - timesArray[i];
+    if (gap <= MAX_BRIDGE_S && gap > 0) {
+      intervalBridges[i] = matchSampleBoxes(frameDetections[i], frameDetections[i + 1], maxCenterDistCap);
+    } else {
+      intervalBridges[i] = {
+        matched: [],
+        unmatchedA: frameDetections[i],
+        unmatchedB: frameDetections[i + 1],
+      };
+    }
+  }
 
   const getScale = (targetWidth: number, targetHeight: number): ScaleFactors => ({
     scaleX: targetWidth / meta.width,
