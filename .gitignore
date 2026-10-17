@@ -37,6 +37,7 @@ runs/
 *.mp4
 *.webm
 *.avi
+vision/source/*.mp4
 
 # Temporary Aegis repair snapshots
 .aegis-*/

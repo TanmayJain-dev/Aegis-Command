@@ -23,7 +23,7 @@ In accordance with project engineering invariants:
 1. **Cell 1 (`nvidia-smi`)**: Confirm CUDA GPU device is allocated.
 2. **Cell 2 (Dependencies)**: Installs `ultralytics`, `sahi`, `albumentations`, `opencv-python`.
 3. **Cell 3 (Clone)**: Clones repo and checks out branch `feat/accuracy-v2`.
-4. **Cell 4 (Frame Check)**: Verifies 155 frames in `vision/eval/images/`. If missing or incomplete, runs `sample_frames()` from `vision/source/drone_feed.mp4` (stride 13, offset 6).
+4. **Cell 4 (Frame Check)**: Verifies 155 frames in `vision/eval/images/`. If missing or incomplete, runs `sample_frames()` from `vision/source/drone_feed.mp4` (downloaded via `python scripts/download_weights.py --include-source`, stride 13, offset 6).
 5. **Cell 5 (Gate Check)**: Validates `vision/eval/labels/VERIFIED` cryptographic checksum (`a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc`).
 6. **Cell 6 (Zero-Shot Matrix)**: Sequentially executes 16 configurations across models (`yolov8n/s/m`, `yolo11n/s/m`) and resolutions (`640`, `960`, `1280`), dumping `predictions.json` and `run_meta.json` into `docs/results/raw/<run_id>/`.
 7. **Cell 7 (SAHI Evaluation)**: Runs Sliced Aided Hyper Inference (`yolov8s` with 640×640 slices, 0.2 overlap), dumping raw candidates to `docs/results/raw/sahi_yolov8s_640px_all/`.

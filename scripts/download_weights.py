@@ -58,6 +58,13 @@ KNOWN_WEIGHTS = {
         "description": "COCO pretrained YOLOv8s baseline",
         "sha256": "1f47a78bf100391c2a140b7ac73a1caae18c32779be7d310658112f7ac9aa78a",
         "url": "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8s.pt"
+    },
+    "source_video": {
+        "filename": "drone_feed.mp4",
+        "description": "Canonical 1080p source video of truth (1920x1080, 24.7 MB)",
+        "sha256": "a1f378f95ca29504c07235b8f97aa3d23bf31a495f352c71292cd512bcb36aed",
+        "url": "https://github.com/TanmayJain-dev/Aegis-Command/releases/download/v0.4.0/drone_feed.mp4",
+        "dest_dir": "vision/source"
     }
 }
 
@@ -109,9 +116,11 @@ def download_weight(key: str, info: dict, out_dir: Path, session: str = "aegis-c
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Download and verify Aegis Command model checkpoints.")
+    parser = argparse.ArgumentParser(description="Download and verify Aegis Command model checkpoints and assets.")
     parser.add_argument("--model", default="demo_full", choices=list(KNOWN_WEIGHTS.keys()) + ["all"],
-                        help="Model key to download or 'all'")
+                        help="Model key to download or 'all' (default: demo_full)")
+    parser.add_argument("--include-source", action="store_true",
+                        help="Also download canonical 1080p source video to vision/source/drone_feed.mp4")
     parser.add_argument("--out-dir", default="weights", help="Directory to save weights (default: weights/)")
     parser.add_argument("--session", default="aegis-cv", help="Active Colab session name (default: aegis-cv)")
     args = parser.parse_args()
@@ -119,9 +128,25 @@ def main():
     out_dir = Path(args.out_dir)
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    targets = list(KNOWN_WEIGHTS.keys()) if args.model == "all" else [args.model]
+    # If "all", target all weight models (excluding source_video unless requested)
+    if args.model == "all":
+        targets = [k for k in KNOWN_WEIGHTS.keys() if k != "source_video"]
+    else:
+        targets = [args.model]
+
     for key in targets:
-        download_weight(key, KNOWN_WEIGHTS[key], out_dir, session=args.session)
+        info = KNOWN_WEIGHTS[key]
+        target_dir = out_dir
+        if "dest_dir" in info and args.out_dir == "weights":
+            target_dir = Path(info["dest_dir"])
+            target_dir.mkdir(parents=True, exist_ok=True)
+        download_weight(key, info, target_dir, session=args.session)
+
+    if args.include_source and "source_video" not in targets:
+        info = KNOWN_WEIGHTS["source_video"]
+        target_dir = Path(info.get("dest_dir", "vision/source"))
+        target_dir.mkdir(parents=True, exist_ok=True)
+        download_weight("source_video", info, target_dir, session=args.session)
 
 
 if __name__ == "__main__":

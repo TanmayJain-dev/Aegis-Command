@@ -77,7 +77,10 @@ def bootstrap_environment(repo_dir: Path):
     existing_images = list(images_dir.glob("*.jpg")) if images_dir.exists() else []
     if len(existing_images) < 155:
         drone_video = repo_dir / "vision" / "source" / "drone_feed.mp4"
-        assert drone_video.exists(), f"Source video {drone_video} missing!"
+        assert drone_video.exists(), (
+            f"Source video not found at {drone_video}. Download with "
+            "'python scripts/download_weights.py --include-source' or from GitHub Release v0.4.0."
+        )
         log(f"Extracting 155 evaluation frames from {drone_video}...")
         from vision.eval.sample_frames import sample_frames
         sample_frames(video_path=str(drone_video), out_dir=str(images_dir))

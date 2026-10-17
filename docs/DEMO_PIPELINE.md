@@ -4,7 +4,7 @@ Aegis ships with a deterministic replay pipeline rather than requiring a live dr
 
 ## Canonical assets
 
-- `vision/source/drone_feed.mp4` — canonical 1080p source video of truth for extraction.
+- `vision/source/drone_feed.mp4` — canonical 1080p source video of truth for extraction (hosted on GitHub Release v0.4.0 assets; download with `python scripts/download_weights.py --include-source`).
 - `frontend/public/feeds/index.json` — feeds manifest registry.
 - `frontend/public/feeds/uav-alpha/video.mp4` — web-transcoded video (720p 30fps <= 10MB) rendered by the operator console.
 - `frontend/public/feeds/uav-alpha/detections.json` — timestamped object detections consumed by the frontend.

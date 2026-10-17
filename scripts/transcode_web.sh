@@ -9,6 +9,7 @@ OUTPUT="${2:-frontend/public/feeds/uav-alpha/video.mp4}"
 
 if [ ! -f "$INPUT" ]; then
   echo "Error: Input file '$INPUT' does not exist." >&2
+  echo "Source video not found. Download with: python scripts/download_weights.py --include-source or from GitHub Release v0.4.0." >&2
   exit 1
 fi
 

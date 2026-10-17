@@ -19,7 +19,7 @@ def sample_frames(video_path="vision/source/drone_feed.mp4", out_dir="vision/eva
         if legacy_file.exists():
             video_file = legacy_file
         else:
-            print(f"Error: video not found at {video_file}", file=sys.stderr)
+            print(f"Error: Source video not found at {video_file}. Download with 'python scripts/download_weights.py --include-source' or from GitHub Release v0.4.0.", file=sys.stderr)
             sys.exit(1)
 
     out_path = Path(out_dir)
