@@ -35,6 +35,7 @@ runs/
 
 # Local media / generated detection assets
 *.mp4
+!frontend/public/feeds/*/video.mp4
 *.webm
 *.avi
 vision/source/*.mp4
