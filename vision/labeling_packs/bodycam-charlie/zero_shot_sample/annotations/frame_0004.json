@@ -1,0 +1,126 @@
+{
+  "version": "4.1.0",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "person",
+      "score": 0.9,
+      "points": [
+        [
+          694.4,
+          102.8
+        ],
+        [
+          767.1,
+          102.8
+        ],
+        [
+          767.1,
+          271.0
+        ],
+        [
+          694.4,
+          271.0
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.86,
+      "points": [
+        [
+          562.6,
+          104.8
+        ],
+        [
+          633.2,
+          104.8
+        ],
+        [
+          633.2,
+          264.1
+        ],
+        [
+          562.6,
+          264.1
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.87,
+      "points": [
+        [
+          0.0,
+          244.9
+        ],
+        [
+          54.4,
+          244.9
+        ],
+        [
+          54.4,
+          349.2
+        ],
+        [
+          0.0,
+          349.2
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.83,
+      "points": [
+        [
+          834.2,
+          173.1
+        ],
+        [
+          972.2,
+          173.1
+        ],
+        [
+          972.2,
+          343.7
+        ],
+        [
+          834.2,
+          343.7
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0004.jpg",
+  "imageHeight": 720,
+  "imageWidth": 1280
+}

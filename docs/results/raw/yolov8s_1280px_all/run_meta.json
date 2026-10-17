@@ -1,0 +1,19 @@
+{
+  "run_id": "yolov8s_1280px_all",
+  "command": "/usr/local/lib/python3.13/dist-packages/colab_kernel_launcher.py -f /root/.local/share/jupyter/runtime/kernel-3efb763c-0d3b-4d98-8a80-90a09ad1220a.json",
+  "git_commit": "a6a0dac8b8fc0fb6e0958cbabae6195a41f24a46",
+  "device": "cuda:0",
+  "torch_version": "2.11.0+cu130",
+  "ultralytics_version": "8.4.178",
+  "imgsz": 1280,
+  "weights": "yolov8s.pt",
+  "timestamp": "2026-10-16T08:57:49Z",
+  "wall_seconds": 21.52,
+  "labels_sha256": "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
+  "num_frames": 155,
+  "split": "all",
+  "fold": 1,
+  "latency_mean_ms": 54.36,
+  "latency_p50_ms": 53.32,
+  "latency_p95_ms": 67.41
+}

@@ -25,10 +25,14 @@ def ingest_new_video(source_video_path):
 
     print(f"[AEGIS INGESTION] Processing new target video: {source_video_path}")
 
-    # 1. Copy the new video to the frontend public folder.
-    target_video_path = os.path.join(FRONTEND_PUBLIC, "drone_feed.mp4")
+    # 1. Copy the new video to the frontend feed directory (and legacy path)
+    feed_dir = os.path.join(FRONTEND_PUBLIC, "feeds", "uav-alpha")
+    os.makedirs(feed_dir, exist_ok=True)
+    target_video_path = os.path.join(feed_dir, "video.mp4")
     shutil.copy(source_video_path, target_video_path)
-    print("[AEGIS INGESTION] Video hot-swapped into Next.js UI.")
+    # Also keep legacy path in sync
+    shutil.copy(source_video_path, os.path.join(FRONTEND_PUBLIC, "drone_feed.mp4"))
+    print("[AEGIS INGESTION] Video hot-swapped into Next.js feeds/uav-alpha.")
 
     # 2. Run YOLOv8 extraction and generate timestamped telemetry.
     print("[AEGIS INGESTION] Booting YOLOv8s AI Core...")
@@ -96,8 +100,11 @@ def ingest_new_video(source_video_path):
     cap.release()
 
     # 3. Write the matching detection timeline consumed by the frontend.
-    target_json_path = os.path.join(FRONTEND_PUBLIC, "detections.json")
+    target_json_path = os.path.join(feed_dir, "detections.json")
     with open(target_json_path, "w") as f:
+        json.dump(timeline_detections, f)
+    # Also keep legacy path in sync
+    with open(os.path.join(FRONTEND_PUBLIC, "detections.json"), "w") as f:
         json.dump(timeline_detections, f)
 
     print(f"\n[AEGIS INGESTION COMPLETE] Telemetry mapped to {target_json_path}.")

@@ -1,0 +1,151 @@
+{
+  "artifact": "frontend/public/feeds/uav-alpha/detections.json",
+  "source_resolution": "1920x1080",
+  "time_tolerance_s": 0.05,
+  "labels_sha256": "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
+  "total_eval_frames": 155,
+  "frames_with_detections": 138,
+  "frames_empty": 17,
+  "total_ground_truth_boxes": 1948,
+  "total_candidate_predictions": 220,
+  "per_class_evaluation": {
+    "person": {
+      "n_gt": 1737,
+      "n_pred": 180,
+      "metrics_at_conf_0.25": {
+        "tp": 153,
+        "fp": 27,
+        "precision": 0.85,
+        "recall": 0.0881,
+        "f1": 0.1596
+      },
+      "best_f1_threshold": {
+        "best_conf": 0.05,
+        "best_f1": 0.1596,
+        "precision": 0.85,
+        "recall": 0.0881
+      },
+      "ap50": 0.0837,
+      "ap50_95": 0.0493
+    },
+    "car": {
+      "n_gt": 58,
+      "n_pred": 2,
+      "metrics_at_conf_0.25": {
+        "tp": 1,
+        "fp": 1,
+        "precision": 0.5,
+        "recall": 0.0172,
+        "f1": 0.0333
+      },
+      "best_f1_threshold": {
+        "best_conf": 0.44,
+        "best_f1": 0.0339,
+        "precision": 1.0,
+        "recall": 0.0172
+      },
+      "ap50": 0.0172,
+      "ap50_95": 0.0121
+    },
+    "truck": {
+      "n_gt": 153,
+      "n_pred": 38,
+      "metrics_at_conf_0.25": {
+        "tp": 37,
+        "fp": 1,
+        "precision": 0.9737,
+        "recall": 0.2418,
+        "f1": 0.3874
+      },
+      "best_f1_threshold": {
+        "best_conf": 0.05,
+        "best_f1": 0.3874,
+        "precision": 0.9737,
+        "recall": 0.2418
+      },
+      "ap50": 0.2382,
+      "ap50_95": 0.165
+    },
+    "bus": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "note": "excluded_no_gt"
+    }
+  },
+  "macro_ap50": 0.1131,
+  "recall_by_height_bucket": {
+    "<16px": {
+      "gt_total": 8,
+      "gt_matched": 0,
+      "recall": 0.0,
+      "by_class": {
+        "person": {
+          "gt": 8,
+          "matched": 0,
+          "recall": 0.0
+        }
+      }
+    },
+    "16-32px": {
+      "gt_total": 115,
+      "gt_matched": 0,
+      "recall": 0.0,
+      "by_class": {
+        "person": {
+          "gt": 87,
+          "matched": 0,
+          "recall": 0.0
+        },
+        "car": {
+          "gt": 28,
+          "matched": 0,
+          "recall": 0.0
+        }
+      }
+    },
+    "32-64px": {
+      "gt_total": 801,
+      "gt_matched": 16,
+      "recall": 0.02,
+      "by_class": {
+        "person": {
+          "gt": 772,
+          "matched": 16,
+          "recall": 0.0207
+        },
+        "car": {
+          "gt": 25,
+          "matched": 0,
+          "recall": 0.0
+        },
+        "truck": {
+          "gt": 4,
+          "matched": 0,
+          "recall": 0.0
+        }
+      }
+    },
+    ">64px": {
+      "gt_total": 1024,
+      "gt_matched": 175,
+      "recall": 0.1709,
+      "by_class": {
+        "truck": {
+          "gt": 149,
+          "matched": 37,
+          "recall": 0.2483
+        },
+        "person": {
+          "gt": 870,
+          "matched": 137,
+          "recall": 0.1575
+        },
+        "car": {
+          "gt": 5,
+          "matched": 1,
+          "recall": 0.2
+        }
+      }
+    }
+  }
+}

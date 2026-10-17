@@ -1,0 +1,17 @@
+{
+  "total_frames_inspected": 155,
+  "total_boxes_inspected": 1948,
+  "total_issues_flagged": 100,
+  "frames_with_issues_count": 66,
+  "breakdown_by_severity": {
+    "HIGH": 78,
+    "MEDIUM": 22
+  },
+  "breakdown_by_type": {
+    "PERSON_VEHICLE_OVERLAP": 78,
+    "IMPLAUSIBLE_ASPECT_RATIO_TALL": 21,
+    "TOO_SMALL": 1
+  },
+  "csv_report": "docs/results/raw/task1_label_qa_report.csv",
+  "overlays_dir": "scratch/label_qa"
+}

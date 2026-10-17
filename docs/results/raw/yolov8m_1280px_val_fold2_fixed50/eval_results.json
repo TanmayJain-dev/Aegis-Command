@@ -1,0 +1,218 @@
+{
+  "evaluated_at": "2026-10-16T19:29:37Z",
+  "model": "/kaggle/working/checkpoints/aegis_5fold_fold2_last.pt",
+  "split": "val",
+  "fold": 2,
+  "native_classes": true,
+  "imgsz": 1280,
+  "device": "cuda:0",
+  "num_images": 31,
+  "latency_ms": {
+    "mean_ms": 62.14,
+    "p50_ms": 61.37,
+    "p95_ms": 67.62
+  },
+  "bootstrap_ci_95_person": {
+    "ap50_ci": [
+      0.7691,
+      0.8327
+    ],
+    "recall_ci": [
+      0.8098,
+      0.8603
+    ],
+    "ap50_mean": 0.8001,
+    "recall_mean": 0.8344
+  },
+  "metrics_at_conf_0.25": {
+    "person": {
+      "n_gt": 575,
+      "n_pred": 571,
+      "tp": 480,
+      "fp": 91,
+      "fp_per_frame": 2.9355,
+      "precision": 0.8406,
+      "recall": 0.8348,
+      "f1": 0.8377,
+      "ap50": 0.7995,
+      "ap50_95": 0.3686
+    },
+    "car": {
+      "n_gt": 4,
+      "n_pred": 26,
+      "tp": 2,
+      "fp": 24,
+      "fp_per_frame": 0.7742,
+      "precision": 0.0769,
+      "recall": 0.5,
+      "f1": 0.1333,
+      "ap50": 0.125,
+      "ap50_95": 0.0625,
+      "note": "n=58, unreliable"
+    },
+    "truck": {
+      "n_gt": 31,
+      "n_pred": 33,
+      "tp": 28,
+      "fp": 5,
+      "fp_per_frame": 0.1613,
+      "precision": 0.8485,
+      "recall": 0.9032,
+      "f1": 0.875,
+      "ap50": 0.8883,
+      "ap50_95": 0.5686
+    },
+    "bus": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0,
+      "note": "n=0, excluded"
+    },
+    "motorcycle": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0
+    }
+  },
+  "metrics_at_conf_0.35": {
+    "person": {
+      "n_gt": 575,
+      "n_pred": 519,
+      "tp": 458,
+      "fp": 61,
+      "fp_per_frame": 1.9677,
+      "precision": 0.8825,
+      "recall": 0.7965,
+      "f1": 0.8373,
+      "ap50": 0.7663,
+      "ap50_95": 0.355
+    },
+    "car": {
+      "n_gt": 4,
+      "n_pred": 22,
+      "tp": 2,
+      "fp": 20,
+      "fp_per_frame": 0.6452,
+      "precision": 0.0909,
+      "recall": 0.5,
+      "f1": 0.1538,
+      "ap50": 0.125,
+      "ap50_95": 0.0625,
+      "note": "n=58, unreliable"
+    },
+    "truck": {
+      "n_gt": 31,
+      "n_pred": 31,
+      "tp": 27,
+      "fp": 4,
+      "fp_per_frame": 0.129,
+      "precision": 0.871,
+      "recall": 0.871,
+      "f1": 0.871,
+      "ap50": 0.8609,
+      "ap50_95": 0.5552
+    },
+    "bus": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0,
+      "note": "n=0, excluded"
+    },
+    "motorcycle": {
+      "n_gt": 0,
+      "n_pred": 0,
+      "tp": 0,
+      "fp": 0,
+      "fp_per_frame": 0.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 0.0,
+      "ap50": 0.0,
+      "ap50_95": 0.0
+    }
+  },
+  "error_analysis": {
+    "confusion_matrix": [
+      [
+        480,
+        0,
+        0,
+        0,
+        0,
+        95
+      ],
+      [
+        0,
+        2,
+        0,
+        0,
+        0,
+        2
+      ],
+      [
+        0,
+        0,
+        28,
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        91,
+        24,
+        5,
+        0,
+        0,
+        0
+      ]
+    ],
+    "fp_breakdown": {
+      "background": 102,
+      "wrong_class": 0,
+      "duplicate": 18
+    },
+    "fn_by_area": {
+      "small": 38,
+      "medium": 51,
+      "large": 11
+    }
+  },
+  "raw_dir": "/kaggle/working/results/yolov8m_1280px_val_fold2_fixed50"
+}

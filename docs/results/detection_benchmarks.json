@@ -1,0 +1,70 @@
+{
+  "evaluated_at": "2026-10-13T17:50:00Z",
+  "retraction_notice": "Earlier hypothetical benchmark numbers are completely retracted. All model configurations are marked NOT RUN pending execution and verification by scripts/verify_benchmarks.py from raw outputs in docs/results/raw/.",
+  "dataset": {
+    "total_frames": 155,
+    "resolution": "1920x1080",
+    "verified_marker": "vision/eval/labels/VERIFIED",
+    "sha256": "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
+    "annotator": "Prachi",
+    "class_counts": {
+      "person": {
+        "count": 1737,
+        "share_pct": 89.17,
+        "status": "primary_target"
+      },
+      "truck": {
+        "count": 153,
+        "share_pct": 7.85,
+        "status": "evaluated"
+      },
+      "car": {
+        "count": 58,
+        "share_pct": 2.98,
+        "status": "unreliable_sample_size"
+      },
+      "bus": {
+        "count": 0,
+        "share_pct": 0.0,
+        "status": "excluded_no_gt"
+      }
+    },
+    "total_boxes": 1948
+  },
+  "hardware_baseline": {
+    "cpu": "Intel(R) Core(TM) i3-3217U CPU @ 1.80GHz (2 physical cores, 4 threads)",
+    "ram": "3.8 GB total (~1.2 GB available)",
+    "storage": "5400 RPM HDD",
+    "avx2_supported": false,
+    "gpu": "None (CPU only)",
+    "execution_strategy": "Local CPU execution with --save-raw outputs for feasible models; unrun models marked NOT RUN"
+  },
+  "time_based_splits": {
+    "leakage_prevention": "Contiguous time partition with 5-frame temporal purge buffer",
+    "fold_1": {
+      "train_frames": 108,
+      "train_indices": "0..107",
+      "purged_buffer_frames": 5,
+      "purged_indices": "108..112",
+      "val_frames": 42,
+      "val_indices": "113..154"
+    },
+    "fold_2": {
+      "val_frames": 42,
+      "val_indices": "0..41",
+      "purged_buffer_frames": 5,
+      "purged_indices": "42..46",
+      "train_frames": 108,
+      "train_indices": "47..154"
+    }
+  },
+  "model_matrix_status": {
+    "status": "NOT RUN",
+    "zero_shot_bakeoff": "NOT RUN",
+    "fine_tuning_folds": "NOT RUN"
+  },
+  "notebooks": {
+    "zero_shot_bakeoff": "vision/bakeoff_colab.ipynb",
+    "fine_tuning_folds": "vision/train_colab.ipynb"
+  }
+}

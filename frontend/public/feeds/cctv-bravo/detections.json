@@ -1,0 +1,7608 @@
+{
+  "meta": {
+    "model": "yolov8m.pt",
+    "weights_sha256": "5d4a90cdc7a21786cc59cd19778e9eafff836df9e2da32524737c7ee6efe4fe5",
+    "imgsz": 1280,
+    "conf": 0.35,
+    "date": "2026-10-16",
+    "evaluated": false,
+    "feed": "cctv-bravo",
+    "width": 1280,
+    "height": 720,
+    "fps": 25.0,
+    "duration_s": 28.56,
+    "sahi": false,
+    "tracker": "bytetrack.yaml"
+  },
+  "0.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        599.2,
+        138.3,
+        742.8,
+        205.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.88,
+      "box": [
+        781.7,
+        178.4,
+        934.9,
+        332.8
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        667.5,
+        512.9,
+        955.2,
+        692.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        787.3,
+        463.6,
+        821.0,
+        530.9
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        708.4,
+        286.5,
+        736.0,
+        354.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        435.3,
+        185.3,
+        620.7,
+        290.3
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-7",
+      "class": "person",
+      "confidence": 0.77,
+      "box": [
+        878.2,
+        487.2,
+        901.0,
+        560.5
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.75,
+      "box": [
+        685.8,
+        52.2,
+        797.6,
+        118.2
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-9",
+      "class": "person",
+      "confidence": 0.72,
+      "box": [
+        1088.1,
+        497.8,
+        1142.3,
+        577.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-10",
+      "class": "person",
+      "confidence": 0.72,
+      "box": [
+        818.6,
+        483.0,
+        847.5,
+        540.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.7,
+      "box": [
+        654.4,
+        162.4,
+        770.9,
+        255.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-12",
+      "class": "person",
+      "confidence": 0.66,
+      "box": [
+        856.2,
+        204.7,
+        885.1,
+        270.3
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-13",
+      "class": "person",
+      "confidence": 0.64,
+      "box": [
+        878.7,
+        174.8,
+        909.2,
+        239.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-14",
+      "class": "person",
+      "confidence": 0.46,
+      "box": [
+        837.5,
+        461.7,
+        857.4,
+        509.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "0.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        601.5,
+        130.4,
+        742.6,
+        196.5
+      ],
+      "speed_kmh": 3.1,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.87,
+      "box": [
+        779.7,
+        167.5,
+        928.2,
+        317.1
+      ],
+      "speed_kmh": 5.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        670.0,
+        484.6,
+        943.1,
+        654.7
+      ],
+      "speed_kmh": 12.0,
+      "direction": "N"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.78,
+      "box": [
+        784.4,
+        438.4,
+        816.3,
+        501.8
+      ],
+      "speed_kmh": 9.9,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.76,
+      "box": [
+        709.7,
+        269.1,
+        737.7,
+        338.1
+      ],
+      "speed_kmh": 6.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        444.3,
+        177.3,
+        619.4,
+        276.3
+      ],
+      "speed_kmh": 4.2,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.73,
+      "box": [
+        687.0,
+        47.5,
+        795.5,
+        111.6
+      ],
+      "speed_kmh": 2.0,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.65,
+      "box": [
+        655.9,
+        153.5,
+        768.3,
+        243.5
+      ],
+      "speed_kmh": 3.8,
+      "direction": "N"
+    },
+    {
+      "id": "Person-12",
+      "class": "person",
+      "confidence": 0.72,
+      "box": [
+        850.9,
+        193.2,
+        878.4,
+        255.7
+      ],
+      "speed_kmh": 5.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-13",
+      "class": "person",
+      "confidence": 0.69,
+      "box": [
+        876.8,
+        163.7,
+        906.2,
+        226.3
+      ],
+      "speed_kmh": 4.5,
+      "direction": "N"
+    }
+  ],
+  "1.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        604.2,
+        118.0,
+        740.6,
+        182.0
+      ],
+      "speed_kmh": 4.8,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.84,
+      "box": [
+        776.4,
+        151.7,
+        918.7,
+        295.2
+      ],
+      "speed_kmh": 7.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        673.6,
+        443.1,
+        925.9,
+        600.0
+      ],
+      "speed_kmh": 17.5,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.77,
+      "box": [
+        705.5,
+        244.2,
+        733.9,
+        314.4
+      ],
+      "speed_kmh": 8.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        453.6,
+        161.8,
+        621.0,
+        256.3
+      ],
+      "speed_kmh": 6.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.78,
+      "box": [
+        687.6,
+        39.8,
+        792.3,
+        101.5
+      ],
+      "speed_kmh": 3.2,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.51,
+      "box": [
+        657.4,
+        139.1,
+        765.5,
+        225.5
+      ],
+      "speed_kmh": 5.8,
+      "direction": "N"
+    }
+  ],
+  "1.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        605.4,
+        105.3,
+        735.4,
+        166.2
+      ],
+      "speed_kmh": 5.2,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.81,
+      "box": [
+        771.8,
+        134.0,
+        907.8,
+        271.2
+      ],
+      "speed_kmh": 8.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        674.7,
+        400.4,
+        906.6,
+        544.3
+      ],
+      "speed_kmh": 18.0,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.78,
+      "box": [
+        701.4,
+        222.0,
+        728.9,
+        290.2
+      ],
+      "speed_kmh": 8.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.64,
+      "box": [
+        461.3,
+        145.7,
+        621.8,
+        236.2
+      ],
+      "speed_kmh": 6.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.81,
+      "box": [
+        686.6,
+        31.2,
+        787.3,
+        90.4
+      ],
+      "speed_kmh": 3.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.48,
+      "box": [
+        660.3,
+        123.9,
+        757.6,
+        201.4
+      ],
+      "speed_kmh": 7.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        473.5,
+        584.1,
+        996.9,
+        717.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "2.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        604.9,
+        92.2,
+        728.7,
+        150.2
+      ],
+      "speed_kmh": 5.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.88,
+      "box": [
+        765.2,
+        116.3,
+        893.9,
+        246.4
+      ],
+      "speed_kmh": 8.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        672.5,
+        358.5,
+        887.9,
+        491.8
+      ],
+      "speed_kmh": 17.4,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.69,
+      "box": [
+        696.1,
+        199.8,
+        722.1,
+        264.8
+      ],
+      "speed_kmh": 8.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        466.6,
+        129.7,
+        619.8,
+        215.9
+      ],
+      "speed_kmh": 6.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.69,
+      "box": [
+        682.0,
+        22.3,
+        779.5,
+        79.5
+      ],
+      "speed_kmh": 4.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.56,
+      "box": [
+        659.1,
+        109.0,
+        749.3,
+        180.3
+      ],
+      "speed_kmh": 6.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.81,
+      "box": [
+        441.5,
+        535.5,
+        1016.4,
+        683.1
+      ],
+      "speed_kmh": 15.0,
+      "direction": "N"
+    }
+  ],
+  "2.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        599.9,
+        80.2,
+        719.3,
+        136.2
+      ],
+      "speed_kmh": 5.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.88,
+      "box": [
+        754.8,
+        100.9,
+        878.8,
+        226.4
+      ],
+      "speed_kmh": 7.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        669.6,
+        322.5,
+        868.7,
+        445.2
+      ],
+      "speed_kmh": 15.4,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.75,
+      "box": [
+        689.8,
+        179.4,
+        714.5,
+        241.3
+      ],
+      "speed_kmh": 8.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        466.6,
+        113.1,
+        617.7,
+        198.0
+      ],
+      "speed_kmh": 6.2,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.7,
+      "box": [
+        675.1,
+        14.0,
+        770.0,
+        69.5
+      ],
+      "speed_kmh": 4.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.47,
+      "box": [
+        655.1,
+        95.5,
+        740.9,
+        162.8
+      ],
+      "speed_kmh": 6.0,
+      "direction": "N"
+    }
+  ],
+  "3.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        590.5,
+        67.4,
+        705.1,
+        121.5
+      ],
+      "speed_kmh": 6.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.86,
+      "box": [
+        744.6,
+        86.4,
+        861.5,
+        204.7
+      ],
+      "speed_kmh": 8.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        663.7,
+        288.2,
+        848.6,
+        401.5
+      ],
+      "speed_kmh": 14.8,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.7,
+      "box": [
+        681.0,
+        158.2,
+        704.4,
+        217.6
+      ],
+      "speed_kmh": 8.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        466.5,
+        97.8,
+        612.6,
+        179.8
+      ],
+      "speed_kmh": 6.1,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.79,
+      "box": [
+        667.1,
+        6.0,
+        758.2,
+        59.1
+      ],
+      "speed_kmh": 4.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.42,
+      "box": [
+        645.8,
+        81.5,
+        731.9,
+        148.5
+      ],
+      "speed_kmh": 6.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        584.8,
+        417.4,
+        832.6,
+        552.2
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.55,
+      "box": [
+        349.4,
+        519.7,
+        988.1,
+        687.3
+      ],
+      "speed_kmh": 10.9,
+      "direction": "W"
+    }
+  ],
+  "3.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        582.9,
+        56.0,
+        693.8,
+        108.9
+      ],
+      "speed_kmh": 5.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.87,
+      "box": [
+        733.1,
+        71.8,
+        845.0,
+        185.4
+      ],
+      "speed_kmh": 7.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        657.9,
+        257.7,
+        831.1,
+        363.2
+      ],
+      "speed_kmh": 13.1,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.72,
+      "box": [
+        673.4,
+        139.4,
+        695.7,
+        196.5
+      ],
+      "speed_kmh": 7.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        465.9,
+        84.6,
+        606.1,
+        163.2
+      ],
+      "speed_kmh": 5.5,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.74,
+      "box": [
+        660.9,
+        0.2,
+        745.2,
+        48.9
+      ],
+      "speed_kmh": 4.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.5,
+      "box": [
+        638.0,
+        69.7,
+        721.6,
+        134.4
+      ],
+      "speed_kmh": 5.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        584.2,
+        376.4,
+        816.3,
+        502.7
+      ],
+      "speed_kmh": 16.6,
+      "direction": "N"
+    }
+  ],
+  "4.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        576.4,
+        45.1,
+        682.3,
+        95.8
+      ],
+      "speed_kmh": 5.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.87,
+      "box": [
+        720.8,
+        58.0,
+        826.4,
+        165.2
+      ],
+      "speed_kmh": 8.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        650.0,
+        228.9,
+        813.0,
+        327.5
+      ],
+      "speed_kmh": 12.5,
+      "direction": "N"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.74,
+      "box": [
+        663.1,
+        122.3,
+        684.0,
+        176.5
+      ],
+      "speed_kmh": 7.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.65,
+      "box": [
+        464.9,
+        71.6,
+        598.5,
+        146.3
+      ],
+      "speed_kmh": 5.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.74,
+      "box": [
+        655.6,
+        0.0,
+        728.2,
+        39.3
+      ],
+      "speed_kmh": 4.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.38,
+      "box": [
+        629.3,
+        57.2,
+        710.9,
+        120.3
+      ],
+      "speed_kmh": 5.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        584.3,
+        331.9,
+        794.2,
+        445.9
+      ],
+      "speed_kmh": 18.7,
+      "direction": "N"
+    }
+  ],
+  "4.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        568.4,
+        34.6,
+        668.7,
+        83.0
+      ],
+      "speed_kmh": 5.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.82,
+      "box": [
+        707.3,
+        44.5,
+        808.4,
+        147.2
+      ],
+      "speed_kmh": 8.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        641.7,
+        202.0,
+        795.4,
+        294.2
+      ],
+      "speed_kmh": 11.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.7,
+      "box": [
+        652.5,
+        105.3,
+        672.7,
+        158.7
+      ],
+      "speed_kmh": 7.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        460.7,
+        58.1,
+        591.1,
+        130.9
+      ],
+      "speed_kmh": 5.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-8",
+      "class": "truck",
+      "confidence": 0.54,
+      "box": [
+        651.2,
+        0.0,
+        709.6,
+        29.7
+      ],
+      "speed_kmh": 4.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.51,
+      "box": [
+        618.5,
+        45.7,
+        698.4,
+        107.2
+      ],
+      "speed_kmh": 6.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.61,
+      "box": [
+        579.9,
+        291.2,
+        777.3,
+        398.2
+      ],
+      "speed_kmh": 16.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.73,
+      "box": [
+        527.4,
+        377.1,
+        755.6,
+        509.9
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "5.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        557.8,
+        24.1,
+        653.9,
+        70.9
+      ],
+      "speed_kmh": 6.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.83,
+      "box": [
+        690.6,
+        29.6,
+        789.5,
+        130.4
+      ],
+      "speed_kmh": 8.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        631.2,
+        177.7,
+        775.5,
+        263.6
+      ],
+      "speed_kmh": 11.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.71,
+      "box": [
+        639.7,
+        88.6,
+        659.1,
+        140.8
+      ],
+      "speed_kmh": 7.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        455.5,
+        47.9,
+        578.4,
+        116.1
+      ],
+      "speed_kmh": 5.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-8",
+      "class": "car",
+      "confidence": 0.48,
+      "box": [
+        642.1,
+        0.0,
+        686.1,
+        20.4
+      ],
+      "speed_kmh": 6.1,
+      "direction": "W"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.47,
+      "box": [
+        606.6,
+        33.9,
+        682.1,
+        91.5
+      ],
+      "speed_kmh": 7.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        572.6,
+        255.6,
+        757.9,
+        355.9
+      ],
+      "speed_kmh": 14.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-73",
+      "class": "car",
+      "confidence": 0.72,
+      "box": [
+        525.0,
+        336.6,
+        734.6,
+        458.4
+      ],
+      "speed_kmh": 17.1,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-85",
+      "class": "truck",
+      "confidence": 0.73,
+      "box": [
+        1204.2,
+        22.9,
+        1263.1,
+        138.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-12",
+      "class": "person",
+      "confidence": 0.66,
+      "box": [
+        851.3,
+        165.0,
+        875.9,
+        220.2
+      ],
+      "speed_kmh": 1.3,
+      "direction": "N"
+    }
+  ],
+  "5.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        546.3,
+        14.6,
+        638.8,
+        60.0
+      ],
+      "speed_kmh": 6.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.87,
+      "box": [
+        675.2,
+        18.8,
+        769.2,
+        114.7
+      ],
+      "speed_kmh": 8.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        620.0,
+        156.0,
+        755.4,
+        235.7
+      ],
+      "speed_kmh": 10.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.71,
+      "box": [
+        627.0,
+        76.1,
+        644.8,
+        124.3
+      ],
+      "speed_kmh": 7.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        447.8,
+        38.1,
+        565.6,
+        103.2
+      ],
+      "speed_kmh": 5.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.47,
+      "box": [
+        592.6,
+        22.8,
+        665.8,
+        78.3
+      ],
+      "speed_kmh": 7.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        563.7,
+        225.1,
+        740.1,
+        320.5
+      ],
+      "speed_kmh": 12.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-73",
+      "class": "car",
+      "confidence": 0.52,
+      "box": [
+        527.9,
+        297.1,
+        718.5,
+        407.9
+      ],
+      "speed_kmh": 16.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-85",
+      "class": "truck",
+      "confidence": 0.59,
+      "box": [
+        1179.6,
+        11.1,
+        1237.0,
+        121.7
+      ],
+      "speed_kmh": 10.5,
+      "direction": "NW"
+    }
+  ],
+  "6.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        533.7,
+        5.7,
+        621.5,
+        49.2
+      ],
+      "speed_kmh": 6.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.85,
+      "box": [
+        659.3,
+        8.5,
+        748.5,
+        99.7
+      ],
+      "speed_kmh": 8.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        606.4,
+        135.5,
+        735.7,
+        210.7
+      ],
+      "speed_kmh": 10.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-5",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        617.9,
+        63.9,
+        635.8,
+        110.0
+      ],
+      "speed_kmh": 5.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        438.4,
+        27.0,
+        552.7,
+        89.9
+      ],
+      "speed_kmh": 5.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.51,
+      "box": [
+        579.5,
+        12.9,
+        649.8,
+        65.7
+      ],
+      "speed_kmh": 6.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.65,
+      "box": [
+        554.5,
+        197.2,
+        722.0,
+        287.6
+      ],
+      "speed_kmh": 12.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.65,
+      "box": [
+        517.4,
+        261.0,
+        694.4,
+        363.3
+      ],
+      "speed_kmh": 15.8,
+      "direction": "NW"
+    }
+  ],
+  "6.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        526.2,
+        0.0,
+        607.8,
+        39.5
+      ],
+      "speed_kmh": 4.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.82,
+      "box": [
+        647.5,
+        0.0,
+        732.8,
+        86.5
+      ],
+      "speed_kmh": 6.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        597.4,
+        118.1,
+        721.5,
+        189.5
+      ],
+      "speed_kmh": 8.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        432.0,
+        17.1,
+        544.1,
+        78.4
+      ],
+      "speed_kmh": 4.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.43,
+      "box": [
+        567.7,
+        4.3,
+        639.0,
+        57.9
+      ],
+      "speed_kmh": 5.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        548.7,
+        173.6,
+        707.1,
+        258.8
+      ],
+      "speed_kmh": 10.1,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.79,
+      "box": [
+        514.2,
+        232.1,
+        678.5,
+        326.5
+      ],
+      "speed_kmh": 12.3,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-121",
+      "class": "truck",
+      "confidence": 0.67,
+      "box": [
+        1092.2,
+        0.1,
+        1184.9,
+        87.5
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.73,
+      "box": [
+        351.1,
+        474.3,
+        919.6,
+        633.0
+      ],
+      "speed_kmh": 3.1,
+      "direction": "NW"
+    }
+  ],
+  "7.0": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.7,
+      "box": [
+        524.3,
+        0.0,
+        592.8,
+        30.4
+      ],
+      "speed_kmh": 3.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.62,
+      "box": [
+        639.3,
+        0.0,
+        715.9,
+        73.7
+      ],
+      "speed_kmh": 5.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        589.0,
+        101.6,
+        709.4,
+        170.2
+      ],
+      "speed_kmh": 7.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.72,
+      "box": [
+        428.3,
+        9.0,
+        535.8,
+        67.4
+      ],
+      "speed_kmh": 4.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-11",
+      "class": "truck",
+      "confidence": 0.41,
+      "box": [
+        561.4,
+        0.0,
+        626.5,
+        46.1
+      ],
+      "speed_kmh": 4.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        544.5,
+        151.5,
+        693.5,
+        231.5
+      ],
+      "speed_kmh": 9.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-73",
+      "class": "car",
+      "confidence": 0.65,
+      "box": [
+        513.0,
+        205.3,
+        667.4,
+        293.3
+      ],
+      "speed_kmh": 11.0,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-121",
+      "class": "truck",
+      "confidence": 0.7,
+      "box": [
+        1072.3,
+        0.0,
+        1150.4,
+        73.4
+      ],
+      "speed_kmh": 10.1,
+      "direction": "W"
+    }
+  ],
+  "7.5": [
+    {
+      "id": "Car-1",
+      "class": "car",
+      "confidence": 0.54,
+      "box": [
+        521.6,
+        0.0,
+        572.6,
+        21.9
+      ],
+      "speed_kmh": 4.4,
+      "direction": "W"
+    },
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.51,
+      "box": [
+        633.5,
+        0.0,
+        700.7,
+        62.8
+      ],
+      "speed_kmh": 4.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        582.8,
+        87.3,
+        696.6,
+        151.3
+      ],
+      "speed_kmh": 6.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        425.0,
+        1.1,
+        528.5,
+        56.9
+      ],
+      "speed_kmh": 3.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        540.4,
+        132.7,
+        682.0,
+        208.4
+      ],
+      "speed_kmh": 8.0,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.51,
+      "box": [
+        509.5,
+        183.5,
+        659.2,
+        268.2
+      ],
+      "speed_kmh": 8.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-121",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        1050.1,
+        0.0,
+        1114.2,
+        59.4
+      ],
+      "speed_kmh": 10.8,
+      "direction": "W"
+    },
+    {
+      "id": "Car-138",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        1221.0,
+        169.4,
+        1280.0,
+        225.8
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.72,
+      "box": [
+        531.6,
+        394.5,
+        722.6,
+        518.8
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.86,
+      "box": [
+        323.7,
+        498.2,
+        884.9,
+        665.2
+      ],
+      "speed_kmh": 7.5,
+      "direction": "SW"
+    }
+  ],
+  "8.0": [
+    {
+      "id": "Truck-2",
+      "class": "truck",
+      "confidence": 0.45,
+      "box": [
+        631.5,
+        0.0,
+        685.4,
+        47.6
+      ],
+      "speed_kmh": 4.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        578.9,
+        73.3,
+        687.2,
+        133.4
+      ],
+      "speed_kmh": 6.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        426.7,
+        0.0,
+        520.8,
+        47.0
+      ],
+      "speed_kmh": 2.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        542.5,
+        114.6,
+        673.8,
+        184.5
+      ],
+      "speed_kmh": 7.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.57,
+      "box": [
+        513.3,
+        161.6,
+        650.0,
+        237.9
+      ],
+      "speed_kmh": 9.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-121",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        1032.2,
+        0.1,
+        1083.7,
+        46.6
+      ],
+      "speed_kmh": 9.0,
+      "direction": "W"
+    },
+    {
+      "id": "Car-138",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1207.1,
+        150.4,
+        1273.1,
+        208.8
+      ],
+      "speed_kmh": 7.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.9,
+      "box": [
+        490.3,
+        434.3,
+        720.4,
+        584.2
+      ],
+      "speed_kmh": 20.5,
+      "direction": "S"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1171.2,
+        118.3,
+        1264.9,
+        172.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "8.5": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.48,
+      "box": [
+        577.5,
+        60.7,
+        684.1,
+        119.2
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        435.2,
+        0.0,
+        515.8,
+        37.8
+      ],
+      "speed_kmh": 1.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-44",
+      "class": "car",
+      "confidence": 0.51,
+      "box": [
+        543.8,
+        98.6,
+        669.3,
+        165.3
+      ],
+      "speed_kmh": 6.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-73",
+      "class": "car",
+      "confidence": 0.58,
+      "box": [
+        522.3,
+        141.2,
+        653.3,
+        214.0
+      ],
+      "speed_kmh": 8.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-121",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        1024.4,
+        0.1,
+        1066.2,
+        36.4
+      ],
+      "speed_kmh": 4.9,
+      "direction": "W"
+    },
+    {
+      "id": "Car-138",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        1219.4,
+        163.1,
+        1278.2,
+        215.1
+      ],
+      "speed_kmh": 4.6,
+      "direction": "SE"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.88,
+      "box": [
+        486.9,
+        412.3,
+        713.5,
+        559.9
+      ],
+      "speed_kmh": 8.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1174.8,
+        124.8,
+        1271.5,
+        180.2
+      ],
+      "speed_kmh": 3.2,
+      "direction": "SE"
+    },
+    {
+      "id": "Person-167",
+      "class": "person",
+      "confidence": 0.61,
+      "box": [
+        634.7,
+        12.4,
+        650.4,
+        54.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.8,
+      "box": [
+        314.1,
+        523.4,
+        894.4,
+        705.1
+      ],
+      "speed_kmh": 5.9,
+      "direction": "S"
+    }
+  ],
+  "9.0": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.63,
+      "box": [
+        579.6,
+        48.1,
+        683.2,
+        104.4
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-6",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        448.5,
+        0.0,
+        513.7,
+        28.5
+      ],
+      "speed_kmh": 2.6,
+      "direction": "NE"
+    },
+    {
+      "id": "Truck-44",
+      "class": "truck",
+      "confidence": 0.49,
+      "box": [
+        548.4,
+        83.3,
+        666.3,
+        145.5
+      ],
+      "speed_kmh": 6.3,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.45,
+      "box": [
+        527.7,
+        123.0,
+        652.1,
+        191.8
+      ],
+      "speed_kmh": 7.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-121",
+      "class": "car",
+      "confidence": 0.61,
+      "box": [
+        1020.0,
+        0.4,
+        1052.6,
+        27.0
+      ],
+      "speed_kmh": 3.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-138",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1211.7,
+        146.0,
+        1273.5,
+        200.2
+      ],
+      "speed_kmh": 6.2,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.73,
+      "box": [
+        478.0,
+        455.5,
+        740.8,
+        625.6
+      ],
+      "speed_kmh": 19.9,
+      "direction": "S"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1168.1,
+        113.1,
+        1265.7,
+        168.4
+      ],
+      "speed_kmh": 4.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1115.7,
+        87.2,
+        1237.0,
+        136.7
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "9.5": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        584.6,
+        37.0,
+        682.4,
+        89.5
+      ],
+      "speed_kmh": 4.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-44",
+      "class": "truck",
+      "confidence": 0.45,
+      "box": [
+        555.4,
+        70.0,
+        667.4,
+        128.7
+      ],
+      "speed_kmh": 5.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.4,
+      "box": [
+        535.1,
+        107.1,
+        654.6,
+        172.7
+      ],
+      "speed_kmh": 6.5,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.62,
+      "box": [
+        494.2,
+        440.6,
+        741.9,
+        598.5
+      ],
+      "speed_kmh": 8.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1178.1,
+        119.7,
+        1275.4,
+        174.8
+      ],
+      "speed_kmh": 4.2,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1130.2,
+        92.9,
+        1255.5,
+        144.0
+      ],
+      "speed_kmh": 6.4,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.86,
+      "box": [
+        515.0,
+        319.4,
+        706.7,
+        442.7
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.73,
+      "box": [
+        648.1,
+        198.6,
+        665.5,
+        261.6
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.78,
+      "box": [
+        399.4,
+        550.7,
+        892.4,
+        714.5
+      ],
+      "speed_kmh": 8.2,
+      "direction": "SE"
+    }
+  ],
+  "10.0": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.71,
+      "box": [
+        580.3,
+        25.8,
+        691.7,
+        86.2
+      ],
+      "speed_kmh": 2.8,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-44",
+      "class": "truck",
+      "confidence": 0.74,
+      "box": [
+        559.6,
+        56.3,
+        668.0,
+        112.9
+      ],
+      "speed_kmh": 5.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.65,
+      "box": [
+        542.2,
+        90.6,
+        658.3,
+        153.8
+      ],
+      "speed_kmh": 6.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.85,
+      "box": [
+        528.7,
+        477.5,
+        771.9,
+        632.6
+      ],
+      "speed_kmh": 17.3,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1174.7,
+        109.2,
+        1271.4,
+        163.4
+      ],
+      "speed_kmh": 4.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1120.9,
+        82.9,
+        1245.0,
+        133.5
+      ],
+      "speed_kmh": 5.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.84,
+      "box": [
+        523.9,
+        285.6,
+        705.5,
+        402.5
+      ],
+      "speed_kmh": 13.4,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.75,
+      "box": [
+        650.4,
+        178.2,
+        666.7,
+        236.8
+      ],
+      "speed_kmh": 8.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1088.0,
+        62.2,
+        1195.5,
+        107.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-138",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1210.4,
+        135.7,
+        1278.0,
+        195.1
+      ],
+      "speed_kmh": 1.4,
+      "direction": "N"
+    }
+  ],
+  "10.5": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        583.3,
+        16.7,
+        691.3,
+        75.4
+      ],
+      "speed_kmh": 3.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-44",
+      "class": "truck",
+      "confidence": 0.57,
+      "box": [
+        563.3,
+        45.0,
+        669.2,
+        100.1
+      ],
+      "speed_kmh": 4.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.48,
+      "box": [
+        547.8,
+        77.3,
+        659.4,
+        137.6
+      ],
+      "speed_kmh": 5.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1141.8,
+        88.6,
+        1268.4,
+        140.2
+      ],
+      "speed_kmh": 8.3,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.75,
+      "box": [
+        534.1,
+        252.4,
+        702.6,
+        360.8
+      ],
+      "speed_kmh": 13.5,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.76,
+      "box": [
+        654.1,
+        156.5,
+        669.4,
+        211.1
+      ],
+      "speed_kmh": 8.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1099.8,
+        66.4,
+        1213.4,
+        113.9
+      ],
+      "speed_kmh": 5.7,
+      "direction": "E"
+    },
+    {
+      "id": "Car-138",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1203.0,
+        122.2,
+        1272.3,
+        182.0
+      ],
+      "speed_kmh": 5.3,
+      "direction": "NW"
+    }
+  ],
+  "11.0": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        591.8,
+        7.2,
+        685.0,
+        57.1
+      ],
+      "speed_kmh": 5.0,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-44",
+      "class": "truck",
+      "confidence": 0.67,
+      "box": [
+        566.7,
+        33.9,
+        669.3,
+        86.8
+      ],
+      "speed_kmh": 4.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.52,
+      "box": [
+        551.8,
+        64.2,
+        659.2,
+        121.8
+      ],
+      "speed_kmh": 5.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1138.9,
+        81.3,
+        1260.5,
+        130.5
+      ],
+      "speed_kmh": 3.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.75,
+      "box": [
+        542.3,
+        222.2,
+        699.8,
+        323.5
+      ],
+      "speed_kmh": 12.2,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.74,
+      "box": [
+        656.9,
+        136.1,
+        671.7,
+        187.7
+      ],
+      "speed_kmh": 7.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1092.2,
+        58.3,
+        1205.9,
+        105.8
+      ],
+      "speed_kmh": 4.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        1058.7,
+        39.2,
+        1160.8,
+        82.2
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.5,
+      "box": [
+        488.9,
+        408.3,
+        861.2,
+        653.2
+      ],
+      "speed_kmh": 6.2,
+      "direction": "NE"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1173.5,
+        102.5,
+        1275.4,
+        159.4
+      ],
+      "speed_kmh": 1.0,
+      "direction": "N"
+    }
+  ],
+  "11.5": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.66,
+      "box": [
+        591.4,
+        0.0,
+        689.2,
+        52.2
+      ],
+      "speed_kmh": 2.3,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-44",
+      "class": "truck",
+      "confidence": 0.39,
+      "box": [
+        568.6,
+        24.1,
+        671.7,
+        77.0
+      ],
+      "speed_kmh": 3.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.44,
+      "box": [
+        554.5,
+        52.4,
+        659.0,
+        107.9
+      ],
+      "speed_kmh": 4.6,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.75,
+      "box": [
+        550.4,
+        197.1,
+        696.6,
+        290.7
+      ],
+      "speed_kmh": 10.5,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.74,
+      "box": [
+        656.5,
+        118.4,
+        670.8,
+        167.8
+      ],
+      "speed_kmh": 6.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1113.7,
+        63.9,
+        1226.8,
+        110.8
+      ],
+      "speed_kmh": 7.9,
+      "direction": "E"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1071.6,
+        43.5,
+        1176.4,
+        87.6
+      ],
+      "speed_kmh": 5.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        1207.9,
+        166.0,
+        1272.8,
+        232.5
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1167.2,
+        91.8,
+        1270.2,
+        148.2
+      ],
+      "speed_kmh": 4.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-10",
+      "class": "person",
+      "confidence": 0.69,
+      "box": [
+        814.3,
+        494.4,
+        854.5,
+        576.1
+      ],
+      "speed_kmh": 0.4,
+      "direction": "S"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.56,
+      "box": [
+        489.8,
+        566.9,
+        918.1,
+        717.6
+      ],
+      "speed_kmh": 5.3,
+      "direction": "E"
+    }
+  ],
+  "12.0": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.46,
+      "box": [
+        597.2,
+        0.0,
+        686.2,
+        43.2
+      ],
+      "speed_kmh": 1.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.56,
+      "box": [
+        557.4,
+        40.9,
+        659.0,
+        94.3
+      ],
+      "speed_kmh": 4.5,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.71,
+      "box": [
+        557.4,
+        173.3,
+        696.0,
+        261.8
+      ],
+      "speed_kmh": 9.6,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.6,
+      "box": [
+        656.5,
+        102.4,
+        670.2,
+        148.9
+      ],
+      "speed_kmh": 6.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1109.5,
+        56.9,
+        1220.7,
+        102.7
+      ],
+      "speed_kmh": 3.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1065.6,
+        36.4,
+        1170.1,
+        80.3
+      ],
+      "speed_kmh": 3.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        1197.8,
+        147.1,
+        1262.4,
+        212.6
+      ],
+      "speed_kmh": 7.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-260",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        1037.2,
+        20.5,
+        1129.5,
+        59.7
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-10",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        814.3,
+        484.6,
+        855.6,
+        570.1
+      ],
+      "speed_kmh": 2.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1134.9,
+        75.3,
+        1266.5,
+        128.7
+      ],
+      "speed_kmh": 0.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.65,
+      "box": [
+        563.9,
+        477.2,
+        841.0,
+        659.3
+      ],
+      "speed_kmh": 8.4,
+      "direction": "SE"
+    }
+  ],
+  "12.5": [
+    {
+      "id": "Car-3",
+      "class": "car",
+      "confidence": 0.52,
+      "box": [
+        605.2,
+        0.0,
+        680.8,
+        34.4
+      ],
+      "speed_kmh": 1.7,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-73",
+      "class": "truck",
+      "confidence": 0.45,
+      "box": [
+        560.7,
+        32.4,
+        659.0,
+        83.5
+      ],
+      "speed_kmh": 3.5,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.65,
+      "box": [
+        563.5,
+        154.1,
+        696.2,
+        238.8
+      ],
+      "speed_kmh": 7.7,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.51,
+      "box": [
+        657.0,
+        89.6,
+        670.1,
+        133.6
+      ],
+      "speed_kmh": 5.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        1096.5,
+        47.9,
+        1204.2,
+        92.0
+      ],
+      "speed_kmh": 6.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1055.6,
+        28.5,
+        1156.4,
+        70.8
+      ],
+      "speed_kmh": 5.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        1184.6,
+        129.0,
+        1253.3,
+        196.9
+      ],
+      "speed_kmh": 7.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-260",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        1026.6,
+        14.1,
+        1116.7,
+        52.3
+      ],
+      "speed_kmh": 4.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.8,
+      "box": [
+        859.9,
+        258.9,
+        881.6,
+        317.6
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-283",
+      "class": "person",
+      "confidence": 0.62,
+      "box": [
+        671.1,
+        49.3,
+        685.0,
+        91.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-285",
+      "class": "person",
+      "confidence": 0.67,
+      "box": [
+        806.5,
+        430.2,
+        839.9,
+        511.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1123.4,
+        67.3,
+        1254.2,
+        120.5
+      ],
+      "speed_kmh": 5.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.61,
+      "box": [
+        591.4,
+        456.3,
+        821.2,
+        607.0
+      ],
+      "speed_kmh": 13.2,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.68,
+      "box": [
+        584.9,
+        605.1,
+        904.2,
+        718.6
+      ],
+      "speed_kmh": 8.1,
+      "direction": "SE"
+    }
+  ],
+  "13.0": [
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.48,
+      "box": [
+        568.6,
+        137.8,
+        694.6,
+        217.9
+      ],
+      "speed_kmh": 6.7,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.37,
+      "box": [
+        657.9,
+        80.3,
+        670.2,
+        120.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        1084.3,
+        42.0,
+        1186.2,
+        83.3
+      ],
+      "speed_kmh": 6.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1043.3,
+        22.6,
+        1140.9,
+        63.4
+      ],
+      "speed_kmh": 5.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1173.7,
+        115.5,
+        1243.9,
+        182.0
+      ],
+      "speed_kmh": 6.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-260",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        1016.2,
+        8.8,
+        1101.2,
+        44.9
+      ],
+      "speed_kmh": 5.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        864.8,
+        247.0,
+        885.2,
+        301.9
+      ],
+      "speed_kmh": 5.2,
+      "direction": "N"
+    },
+    {
+      "id": "Person-283",
+      "class": "person",
+      "confidence": 0.49,
+      "box": [
+        671.8,
+        42.4,
+        685.0,
+        82.5
+      ],
+      "speed_kmh": 2.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1108.0,
+        59.1,
+        1236.2,
+        111.5
+      ],
+      "speed_kmh": 6.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-298",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        798.9,
+        386.6,
+        829.4,
+        462.8
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-299",
+      "class": "person",
+      "confidence": 0.78,
+      "box": [
+        925.2,
+        630.8,
+        977.8,
+        712.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.79,
+      "box": [
+        558.7,
+        559.6,
+        938.0,
+        701.5
+      ],
+      "speed_kmh": 11.4,
+      "direction": "N"
+    }
+  ],
+  "13.5": [
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.57,
+      "box": [
+        574.6,
+        122.8,
+        693.1,
+        197.8
+      ],
+      "speed_kmh": 6.4,
+      "direction": "N"
+    },
+    {
+      "id": "Person-190",
+      "class": "person",
+      "confidence": 0.43,
+      "box": [
+        659.6,
+        72.8,
+        670.8,
+        109.1
+      ],
+      "speed_kmh": 3.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        1068.4,
+        34.4,
+        1168.5,
+        74.8
+      ],
+      "speed_kmh": 6.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        1031.6,
+        16.5,
+        1125.7,
+        55.8
+      ],
+      "speed_kmh": 5.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1161.4,
+        103.0,
+        1232.9,
+        166.9
+      ],
+      "speed_kmh": 6.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-260",
+      "class": "car",
+      "confidence": 0.65,
+      "box": [
+        1006.9,
+        3.0,
+        1089.0,
+        37.8
+      ],
+      "speed_kmh": 4.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.77,
+      "box": [
+        868.8,
+        232.0,
+        890.1,
+        289.2
+      ],
+      "speed_kmh": 5.2,
+      "direction": "N"
+    },
+    {
+      "id": "Person-283",
+      "class": "person",
+      "confidence": 0.4,
+      "box": [
+        672.3,
+        35.0,
+        685.0,
+        73.6
+      ],
+      "speed_kmh": 2.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1094.1,
+        50.4,
+        1217.3,
+        100.8
+      ],
+      "speed_kmh": 6.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1200.9,
+        226.3,
+        1270.4,
+        302.3
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-315",
+      "class": "person",
+      "confidence": 0.64,
+      "box": [
+        897.1,
+        551.8,
+        957.9,
+        637.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.67,
+      "box": [
+        607.5,
+        366.5,
+        799.7,
+        490.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-317",
+      "class": "person",
+      "confidence": 0.76,
+      "box": [
+        791.1,
+        348.2,
+        817.8,
+        422.3
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.83,
+      "box": [
+        628.2,
+        483.8,
+        843.0,
+        623.3
+      ],
+      "speed_kmh": 6.6,
+      "direction": "SE"
+    }
+  ],
+  "14.0": [
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.61,
+      "box": [
+        582.0,
+        108.2,
+        690.7,
+        176.5
+      ],
+      "speed_kmh": 6.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        1057.8,
+        26.2,
+        1151.7,
+        63.7
+      ],
+      "speed_kmh": 6.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        1020.8,
+        8.7,
+        1112.1,
+        46.8
+      ],
+      "speed_kmh": 5.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1143.2,
+        89.0,
+        1216.4,
+        150.7
+      ],
+      "speed_kmh": 8.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-260",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        999.4,
+        0.0,
+        1068.6,
+        28.9
+      ],
+      "speed_kmh": 5.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        869.8,
+        216.3,
+        890.3,
+        270.3
+      ],
+      "speed_kmh": 6.2,
+      "direction": "N"
+    },
+    {
+      "id": "Person-283",
+      "class": "person",
+      "confidence": 0.61,
+      "box": [
+        672.8,
+        25.3,
+        684.9,
+        61.8
+      ],
+      "speed_kmh": 3.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1080.7,
+        40.3,
+        1198.4,
+        88.6
+      ],
+      "speed_kmh": 7.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1190.3,
+        203.4,
+        1258.4,
+        276.8
+      ],
+      "speed_kmh": 9.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.74,
+      "box": [
+        612.1,
+        329.2,
+        791.7,
+        445.0
+      ],
+      "speed_kmh": 14.9,
+      "direction": "N"
+    },
+    {
+      "id": "Person-339",
+      "class": "person",
+      "confidence": 0.62,
+      "box": [
+        1063.3,
+        558.3,
+        1105.8,
+        630.1
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.8,
+      "box": [
+        638.7,
+        448.9,
+        837.2,
+        576.2
+      ],
+      "speed_kmh": 14.8,
+      "direction": "N"
+    },
+    {
+      "id": "Person-7",
+      "class": "person",
+      "confidence": 0.76,
+      "box": [
+        891.7,
+        489.0,
+        919.5,
+        569.1
+      ],
+      "speed_kmh": 0.2,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-19",
+      "class": "truck",
+      "confidence": 0.69,
+      "box": [
+        550.6,
+        553.4,
+        956.9,
+        712.1
+      ],
+      "speed_kmh": 1.0,
+      "direction": "E"
+    }
+  ],
+  "14.5": [
+    {
+      "id": "Truck-188",
+      "class": "truck",
+      "confidence": 0.57,
+      "box": [
+        590.3,
+        93.6,
+        685.7,
+        152.7
+      ],
+      "speed_kmh": 6.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        1043.9,
+        16.7,
+        1136.7,
+        53.6
+      ],
+      "speed_kmh": 6.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        1012.1,
+        1.8,
+        1097.6,
+        37.3
+      ],
+      "speed_kmh": 5.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1125.3,
+        75.3,
+        1200.5,
+        135.2
+      ],
+      "speed_kmh": 8.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-260",
+      "class": "car",
+      "confidence": 0.64,
+      "box": [
+        993.2,
+        0.0,
+        1045.7,
+        21.1
+      ],
+      "speed_kmh": 5.4,
+      "direction": "W"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        873.9,
+        201.0,
+        895.2,
+        256.5
+      ],
+      "speed_kmh": 5.5,
+      "direction": "N"
+    },
+    {
+      "id": "Person-283",
+      "class": "person",
+      "confidence": 0.38,
+      "box": [
+        673.7,
+        16.8,
+        684.7,
+        49.9
+      ],
+      "speed_kmh": 3.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1068.6,
+        30.4,
+        1182.2,
+        77.2
+      ],
+      "speed_kmh": 6.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.93,
+      "box": [
+        1179.6,
+        180.1,
+        1247.1,
+        250.7
+      ],
+      "speed_kmh": 9.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.47,
+      "box": [
+        617.9,
+        290.8,
+        783.7,
+        397.5
+      ],
+      "speed_kmh": 15.5,
+      "direction": "N"
+    },
+    {
+      "id": "Person-356",
+      "class": "person",
+      "confidence": 0.73,
+      "box": [
+        870.5,
+        436.6,
+        912.9,
+        514.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-366",
+      "class": "person",
+      "confidence": 0.57,
+      "box": [
+        1034.6,
+        500.1,
+        1071.6,
+        564.6
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "15.0": [
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.7,
+      "box": [
+        1031.9,
+        7.6,
+        1121.9,
+        43.3
+      ],
+      "speed_kmh": 6.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        1008.2,
+        0.0,
+        1079.7,
+        28.0
+      ],
+      "speed_kmh": 4.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1107.7,
+        62.9,
+        1183.0,
+        119.5
+      ],
+      "speed_kmh": 8.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.75,
+      "box": [
+        873.5,
+        186.2,
+        894.1,
+        239.1
+      ],
+      "speed_kmh": 5.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        1055.3,
+        20.0,
+        1166.1,
+        65.8
+      ],
+      "speed_kmh": 6.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1168.4,
+        157.2,
+        1236.4,
+        224.7
+      ],
+      "speed_kmh": 9.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.74,
+      "box": [
+        622.0,
+        255.7,
+        776.2,
+        354.8
+      ],
+      "speed_kmh": 14.0,
+      "direction": "N"
+    },
+    {
+      "id": "Person-385",
+      "class": "person",
+      "confidence": 0.68,
+      "box": [
+        855.4,
+        386.4,
+        898.0,
+        463.5
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-392",
+      "class": "car",
+      "confidence": 0.47,
+      "box": [
+        583.3,
+        1.5,
+        666.2,
+        44.0
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.59,
+      "box": [
+        770.0,
+        246.9,
+        801.2,
+        314.3
+      ],
+      "speed_kmh": 2.4,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.35,
+      "box": [
+        630.9,
+        434.0,
+        860.5,
+        579.5
+      ],
+      "speed_kmh": 1.7,
+      "direction": "NE"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        567.7,
+        575.3,
+        922.2,
+        716.1
+      ],
+      "speed_kmh": 2.8,
+      "direction": "SW"
+    }
+  ],
+  "15.5": [
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.71,
+      "box": [
+        1023.8,
+        1.2,
+        1102.9,
+        32.3
+      ],
+      "speed_kmh": 5.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-223",
+      "class": "car",
+      "confidence": 0.49,
+      "box": [
+        1002.0,
+        0.0,
+        1054.4,
+        19.1
+      ],
+      "speed_kmh": 5.9,
+      "direction": "W"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1090.6,
+        51.0,
+        1166.8,
+        105.3
+      ],
+      "speed_kmh": 7.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.8,
+      "box": [
+        878.7,
+        172.4,
+        899.5,
+        224.7
+      ],
+      "speed_kmh": 5.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        1044.5,
+        10.6,
+        1151.3,
+        54.8
+      ],
+      "speed_kmh": 5.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1156.7,
+        138.0,
+        1226.4,
+        202.5
+      ],
+      "speed_kmh": 8.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.77,
+      "box": [
+        627.5,
+        226.3,
+        771.0,
+        318.3
+      ],
+      "speed_kmh": 11.9,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-392",
+      "class": "truck",
+      "confidence": 0.41,
+      "box": [
+        592.0,
+        0.6,
+        659.2,
+        34.8
+      ],
+      "speed_kmh": 1.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1209.9,
+        238.4,
+        1280.0,
+        315.3
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-415",
+      "class": "person",
+      "confidence": 0.62,
+      "box": [
+        846.0,
+        346.7,
+        884.3,
+        418.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-144",
+      "class": "truck",
+      "confidence": 0.42,
+      "box": [
+        624.6,
+        399.2,
+        865.1,
+        551.4
+      ],
+      "speed_kmh": 11.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        566.6,
+        533.2,
+        907.3,
+        672.0
+      ],
+      "speed_kmh": 15.8,
+      "direction": "N"
+    }
+  ],
+  "16.0": [
+    {
+      "id": "Car-200",
+      "class": "car",
+      "confidence": 0.45,
+      "box": [
+        1014.4,
+        0.0,
+        1075.6,
+        22.4
+      ],
+      "speed_kmh": 6.9,
+      "direction": "W"
+    },
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1072.3,
+        37.9,
+        1150.3,
+        90.8
+      ],
+      "speed_kmh": 8.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.73,
+      "box": [
+        878.6,
+        158.1,
+        897.8,
+        206.2
+      ],
+      "speed_kmh": 5.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1034.6,
+        1.7,
+        1133.2,
+        42.5
+      ],
+      "speed_kmh": 6.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1135.9,
+        118.0,
+        1206.8,
+        178.8
+      ],
+      "speed_kmh": 10.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.53,
+      "box": [
+        630.2,
+        195.2,
+        765.2,
+        281.4
+      ],
+      "speed_kmh": 12.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.92,
+      "box": [
+        1197.5,
+        215.7,
+        1274.6,
+        295.0
+      ],
+      "speed_kmh": 8.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.73,
+      "box": [
+        623.3,
+        427.8,
+        846.2,
+        565.2
+      ],
+      "speed_kmh": 8.5,
+      "direction": "SW"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        560.1,
+        570.2,
+        882.0,
+        701.1
+      ],
+      "speed_kmh": 13.2,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-421",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        1046.2,
+        228.3,
+        1077.5,
+        290.1
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-425",
+      "class": "person",
+      "confidence": 0.6,
+      "box": [
+        834.6,
+        304.7,
+        869.3,
+        373.9
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-285",
+      "class": "person",
+      "confidence": 0.52,
+      "box": [
+        819.1,
+        428.7,
+        840.4,
+        479.3
+      ],
+      "speed_kmh": 0.9,
+      "direction": "N"
+    }
+  ],
+  "16.5": [
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1056.9,
+        26.0,
+        1135.0,
+        76.6
+      ],
+      "speed_kmh": 7.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.71,
+      "box": [
+        881.6,
+        143.1,
+        902.2,
+        193.6
+      ],
+      "speed_kmh": 5.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        1029.3,
+        0.0,
+        1111.3,
+        31.4
+      ],
+      "speed_kmh": 5.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1112.7,
+        99.0,
+        1186.0,
+        157.6
+      ],
+      "speed_kmh": 10.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.52,
+      "box": [
+        619.3,
+        167.9,
+        734.3,
+        242.3
+      ],
+      "speed_kmh": 14.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1182.5,
+        184.9,
+        1260.7,
+        263.9
+      ],
+      "speed_kmh": 12.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.73,
+      "box": [
+        623.1,
+        401.6,
+        829.4,
+        525.9
+      ],
+      "speed_kmh": 12.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        504.6,
+        531.9,
+        919.2,
+        708.3
+      ],
+      "speed_kmh": 6.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-441",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        1024.4,
+        197.5,
+        1057.5,
+        258.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "17.0": [
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1040.9,
+        15.0,
+        1118.3,
+        63.0
+      ],
+      "speed_kmh": 7.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.57,
+      "box": [
+        879.7,
+        130.3,
+        898.5,
+        175.6
+      ],
+      "speed_kmh": 5.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-174",
+      "class": "car",
+      "confidence": 0.5,
+      "box": [
+        1025.2,
+        0.0,
+        1085.3,
+        20.7
+      ],
+      "speed_kmh": 5.8,
+      "direction": "W"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1090.0,
+        81.7,
+        1164.9,
+        137.7
+      ],
+      "speed_kmh": 10.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.55,
+      "box": [
+        620.0,
+        143.4,
+        722.1,
+        210.3
+      ],
+      "speed_kmh": 10.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1168.3,
+        156.8,
+        1246.3,
+        232.7
+      ],
+      "speed_kmh": 11.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        625.5,
+        357.8,
+        814.7,
+        469.3
+      ],
+      "speed_kmh": 18.2,
+      "direction": "N"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.51,
+      "box": [
+        778.7,
+        227.7,
+        802.9,
+        281.3
+      ],
+      "speed_kmh": 2.4,
+      "direction": "N"
+    }
+  ],
+  "17.5": [
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1026.1,
+        4.8,
+        1103.7,
+        51.2
+      ],
+      "speed_kmh": 6.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.64,
+      "box": [
+        881.4,
+        117.2,
+        900.3,
+        161.6
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1068.8,
+        66.5,
+        1144.6,
+        119.6
+      ],
+      "speed_kmh": 9.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.42,
+      "box": [
+        624.9,
+        122.0,
+        716.8,
+        182.9
+      ],
+      "speed_kmh": 8.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1149.3,
+        133.0,
+        1227.2,
+        205.1
+      ],
+      "speed_kmh": 11.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        627.7,
+        312.4,
+        804.5,
+        414.5
+      ],
+      "speed_kmh": 18.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        1206.6,
+        207.0,
+        1276.0,
+        299.4
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "18.0": [
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        1014.6,
+        0.0,
+        1086.2,
+        38.9
+      ],
+      "speed_kmh": 6.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.59,
+      "box": [
+        878.5,
+        104.3,
+        896.5,
+        146.5
+      ],
+      "speed_kmh": 5.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1048.0,
+        51.6,
+        1124.7,
+        102.3
+      ],
+      "speed_kmh": 9.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.37,
+      "box": [
+        629.4,
+        101.3,
+        713.2,
+        157.7
+      ],
+      "speed_kmh": 8.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.91,
+      "box": [
+        1124.5,
+        111.2,
+        1201.3,
+        178.6
+      ],
+      "speed_kmh": 12.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        629.9,
+        268.2,
+        794.9,
+        361.9
+      ],
+      "speed_kmh": 17.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        1192.5,
+        184.2,
+        1262.9,
+        276.8
+      ],
+      "speed_kmh": 9.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        605.2,
+        363.4,
+        793.1,
+        485.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.72,
+      "box": [
+        653.3,
+        551.6,
+        962.3,
+        687.6
+      ],
+      "speed_kmh": 11.5,
+      "direction": "E"
+    }
+  ],
+  "18.5": [
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        1005.7,
+        0.0,
+        1066.0,
+        28.3
+      ],
+      "speed_kmh": 5.6,
+      "direction": "W"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.56,
+      "box": [
+        877.3,
+        93.4,
+        895.0,
+        133.6
+      ],
+      "speed_kmh": 4.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1029.6,
+        38.3,
+        1107.0,
+        86.7
+      ],
+      "speed_kmh": 8.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-316",
+      "class": "truck",
+      "confidence": 0.43,
+      "box": [
+        634.7,
+        83.9,
+        711.1,
+        135.7
+      ],
+      "speed_kmh": 7.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1099.8,
+        92.0,
+        1176.0,
+        155.5
+      ],
+      "speed_kmh": 11.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        632.3,
+        230.8,
+        787.0,
+        317.3
+      ],
+      "speed_kmh": 14.8,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1174.4,
+        158.3,
+        1241.1,
+        243.5
+      ],
+      "speed_kmh": 12.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        612.5,
+        318.8,
+        781.5,
+        427.6
+      ],
+      "speed_kmh": 18.4,
+      "direction": "N"
+    }
+  ],
+  "19.0": [
+    {
+      "id": "Car-245",
+      "class": "car",
+      "confidence": 0.73,
+      "box": [
+        998.9,
+        0.0,
+        1043.8,
+        18.0
+      ],
+      "speed_kmh": 5.5,
+      "direction": "W"
+    },
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.59,
+      "box": [
+        873.5,
+        82.4,
+        890.6,
+        121.4
+      ],
+      "speed_kmh": 4.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1012.7,
+        25.9,
+        1089.2,
+        71.5
+      ],
+      "speed_kmh": 8.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1076.3,
+        73.7,
+        1152.1,
+        133.5
+      ],
+      "speed_kmh": 11.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        633.9,
+        196.4,
+        779.2,
+        276.4
+      ],
+      "speed_kmh": 13.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1146.5,
+        132.3,
+        1209.3,
+        209.8
+      ],
+      "speed_kmh": 15.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        618.3,
+        271.7,
+        770.0,
+        368.7
+      ],
+      "speed_kmh": 19.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.55,
+      "box": [
+        655.0,
+        553.2,
+        973.0,
+        698.9
+      ],
+      "speed_kmh": 1.6,
+      "direction": "SE"
+    }
+  ],
+  "19.5": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.59,
+      "box": [
+        872.3,
+        70.8,
+        889.3,
+        108.9
+      ],
+      "speed_kmh": 4.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        997.6,
+        13.7,
+        1073.8,
+        56.8
+      ],
+      "speed_kmh": 7.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1053.7,
+        57.2,
+        1130.3,
+        114.8
+      ],
+      "speed_kmh": 10.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        634.0,
+        166.7,
+        772.1,
+        241.8
+      ],
+      "speed_kmh": 11.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1119.8,
+        109.9,
+        1180.5,
+        182.1
+      ],
+      "speed_kmh": 13.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.81,
+      "box": [
+        621.0,
+        233.9,
+        761.5,
+        322.7
+      ],
+      "speed_kmh": 15.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-544",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1179.7,
+        168.6,
+        1264.9,
+        240.0
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        699.0,
+        589.2,
+        962.8,
+        711.1
+      ],
+      "speed_kmh": 10.6,
+      "direction": "SE"
+    }
+  ],
+  "20.0": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.59,
+      "box": [
+        867.2,
+        58.2,
+        884.0,
+        96.3
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        983.1,
+        2.6,
+        1057.6,
+        43.0
+      ],
+      "speed_kmh": 7.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        1034.2,
+        42.6,
+        1108.4,
+        95.6
+      ],
+      "speed_kmh": 9.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        635.6,
+        139.0,
+        765.4,
+        208.6
+      ],
+      "speed_kmh": 11.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1092.9,
+        88.2,
+        1152.2,
+        155.9
+      ],
+      "speed_kmh": 13.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        624.0,
+        198.2,
+        753.7,
+        279.0
+      ],
+      "speed_kmh": 14.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-544",
+      "class": "car",
+      "confidence": 0.54,
+      "box": [
+        1188.0,
+        177.9,
+        1280.0,
+        260.7
+      ],
+      "speed_kmh": 6.8,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-563",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        707.0,
+        502.3,
+        917.5,
+        634.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-568",
+      "class": "person",
+      "confidence": 0.54,
+      "box": [
+        919.6,
+        50.3,
+        937.5,
+        89.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-151",
+      "class": "car",
+      "confidence": 0.55,
+      "box": [
+        1198.4,
+        17.5,
+        1280.0,
+        72.6
+      ],
+      "speed_kmh": 1.6,
+      "direction": "N"
+    }
+  ],
+  "20.5": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.56,
+      "box": [
+        863.4,
+        47.2,
+        880.0,
+        84.7
+      ],
+      "speed_kmh": 4.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-306",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        971.8,
+        0.0,
+        1040.1,
+        31.4
+      ],
+      "speed_kmh": 5.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1015.1,
+        28.6,
+        1089.1,
+        79.3
+      ],
+      "speed_kmh": 8.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        635.7,
+        115.4,
+        758.8,
+        180.6
+      ],
+      "speed_kmh": 9.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.9,
+      "box": [
+        1069.3,
+        69.6,
+        1127.5,
+        133.8
+      ],
+      "speed_kmh": 11.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        623.6,
+        168.6,
+        747.8,
+        244.9
+      ],
+      "speed_kmh": 11.5,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-563",
+      "class": "truck",
+      "confidence": 0.73,
+      "box": [
+        713.7,
+        525.4,
+        943.8,
+        670.1
+      ],
+      "speed_kmh": 12.1,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.72,
+      "box": [
+        708.6,
+        434.5,
+        886.5,
+        544.5
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-595",
+      "class": "person",
+      "confidence": 0.46,
+      "box": [
+        907.4,
+        35.6,
+        921.3,
+        72.9
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "21.0": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.69,
+      "box": [
+        857.9,
+        36.7,
+        874.3,
+        74.2
+      ],
+      "speed_kmh": 4.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        996.6,
+        14.8,
+        1070.2,
+        63.1
+      ],
+      "speed_kmh": 8.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        636.8,
+        93.8,
+        753.7,
+        155.0
+      ],
+      "speed_kmh": 8.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1047.1,
+        52.4,
+        1103.6,
+        112.7
+      ],
+      "speed_kmh": 10.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        624.6,
+        141.1,
+        741.9,
+        212.0
+      ],
+      "speed_kmh": 10.9,
+      "direction": "N"
+    },
+    {
+      "id": "Truck-589",
+      "class": "truck",
+      "confidence": 0.72,
+      "box": [
+        707.7,
+        445.9,
+        910.3,
+        571.2
+      ],
+      "speed_kmh": 8.0,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        1120.8,
+        124.2,
+        1280.0,
+        198.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.55,
+      "box": [
+        705.2,
+        371.1,
+        862.2,
+        464.5
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-616",
+      "class": "person",
+      "confidence": 0.56,
+      "box": [
+        894.4,
+        19.6,
+        911.0,
+        56.4
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        749.9,
+        578.0,
+        1051.0,
+        717.5
+      ],
+      "speed_kmh": 8.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-544",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        1208.4,
+        199.4,
+        1280.0,
+        273.7
+      ],
+      "speed_kmh": 3.6,
+      "direction": "SE"
+    }
+  ],
+  "21.5": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.47,
+      "box": [
+        854.6,
+        27.3,
+        870.5,
+        64.4
+      ],
+      "speed_kmh": 3.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        980.8,
+        3.3,
+        1052.8,
+        48.8
+      ],
+      "speed_kmh": 7.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        637.6,
+        74.5,
+        748.7,
+        132.2
+      ],
+      "speed_kmh": 7.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1027.2,
+        37.0,
+        1082.1,
+        93.8
+      ],
+      "speed_kmh": 9.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        625.4,
+        116.7,
+        736.4,
+        182.6
+      ],
+      "speed_kmh": 9.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        754.9,
+        479.2,
+        969.7,
+        611.1
+      ],
+      "speed_kmh": 23.3,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        1107.8,
+        110.8,
+        1261.9,
+        181.3
+      ],
+      "speed_kmh": 7.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-606",
+      "class": "truck",
+      "confidence": 0.57,
+      "box": [
+        701.3,
+        382.2,
+        888.3,
+        493.5
+      ],
+      "speed_kmh": 8.3,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        1062.9,
+        77.3,
+        1193.9,
+        136.4
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        802.9,
+        593.9,
+        1067.5,
+        718.3
+      ],
+      "speed_kmh": 12.9,
+      "direction": "E"
+    }
+  ],
+  "22.0": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.61,
+      "box": [
+        849.8,
+        17.3,
+        865.4,
+        53.8
+      ],
+      "speed_kmh": 4.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-398",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        969.0,
+        0.0,
+        1033.7,
+        35.1
+      ],
+      "speed_kmh": 6.3,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.8,
+      "box": [
+        636.5,
+        55.6,
+        743.1,
+        110.5
+      ],
+      "speed_kmh": 7.4,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        1008.1,
+        22.0,
+        1061.8,
+        76.0
+      ],
+      "speed_kmh": 9.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        625.4,
+        94.3,
+        732.1,
+        156.6
+      ],
+      "speed_kmh": 8.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        794.6,
+        500.0,
+        1007.8,
+        631.4
+      ],
+      "speed_kmh": 15.8,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        1146.0,
+        129.8,
+        1272.5,
+        187.7
+      ],
+      "speed_kmh": 9.9,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        739.9,
+        405.1,
+        939.0,
+        522.8
+      ],
+      "speed_kmh": 18.6,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        1072.4,
+        82.7,
+        1215.4,
+        147.4
+      ],
+      "speed_kmh": 6.3,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.46,
+      "box": [
+        830.5,
+        595.6,
+        1088.4,
+        717.5
+      ],
+      "speed_kmh": 8.7,
+      "direction": "E"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.59,
+      "box": [
+        700.1,
+        271.4,
+        821.9,
+        341.8
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-649",
+      "class": "truck",
+      "confidence": 0.58,
+      "box": [
+        693.2,
+        325.8,
+        871.1,
+        419.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-653",
+      "class": "car",
+      "confidence": 0.55,
+      "box": [
+        1194.8,
+        164.8,
+        1258.9,
+        230.8
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "22.5": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.53,
+      "box": [
+        845.4,
+        8.4,
+        860.8,
+        44.6
+      ],
+      "speed_kmh": 3.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        637.2,
+        39.2,
+        738.5,
+        91.1
+      ],
+      "speed_kmh": 6.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-479",
+      "class": "car",
+      "confidence": 0.47,
+      "box": [
+        995.3,
+        8.8,
+        1040.2,
+        51.6
+      ],
+      "speed_kmh": 9.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        625.7,
+        74.8,
+        728.0,
+        133.4
+      ],
+      "speed_kmh": 7.7,
+      "direction": "N"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.59,
+      "box": [
+        810.8,
+        506.1,
+        1053.4,
+        656.3
+      ],
+      "speed_kmh": 12.4,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        1146.4,
+        134.9,
+        1278.3,
+        195.2
+      ],
+      "speed_kmh": 2.5,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.48,
+      "box": [
+        780.2,
+        423.9,
+        969.1,
+        535.9
+      ],
+      "speed_kmh": 13.9,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.66,
+      "box": [
+        1059.3,
+        70.5,
+        1201.3,
+        135.2
+      ],
+      "speed_kmh": 6.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Truck-648",
+      "class": "truck",
+      "confidence": 0.46,
+      "box": [
+        700.1,
+        278.1,
+        841.3,
+        359.6
+      ],
+      "speed_kmh": 5.6,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-649",
+      "class": "car",
+      "confidence": 0.7,
+      "box": [
+        724.3,
+        345.4,
+        919.2,
+        448.0
+      ],
+      "speed_kmh": 16.7,
+      "direction": "SE"
+    },
+    {
+      "id": "Person-653",
+      "class": "person",
+      "confidence": 0.62,
+      "box": [
+        1213.4,
+        174.3,
+        1271.6,
+        234.8
+      ],
+      "speed_kmh": 6.1,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        680.3,
+        232.3,
+        795.4,
+        295.2
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-544",
+      "class": "car",
+      "confidence": 0.81,
+      "box": [
+        1207.6,
+        227.9,
+        1280.0,
+        311.4
+      ],
+      "speed_kmh": 4.0,
+      "direction": "S"
+    }
+  ],
+  "23.0": [
+    {
+      "id": "Person-274",
+      "class": "person",
+      "confidence": 0.52,
+      "box": [
+        840.3,
+        0.0,
+        855.1,
+        35.0
+      ],
+      "speed_kmh": 3.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        637.5,
+        23.7,
+        732.6,
+        71.9
+      ],
+      "speed_kmh": 6.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.84,
+      "box": [
+        626.0,
+        55.6,
+        724.6,
+        111.2
+      ],
+      "speed_kmh": 7.5,
+      "direction": "N"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        887.8,
+        533.1,
+        1130.8,
+        684.3
+      ],
+      "speed_kmh": 29.5,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-606",
+      "class": "truck",
+      "confidence": 0.56,
+      "box": [
+        791.4,
+        424.4,
+        1004.3,
+        551.4
+      ],
+      "speed_kmh": 8.8,
+      "direction": "E"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        1040.2,
+        52.9,
+        1174.8,
+        114.6
+      ],
+      "speed_kmh": 10.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-649",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        766.4,
+        358.1,
+        940.2,
+        449.8
+      ],
+      "speed_kmh": 11.7,
+      "direction": "E"
+    },
+    {
+      "id": "Car-653",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        1201.4,
+        192.1,
+        1272.8,
+        265.8
+      ],
+      "speed_kmh": 9.0,
+      "direction": "S"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.44,
+      "box": [
+        694.9,
+        235.5,
+        823.6,
+        305.7
+      ],
+      "speed_kmh": 8.1,
+      "direction": "E"
+    },
+    {
+      "id": "Car-677",
+      "class": "car",
+      "confidence": 0.73,
+      "box": [
+        1023.0,
+        662.1,
+        1235.7,
+        719.0
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-684",
+      "class": "car",
+      "confidence": 0.47,
+      "box": [
+        1125.3,
+        119.2,
+        1262.9,
+        167.7
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.6,
+      "box": [
+        691.1,
+        196.1,
+        801.0,
+        254.0
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    }
+  ],
+  "23.5": [
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        626.8,
+        40.3,
+        721.5,
+        92.9
+      ],
+      "speed_kmh": 6.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        948.8,
+        554.5,
+        1199.4,
+        709.0
+      ],
+      "speed_kmh": 24.8,
+      "direction": "E"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        859.8,
+        449.4,
+        1078.9,
+        580.9
+      ],
+      "speed_kmh": 27.5,
+      "direction": "E"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        1024.5,
+        36.6,
+        1145.8,
+        92.5
+      ],
+      "speed_kmh": 10.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-649",
+      "class": "car",
+      "confidence": 0.49,
+      "box": [
+        790.9,
+        365.8,
+        986.3,
+        468.8
+      ],
+      "speed_kmh": 13.6,
+      "direction": "E"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        740.9,
+        253.4,
+        887.4,
+        333.4
+      ],
+      "speed_kmh": 21.4,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.44,
+      "box": [
+        690.7,
+        202.1,
+        816.9,
+        268.5
+      ],
+      "speed_kmh": 4.6,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-709",
+      "class": "car",
+      "confidence": 0.57,
+      "box": [
+        1105.4,
+        90.9,
+        1212.2,
+        151.4
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-711",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        973.6,
+        0.0,
+        1024.6,
+        37.3
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        1160.7,
+        117.4,
+        1280.0,
+        187.8
+      ],
+      "speed_kmh": 2.7,
+      "direction": "NE"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        765.5,
+        306.7,
+        901.9,
+        385.4
+      ],
+      "speed_kmh": 12.4,
+      "direction": "SE"
+    }
+  ],
+  "24.0": [
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.82,
+      "box": [
+        627.0,
+        25.0,
+        718.8,
+        75.1
+      ],
+      "speed_kmh": 6.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-589",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1009.3,
+        573.6,
+        1253.3,
+        720.0
+      ],
+      "speed_kmh": 21.3,
+      "direction": "E"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        910.7,
+        461.8,
+        1137.6,
+        597.3
+      ],
+      "speed_kmh": 20.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        1009.2,
+        21.0,
+        1117.2,
+        70.9
+      ],
+      "speed_kmh": 10.4,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-649",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        840.7,
+        379.6,
+        1050.6,
+        491.3
+      ],
+      "speed_kmh": 21.6,
+      "direction": "E"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        763.9,
+        261.6,
+        897.5,
+        334.5
+      ],
+      "speed_kmh": 6.2,
+      "direction": "E"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        728.8,
+        213.9,
+        868.0,
+        287.0
+      ],
+      "speed_kmh": 17.0,
+      "direction": "E"
+    },
+    {
+      "id": "Car-711",
+      "class": "car",
+      "confidence": 0.64,
+      "box": [
+        991.5,
+        3.9,
+        1047.5,
+        44.3
+      ],
+      "speed_kmh": 7.6,
+      "direction": "E"
+    },
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.71,
+      "box": [
+        669.6,
+        102.2,
+        776.9,
+        159.0
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-723",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        676.8,
+        139.3,
+        775.1,
+        190.2
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-725",
+      "class": "car",
+      "confidence": 0.51,
+      "box": [
+        1076.3,
+        78.2,
+        1196.6,
+        122.9
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.48,
+      "box": [
+        787.0,
+        308.7,
+        948.2,
+        401.1
+      ],
+      "speed_kmh": 12.6,
+      "direction": "E"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        637.1,
+        0.0,
+        725.2,
+        41.4
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-684",
+      "class": "car",
+      "confidence": 0.71,
+      "box": [
+        1120.9,
+        89.4,
+        1280.0,
+        160.6
+      ],
+      "speed_kmh": 3.5,
+      "direction": "N"
+    }
+  ],
+  "24.5": [
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.67,
+      "box": [
+        627.4,
+        11.6,
+        716.3,
+        59.5
+      ],
+      "speed_kmh": 5.2,
+      "direction": "N"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.86,
+      "box": [
+        962.7,
+        479.0,
+        1191.0,
+        615.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "E"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        996.2,
+        7.2,
+        1092.2,
+        51.5
+      ],
+      "speed_kmh": 9.1,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-649",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        881.0,
+        389.4,
+        1102.9,
+        507.5
+      ],
+      "speed_kmh": 17.3,
+      "direction": "E"
+    },
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.57,
+      "box": [
+        678.9,
+        114.0,
+        775.6,
+        165.1
+      ],
+      "speed_kmh": 3.5,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        831.7,
+        322.4,
+        1005.9,
+        423.0
+      ],
+      "speed_kmh": 19.5,
+      "direction": "E"
+    },
+    {
+      "id": "Person-733",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        926.0,
+        161.0,
+        948.6,
+        212.8
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-734",
+      "class": "car",
+      "confidence": 0.72,
+      "box": [
+        677.4,
+        59.6,
+        764.4,
+        105.4
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-743",
+      "class": "car",
+      "confidence": 0.56,
+      "box": [
+        1022.9,
+        43.8,
+        1187.2,
+        104.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-144",
+      "class": "car",
+      "confidence": 0.54,
+      "box": [
+        643.7,
+        0.0,
+        717.6,
+        28.6
+      ],
+      "speed_kmh": 2.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-684",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        1111.9,
+        72.8,
+        1280.0,
+        144.7
+      ],
+      "speed_kmh": 6.1,
+      "direction": "N"
+    },
+    {
+      "id": "Car-709",
+      "class": "car",
+      "confidence": 0.89,
+      "box": [
+        1085.7,
+        114.7,
+        1188.3,
+        173.4
+      ],
+      "speed_kmh": 5.7,
+      "direction": "SW"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        1169.3,
+        113.6,
+        1280.0,
+        182.1
+      ],
+      "speed_kmh": 1.2,
+      "direction": "NE"
+    }
+  ],
+  "25.0": [
+    {
+      "id": "Car-500",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        628.0,
+        0.0,
+        713.3,
+        44.1
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-619",
+      "class": "car",
+      "confidence": 0.63,
+      "box": [
+        986.3,
+        0.0,
+        1065.9,
+        35.2
+      ],
+      "speed_kmh": 7.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-649",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        938.1,
+        400.1,
+        1148.0,
+        512.6
+      ],
+      "speed_kmh": 18.6,
+      "direction": "E"
+    },
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.43,
+      "box": [
+        685.4,
+        118.4,
+        785.0,
+        171.0
+      ],
+      "speed_kmh": 3.4,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        865.3,
+        326.4,
+        1051.9,
+        433.8
+      ],
+      "speed_kmh": 14.6,
+      "direction": "E"
+    },
+    {
+      "id": "Car-734",
+      "class": "car",
+      "confidence": 0.6,
+      "box": [
+        675.9,
+        44.0,
+        760.1,
+        88.3
+      ],
+      "speed_kmh": 6.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-745",
+      "class": "car",
+      "confidence": 0.63,
+      "box": [
+        741.6,
+        185.9,
+        858.8,
+        244.4
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-749",
+      "class": "car",
+      "confidence": 0.48,
+      "box": [
+        678.1,
+        93.1,
+        766.8,
+        137.4
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        1162.5,
+        97.4,
+        1280.0,
+        162.0
+      ],
+      "speed_kmh": 6.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        832.0,
+        273.1,
+        974.8,
+        351.1
+      ],
+      "speed_kmh": 13.3,
+      "direction": "E"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.45,
+      "box": [
+        754.8,
+        215.9,
+        918.7,
+        302.1
+      ],
+      "speed_kmh": 7.1,
+      "direction": "E"
+    },
+    {
+      "id": "Car-725",
+      "class": "car",
+      "confidence": 0.88,
+      "box": [
+        1039.1,
+        91.6,
+        1181.6,
+        145.5
+      ],
+      "speed_kmh": 5.7,
+      "direction": "SW"
+    }
+  ],
+  "25.5": [
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        718.9,
+        127.1,
+        825.2,
+        183.0
+      ],
+      "speed_kmh": 13.8,
+      "direction": "E"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.48,
+      "box": [
+        917.0,
+        338.1,
+        1092.3,
+        439.1
+      ],
+      "speed_kmh": 16.9,
+      "direction": "E"
+    },
+    {
+      "id": "Car-734",
+      "class": "car",
+      "confidence": 0.64,
+      "box": [
+        676.0,
+        27.9,
+        753.1,
+        68.3
+      ],
+      "speed_kmh": 6.6,
+      "direction": "N"
+    },
+    {
+      "id": "Car-745",
+      "class": "car",
+      "confidence": 0.42,
+      "box": [
+        737.7,
+        178.9,
+        896.8,
+        258.4
+      ],
+      "speed_kmh": 6.3,
+      "direction": "E"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.73,
+      "box": [
+        1185.5,
+        101.6,
+        1280.0,
+        154.2
+      ],
+      "speed_kmh": 4.2,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-763",
+      "class": "truck",
+      "confidence": 0.55,
+      "box": [
+        630.5,
+        0.4,
+        710.6,
+        36.6
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        853.3,
+        277.8,
+        1022.8,
+        370.3
+      ],
+      "speed_kmh": 13.2,
+      "direction": "E"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.78,
+      "box": [
+        806.0,
+        228.8,
+        950.4,
+        304.8
+      ],
+      "speed_kmh": 15.2,
+      "direction": "E"
+    },
+    {
+      "id": "Car-606",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        1042.8,
+        486.3,
+        1280.0,
+        638.7
+      ],
+      "speed_kmh": 15.5,
+      "direction": "E"
+    },
+    {
+      "id": "Car-743",
+      "class": "car",
+      "confidence": 0.66,
+      "box": [
+        1059.5,
+        36.8,
+        1219.9,
+        96.2
+      ],
+      "speed_kmh": 6.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-684",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        1114.2,
+        67.5,
+        1280.0,
+        131.2
+      ],
+      "speed_kmh": 1.7,
+      "direction": "N"
+    }
+  ],
+  "26.0": [
+    {
+      "id": "Car-734",
+      "class": "car",
+      "confidence": 0.47,
+      "box": [
+        674.8,
+        13.0,
+        747.0,
+        50.9
+      ],
+      "speed_kmh": 6.0,
+      "direction": "N"
+    },
+    {
+      "id": "Car-745",
+      "class": "car",
+      "confidence": 0.81,
+      "box": [
+        782.1,
+        187.8,
+        928.5,
+        261.1
+      ],
+      "speed_kmh": 13.9,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-599",
+      "class": "truck",
+      "confidence": 0.53,
+      "box": [
+        1170.0,
+        99.9,
+        1280.0,
+        165.0
+      ],
+      "speed_kmh": 3.2,
+      "direction": "SW"
+    },
+    {
+      "id": "Truck-763",
+      "class": "truck",
+      "confidence": 0.54,
+      "box": [
+        641.6,
+        0.1,
+        696.6,
+        24.5
+      ],
+      "speed_kmh": 2.3,
+      "direction": "N"
+    },
+    {
+      "id": "Car-668",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        893.9,
+        284.9,
+        1054.8,
+        372.6
+      ],
+      "speed_kmh": 13.2,
+      "direction": "E"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.87,
+      "box": [
+        830.4,
+        233.4,
+        993.0,
+        319.1
+      ],
+      "speed_kmh": 12.5,
+      "direction": "E"
+    },
+    {
+      "id": "Car-684",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        1102.1,
+        55.6,
+        1257.6,
+        113.5
+      ],
+      "speed_kmh": 8.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-711",
+      "class": "car",
+      "confidence": 0.58,
+      "box": [
+        1005.4,
+        1.8,
+        1077.9,
+        52.7
+      ],
+      "speed_kmh": 2.0,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-649",
+      "class": "truck",
+      "confidence": 0.5,
+      "box": [
+        985.6,
+        396.1,
+        1236.9,
+        534.5
+      ],
+      "speed_kmh": 12.4,
+      "direction": "E"
+    }
+  ],
+  "26.5": [
+    {
+      "id": "Car-734",
+      "class": "car",
+      "confidence": 0.55,
+      "box": [
+        674.6,
+        1.7,
+        740.5,
+        36.1
+      ],
+      "speed_kmh": 4.9,
+      "direction": "N"
+    },
+    {
+      "id": "Car-745",
+      "class": "car",
+      "confidence": 0.79,
+      "box": [
+        808.7,
+        195.1,
+        972.3,
+        277.2
+      ],
+      "speed_kmh": 13.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-599",
+      "class": "car",
+      "confidence": 0.56,
+      "box": [
+        1155.0,
+        87.5,
+        1280.0,
+        152.7
+      ],
+      "speed_kmh": 5.2,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.7,
+      "box": [
+        872.2,
+        243.2,
+        1017.7,
+        319.5
+      ],
+      "speed_kmh": 12.1,
+      "direction": "E"
+    },
+    {
+      "id": "Car-684",
+      "class": "car",
+      "confidence": 0.62,
+      "box": [
+        1117.2,
+        59.7,
+        1243.8,
+        108.2
+      ],
+      "speed_kmh": 0.3,
+      "direction": "-"
+    },
+    {
+      "id": "Car-711",
+      "class": "car",
+      "confidence": 0.54,
+      "box": [
+        996.9,
+        1.1,
+        1069.3,
+        50.8
+      ],
+      "speed_kmh": 3.1,
+      "direction": "W"
+    },
+    {
+      "id": "Truck-649",
+      "class": "truck",
+      "confidence": 0.7,
+      "box": [
+        1014.6,
+        453.0,
+        1253.7,
+        580.7
+      ],
+      "speed_kmh": 20.3,
+      "direction": "SE"
+    },
+    {
+      "id": "Car-749",
+      "class": "car",
+      "confidence": 0.74,
+      "box": [
+        718.5,
+        86.8,
+        810.3,
+        132.3
+      ],
+      "speed_kmh": 5.1,
+      "direction": "E"
+    },
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.71,
+      "box": [
+        735.4,
+        128.4,
+        862.1,
+        194.9
+      ],
+      "speed_kmh": 5.0,
+      "direction": "E"
+    },
+    {
+      "id": "Car-648",
+      "class": "car",
+      "confidence": 0.38,
+      "box": [
+        968.0,
+        344.7,
+        1162.2,
+        458.7
+      ],
+      "speed_kmh": 11.1,
+      "direction": "E"
+    },
+    {
+      "id": "Car-743",
+      "class": "car",
+      "confidence": 0.69,
+      "box": [
+        1072.6,
+        37.5,
+        1217.6,
+        91.9
+      ],
+      "speed_kmh": 1.0,
+      "direction": "E"
+    }
+  ],
+  "27.0": [
+    {
+      "id": "Car-745",
+      "class": "car",
+      "confidence": 0.61,
+      "box": [
+        855.2,
+        203.0,
+        997.1,
+        274.3
+      ],
+      "speed_kmh": 12.9,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-684",
+      "class": "truck",
+      "confidence": 0.47,
+      "box": [
+        1106.2,
+        60.2,
+        1252.4,
+        117.6
+      ],
+      "speed_kmh": 1.8,
+      "direction": "S"
+    },
+    {
+      "id": "Car-711",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        994.3,
+        17.7,
+        1060.3,
+        63.8
+      ],
+      "speed_kmh": 5.7,
+      "direction": "S"
+    },
+    {
+      "id": "Car-811",
+      "class": "car",
+      "confidence": 0.83,
+      "box": [
+        804.4,
+        163.8,
+        941.5,
+        235.2
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.65,
+      "box": [
+        774.2,
+        134.0,
+        886.7,
+        193.0
+      ],
+      "speed_kmh": 11.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-19",
+      "class": "car",
+      "confidence": 0.61,
+      "box": [
+        1054.1,
+        628.9,
+        1252.6,
+        717.1
+      ],
+      "speed_kmh": 7.0,
+      "direction": "E"
+    },
+    {
+      "id": "Truck-668",
+      "class": "truck",
+      "confidence": 0.45,
+      "box": [
+        936.0,
+        289.4,
+        1115.7,
+        389.5
+      ],
+      "speed_kmh": 9.5,
+      "direction": "E"
+    }
+  ],
+  "27.5": [
+    {
+      "id": "Truck-684",
+      "class": "truck",
+      "confidence": 0.48,
+      "box": [
+        1089.4,
+        50.0,
+        1232.9,
+        107.7
+      ],
+      "speed_kmh": 7.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-711",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        982.8,
+        15.5,
+        1043.7,
+        59.0
+      ],
+      "speed_kmh": 5.2,
+      "direction": "W"
+    },
+    {
+      "id": "Car-811",
+      "class": "car",
+      "confidence": 0.76,
+      "box": [
+        837.7,
+        172.3,
+        963.2,
+        237.7
+      ],
+      "speed_kmh": 10.1,
+      "direction": "E"
+    },
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.77,
+      "box": [
+        800.9,
+        140.5,
+        912.6,
+        198.2
+      ],
+      "speed_kmh": 9.7,
+      "direction": "E"
+    },
+    {
+      "id": "Car-842",
+      "class": "car",
+      "confidence": 0.41,
+      "box": [
+        674.0,
+        28.7,
+        727.0,
+        67.1
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-845",
+      "class": "car",
+      "confidence": 0.6,
+      "box": [
+        1045.3,
+        8.2,
+        1136.8,
+        57.5
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-421",
+      "class": "person",
+      "confidence": 0.57,
+      "box": [
+        1054.2,
+        217.3,
+        1083.8,
+        274.4
+      ],
+      "speed_kmh": 0.2,
+      "direction": "NE"
+    },
+    {
+      "id": "Car-685",
+      "class": "car",
+      "confidence": 0.46,
+      "box": [
+        903.2,
+        246.1,
+        1072.2,
+        337.3
+      ],
+      "speed_kmh": 7.9,
+      "direction": "E"
+    },
+    {
+      "id": "Car-749",
+      "class": "car",
+      "confidence": 0.7,
+      "box": [
+        713.8,
+        83.2,
+        829.5,
+        141.4
+      ],
+      "speed_kmh": 1.4,
+      "direction": "E"
+    }
+  ],
+  "28.0": [
+    {
+      "id": "Car-722",
+      "class": "car",
+      "confidence": 0.45,
+      "box": [
+        822.8,
+        145.3,
+        941.6,
+        206.6
+      ],
+      "speed_kmh": 9.5,
+      "direction": "E"
+    },
+    {
+      "id": "Car-845",
+      "class": "car",
+      "confidence": 0.46,
+      "box": [
+        1033.8,
+        2.1,
+        1119.0,
+        47.9
+      ],
+      "speed_kmh": 6.0,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-852",
+      "class": "car",
+      "confidence": 0.75,
+      "box": [
+        788.3,
+        113.8,
+        896.3,
+        164.9
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Car-749",
+      "class": "car",
+      "confidence": 0.66,
+      "box": [
+        711.0,
+        71.0,
+        823.5,
+        128.3
+      ],
+      "speed_kmh": 4.8,
+      "direction": "N"
+    },
+    {
+      "id": "Person-653",
+      "class": "person",
+      "confidence": 0.74,
+      "box": [
+        1205.1,
+        333.3,
+        1267.8,
+        398.6
+      ],
+      "speed_kmh": 4.9,
+      "direction": "S"
+    },
+    {
+      "id": "Truck-743",
+      "class": "truck",
+      "confidence": 0.65,
+      "box": [
+        1058.2,
+        31.5,
+        1201.9,
+        86.8
+      ],
+      "speed_kmh": 1.9,
+      "direction": "W"
+    }
+  ],
+  "28.5": [
+    {
+      "id": "Car-845",
+      "class": "car",
+      "confidence": 0.38,
+      "box": [
+        1043.8,
+        4.7,
+        1116.5,
+        44.1
+      ],
+      "speed_kmh": 1.4,
+      "direction": "E"
+    },
+    {
+      "id": "Car-852",
+      "class": "car",
+      "confidence": 0.68,
+      "box": [
+        790.4,
+        105.8,
+        881.7,
+        148.6
+      ],
+      "speed_kmh": 4.9,
+      "direction": "NW"
+    },
+    {
+      "id": "Car-749",
+      "class": "car",
+      "confidence": 0.54,
+      "box": [
+        743.2,
+        74.1,
+        833.9,
+        120.7
+      ],
+      "speed_kmh": 7.7,
+      "direction": "E"
+    },
+    {
+      "id": "Car-865",
+      "class": "car",
+      "confidence": 0.85,
+      "box": [
+        1220.4,
+        40.9,
+        1268.6,
+        88.5
+      ],
+      "speed_kmh": 20.0,
+      "direction": "-"
+    },
+    {
+      "id": "Truck-743",
+      "class": "truck",
+      "confidence": 0.63,
+      "box": [
+        1044.7,
+        22.2,
+        1180.6,
+        75.7
+      ],
+      "speed_kmh": 7.3,
+      "direction": "NW"
+    }
+  ]
+}

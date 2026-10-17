@@ -1,0 +1,271 @@
+{
+  "version": "4.1.0",
+  "flags": {},
+  "checked": false,
+  "shapes": [
+    {
+      "label": "car",
+      "score": 0.87,
+      "points": [
+        [
+          1056.9,
+          26.0
+        ],
+        [
+          1135.0,
+          26.0
+        ],
+        [
+          1135.0,
+          76.6
+        ],
+        [
+          1056.9,
+          76.6
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.71,
+      "points": [
+        [
+          881.6,
+          143.1
+        ],
+        [
+          902.2,
+          143.1
+        ],
+        [
+          902.2,
+          193.6
+        ],
+        [
+          881.6,
+          193.6
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.83,
+      "points": [
+        [
+          1029.3,
+          0.0
+        ],
+        [
+          1111.3,
+          0.0
+        ],
+        [
+          1111.3,
+          31.4
+        ],
+        [
+          1029.3,
+          31.4
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.91,
+      "points": [
+        [
+          1112.7,
+          99.0
+        ],
+        [
+          1186.0,
+          99.0
+        ],
+        [
+          1186.0,
+          157.6
+        ],
+        [
+          1112.7,
+          157.6
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "truck",
+      "score": 0.52,
+      "points": [
+        [
+          619.3,
+          167.9
+        ],
+        [
+          734.3,
+          167.9
+        ],
+        [
+          734.3,
+          242.3
+        ],
+        [
+          619.3,
+          242.3
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.91,
+      "points": [
+        [
+          1182.5,
+          184.9
+        ],
+        [
+          1260.7,
+          184.9
+        ],
+        [
+          1260.7,
+          263.9
+        ],
+        [
+          1182.5,
+          263.9
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.73,
+      "points": [
+        [
+          623.1,
+          401.6
+        ],
+        [
+          829.4,
+          401.6
+        ],
+        [
+          829.4,
+          525.9
+        ],
+        [
+          623.1,
+          525.9
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "car",
+      "score": 0.8,
+      "points": [
+        [
+          504.6,
+          531.9
+        ],
+        [
+          919.2,
+          531.9
+        ],
+        [
+          919.2,
+          708.3
+        ],
+        [
+          504.6,
+          708.3
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    },
+    {
+      "label": "person",
+      "score": 0.81,
+      "points": [
+        [
+          1024.4,
+          197.5
+        ],
+        [
+          1057.5,
+          197.5
+        ],
+        [
+          1057.5,
+          258.2
+        ],
+        [
+          1024.4,
+          258.2
+        ]
+      ],
+      "group_id": null,
+      "description": null,
+      "difficult": false,
+      "shape_type": "rectangle",
+      "flags": {},
+      "attributes": {},
+      "kie_linking": []
+    }
+  ],
+  "imagePath": "frame_0018.jpg",
+  "imageHeight": 720,
+  "imageWidth": 1280
+}

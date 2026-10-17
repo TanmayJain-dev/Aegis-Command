@@ -24,3 +24,25 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* -------------------------------------------------------------------------- */
+/* Aegis Lite Mode Performance Overrides (data-lite="true")                  */
+/* Disables GPU composition layers: backdrop-filter, box-shadows, animations  */
+/* -------------------------------------------------------------------------- */
+[data-lite="true"] [class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background-color: rgba(10, 15, 29, 0.95) !important;
+}
+
+[data-lite="true"] [class*="animate-pulse"],
+[data-lite="true"] [class*="animate-ping"] {
+  animation: none !important;
+}
+
+[data-lite="true"] [class*="shadow-[0_0_"],
+[data-lite="true"] [class*="drop-shadow-"] {
+  box-shadow: none !important;
+  filter: none !important;
+}
+

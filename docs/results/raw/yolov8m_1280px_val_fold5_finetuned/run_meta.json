@@ -1,0 +1,19 @@
+{
+  "run_id": "yolov8m_1280px_val_fold5_finetuned",
+  "command": "vision/colab_runner.py",
+  "git_commit": "5ebf46a76425394ff53e712b7845f87687fcb14a",
+  "device": "cuda:0",
+  "torch_version": "2.11.0+cu130",
+  "ultralytics_version": "8.4.178",
+  "imgsz": 1280,
+  "weights": "/content/Aegis-Command/runs/detect/runs/train/aegis_fold5/weights/best.pt",
+  "timestamp": "2026-10-16T12:17:07Z",
+  "wall_seconds": 4.47,
+  "labels_sha256": "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
+  "num_frames": 31,
+  "split": "val",
+  "fold": 5,
+  "latency_mean_ms": 101.13,
+  "latency_p50_ms": 100.99,
+  "latency_p95_ms": 103.75
+}

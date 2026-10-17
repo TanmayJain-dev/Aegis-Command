@@ -1,0 +1,1525 @@
+{
+  "meta": {
+    "model": "yolov8m.pt",
+    "weights_sha256": "5d4a90cdc7a21786cc59cd19778e9eafff836df9e2da32524737c7ee6efe4fe5",
+    "imgsz": 1280,
+    "conf": 0.35,
+    "date": "2026-10-16",
+    "evaluated": false,
+    "feed": "bodycam-charlie",
+    "width": 1280,
+    "height": 720,
+    "fps": 29.97,
+    "duration_s": 26.86,
+    "sahi": false,
+    "tracker": "bytetrack.yaml"
+  },
+  "0.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        855.9,
+        159.8,
+        912.3,
+        290.0
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        656.9,
+        193.3,
+        714.3,
+        315.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-3",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        260.4,
+        194.5,
+        322.5,
+        298.5
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.61,
+      "box": [
+        773.5,
+        255.4,
+        851.1,
+        345.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "0.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        847.7,
+        152.1,
+        905.0,
+        284.4
+      ],
+      "speed_kmh": 3.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        644.5,
+        189.6,
+        702.9,
+        314.0
+      ],
+      "speed_kmh": 4.4,
+      "direction": "W"
+    },
+    {
+      "id": "Person-3",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        232.1,
+        193.2,
+        294.8,
+        298.5
+      ],
+      "speed_kmh": 10.1,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.66,
+      "box": [
+        788.9,
+        253.7,
+        872.4,
+        350.7
+      ],
+      "speed_kmh": 6.6,
+      "direction": "E"
+    }
+  ],
+  "1.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.85,
+      "box": [
+        827.4,
+        141.9,
+        880.9,
+        264.5
+      ],
+      "speed_kmh": 9.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.74,
+      "box": [
+        630.2,
+        183.0,
+        688.2,
+        307.2
+      ],
+      "speed_kmh": 5.8,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-3",
+      "class": "person",
+      "confidence": 0.8,
+      "box": [
+        199.9,
+        195.6,
+        264.2,
+        304.5
+      ],
+      "speed_kmh": 11.4,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        805.5,
+        250.2,
+        894.8,
+        353.8
+      ],
+      "speed_kmh": 7.0,
+      "direction": "E"
+    }
+  ],
+  "1.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.79,
+      "box": [
+        810.4,
+        131.7,
+        869.9,
+        269.1
+      ],
+      "speed_kmh": 5.1,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        614.4,
+        173.5,
+        675.5,
+        304.6
+      ],
+      "speed_kmh": 5.6,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.7,
+      "box": [
+        816.0,
+        245.5,
+        911.5,
+        357.2
+      ],
+      "speed_kmh": 4.9,
+      "direction": "E"
+    }
+  ],
+  "2.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        791.2,
+        124.0,
+        853.6,
+        268.2
+      ],
+      "speed_kmh": 6.6,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        602.0,
+        163.9,
+        665.3,
+        301.3
+      ],
+      "speed_kmh": 4.7,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        822.3,
+        244.6,
+        921.3,
+        361.4
+      ],
+      "speed_kmh": 3.0,
+      "direction": "E"
+    }
+  ],
+  "2.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        768.0,
+        117.6,
+        832.4,
+        267.1
+      ],
+      "speed_kmh": 8.1,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        595.4,
+        145.1,
+        658.2,
+        283.2
+      ],
+      "speed_kmh": 7.1,
+      "direction": "N"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        818.6,
+        238.9,
+        925.9,
+        366.9
+      ],
+      "speed_kmh": 0.2,
+      "direction": "-"
+    }
+  ],
+  "3.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.89,
+      "box": [
+        743.5,
+        109.4,
+        810.0,
+        264.5
+      ],
+      "speed_kmh": 8.7,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        586.3,
+        129.7,
+        652.2,
+        275.7
+      ],
+      "speed_kmh": 4.9,
+      "direction": "NW"
+    }
+  ],
+  "3.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        717.5,
+        104.3,
+        786.7,
+        266.8
+      ],
+      "speed_kmh": 8.9,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        574.4,
+        114.4,
+        642.8,
+        267.6
+      ],
+      "speed_kmh": 5.7,
+      "direction": "NW"
+    }
+  ],
+  "4.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        694.4,
+        102.8,
+        767.1,
+        271.0
+      ],
+      "speed_kmh": 7.7,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        562.6,
+        104.8,
+        633.2,
+        264.1
+      ],
+      "speed_kmh": 4.5,
+      "direction": "NW"
+    },
+    {
+      "id": "Person-16",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        0.0,
+        244.9,
+        54.4,
+        349.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        834.2,
+        173.1,
+        972.2,
+        343.7
+      ],
+      "speed_kmh": 6.5,
+      "direction": "NE"
+    }
+  ],
+  "4.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        666.1,
+        98.8,
+        742.6,
+        275.5
+      ],
+      "speed_kmh": 9.5,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        547.4,
+        101.5,
+        621.7,
+        268.4
+      ],
+      "speed_kmh": 4.8,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.61,
+      "box": [
+        847.5,
+        156.8,
+        996.6,
+        347.1
+      ],
+      "speed_kmh": 7.2,
+      "direction": "E"
+    }
+  ],
+  "5.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        649.9,
+        92.8,
+        729.4,
+        279.0
+      ],
+      "speed_kmh": 5.3,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.88,
+      "box": [
+        520.3,
+        100.1,
+        597.1,
+        273.6
+      ],
+      "speed_kmh": 9.3,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        873.2,
+        148.5,
+        1034.5,
+        362.4
+      ],
+      "speed_kmh": 11.5,
+      "direction": "E"
+    }
+  ],
+  "5.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        641.5,
+        89.4,
+        724.5,
+        286.5
+      ],
+      "speed_kmh": 2.5,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        482.4,
+        99.8,
+        563.3,
+        282.9
+      ],
+      "speed_kmh": 13.0,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        902.8,
+        147.5,
+        1073.3,
+        382.4
+      ],
+      "speed_kmh": 12.8,
+      "direction": "E"
+    }
+  ],
+  "6.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.89,
+      "box": [
+        618.5,
+        86.3,
+        706.0,
+        292.9
+      ],
+      "speed_kmh": 7.5,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.88,
+      "box": [
+        440.9,
+        101.8,
+        527.9,
+        299.0
+      ],
+      "speed_kmh": 14.2,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.67,
+      "box": [
+        929.2,
+        145.2,
+        1107.6,
+        397.7
+      ],
+      "speed_kmh": 11.2,
+      "direction": "E"
+    }
+  ],
+  "6.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        584.4,
+        86.6,
+        675.1,
+        304.1
+      ],
+      "speed_kmh": 11.9,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        396.5,
+        110.8,
+        488.1,
+        315.8
+      ],
+      "speed_kmh": 15.9,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.85,
+      "box": [
+        933.5,
+        150.2,
+        1122.0,
+        422.9
+      ],
+      "speed_kmh": 6.4,
+      "direction": "SE"
+    }
+  ],
+  "7.0": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.88,
+      "box": [
+        541.3,
+        92.3,
+        634.6,
+        321.0
+      ],
+      "speed_kmh": 15.6,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        926.4,
+        164.0,
+        1124.2,
+        460.5
+      ],
+      "speed_kmh": 9.3,
+      "direction": "S"
+    }
+  ],
+  "7.5": [
+    {
+      "id": "Person-1",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        486.3,
+        101.6,
+        583.5,
+        342.1
+      ],
+      "speed_kmh": 19.9,
+      "direction": "W"
+    },
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        913.6,
+        175.0,
+        1117.3,
+        490.8
+      ],
+      "speed_kmh": 8.2,
+      "direction": "SW"
+    }
+  ],
+  "8.0": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        883.8,
+        176.2,
+        1097.8,
+        510.9
+      ],
+      "speed_kmh": 9.7,
+      "direction": "SW"
+    }
+  ],
+  "8.5": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        849.5,
+        169.7,
+        1065.0,
+        512.2
+      ],
+      "speed_kmh": 12.1,
+      "direction": "W"
+    },
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.89,
+      "box": [
+        171.0,
+        161.2,
+        270.4,
+        395.1
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        342.7,
+        132.4,
+        454.6,
+        378.5
+      ],
+      "speed_kmh": 5.5,
+      "direction": "SW"
+    }
+  ],
+  "9.0": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.58,
+      "box": [
+        831.5,
+        163.8,
+        1059.5,
+        533.6
+      ],
+      "speed_kmh": 5.1,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        127.4,
+        178.7,
+        224.1,
+        405.8
+      ],
+      "speed_kmh": 17.0,
+      "direction": "W"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.93,
+      "box": [
+        293.1,
+        137.8,
+        410.2,
+        395.9
+      ],
+      "speed_kmh": 17.4,
+      "direction": "W"
+    }
+  ],
+  "9.5": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.77,
+      "box": [
+        830.4,
+        140.8,
+        1055.7,
+        513.6
+      ],
+      "speed_kmh": 7.8,
+      "direction": "N"
+    },
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        89.2,
+        194.1,
+        188.0,
+        425.4
+      ],
+      "speed_kmh": 14.8,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        254.4,
+        143.8,
+        372.3,
+        409.7
+      ],
+      "speed_kmh": 14.2,
+      "direction": "W"
+    }
+  ],
+  "10.0": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        796.5,
+        123.8,
+        1030.1,
+        515.1
+      ],
+      "speed_kmh": 11.1,
+      "direction": "W"
+    },
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        50.7,
+        210.8,
+        150.2,
+        442.6
+      ],
+      "speed_kmh": 15.0,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        203.5,
+        159.3,
+        322.4,
+        426.5
+      ],
+      "speed_kmh": 19.1,
+      "direction": "W"
+    }
+  ],
+  "10.5": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        756.5,
+        121.2,
+        1001.3,
+        537.8
+      ],
+      "speed_kmh": 12.9,
+      "direction": "W"
+    },
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        24.9,
+        229.3,
+        124.3,
+        459.4
+      ],
+      "speed_kmh": 11.3,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.93,
+      "box": [
+        153.8,
+        177.6,
+        273.1,
+        443.0
+      ],
+      "speed_kmh": 18.9,
+      "direction": "W"
+    }
+  ],
+  "11.0": [
+    {
+      "id": "Person-4",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        709.1,
+        121.6,
+        952.1,
+        535.6
+      ],
+      "speed_kmh": 17.4,
+      "direction": "W"
+    },
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.94,
+      "box": [
+        3.8,
+        247.3,
+        102.7,
+        474.8
+      ],
+      "speed_kmh": 9.8,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.93,
+      "box": [
+        119.0,
+        194.8,
+        239.7,
+        462.4
+      ],
+      "speed_kmh": 13.9,
+      "direction": "SW"
+    }
+  ],
+  "11.5": [
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        0.0,
+        259.2,
+        86.7,
+        490.3
+      ],
+      "speed_kmh": 6.1,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        81.5,
+        211.8,
+        204.0,
+        480.2
+      ],
+      "speed_kmh": 14.6,
+      "direction": "SW"
+    }
+  ],
+  "12.0": [
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        0.0,
+        276.0,
+        75.2,
+        503.6
+      ],
+      "speed_kmh": 5.8,
+      "direction": "S"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        58.4,
+        234.4,
+        179.6,
+        498.1
+      ],
+      "speed_kmh": 11.2,
+      "direction": "SW"
+    }
+  ],
+  "12.5": [
+    {
+      "id": "Person-40",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        0.0,
+        305.3,
+        63.0,
+        520.1
+      ],
+      "speed_kmh": 8.5,
+      "direction": "S"
+    },
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.93,
+      "box": [
+        32.8,
+        255.5,
+        155.0,
+        517.8
+      ],
+      "speed_kmh": 11.6,
+      "direction": "SW"
+    }
+  ],
+  "13.0": [
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        4.9,
+        271.1,
+        129.6,
+        536.9
+      ],
+      "speed_kmh": 11.4,
+      "direction": "SW"
+    }
+  ],
+  "13.5": [
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.93,
+      "box": [
+        0.0,
+        293.6,
+        108.1,
+        558.6
+      ],
+      "speed_kmh": 9.3,
+      "direction": "SW"
+    }
+  ],
+  "14.0": [
+    {
+      "id": "Person-2",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        0.0,
+        311.8,
+        81.8,
+        581.2
+      ],
+      "speed_kmh": 8.7,
+      "direction": "SW"
+    },
+    {
+      "id": "Person-76",
+      "class": "person",
+      "confidence": 0.93,
+      "box": [
+        12.3,
+        231.1,
+        218.5,
+        663.3
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "14.5": [],
+  "15.0": [],
+  "15.5": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.79,
+      "box": [
+        3.7,
+        444.2,
+        37.7,
+        645.9
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "16.0": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.89,
+      "box": [
+        17.2,
+        462.1,
+        50.9,
+        657.4
+      ],
+      "speed_kmh": 7.1,
+      "direction": "SE"
+    },
+    {
+      "id": "Person-89",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        554.4,
+        584.4,
+        593.3,
+        666.5
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "16.5": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        45.3,
+        473.7,
+        82.2,
+        673.6
+      ],
+      "speed_kmh": 11.8,
+      "direction": "SE"
+    }
+  ],
+  "17.0": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        80.7,
+        488.0,
+        120.0,
+        686.0
+      ],
+      "speed_kmh": 14.0,
+      "direction": "E"
+    }
+  ],
+  "17.5": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        101.6,
+        496.3,
+        144.1,
+        694.8
+      ],
+      "speed_kmh": 8.7,
+      "direction": "E"
+    }
+  ],
+  "18.0": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.92,
+      "box": [
+        126.1,
+        494.7,
+        171.4,
+        691.2
+      ],
+      "speed_kmh": 9.4,
+      "direction": "E"
+    }
+  ],
+  "18.5": [
+    {
+      "id": "Person-87",
+      "class": "person",
+      "confidence": 0.91,
+      "box": [
+        177.9,
+        505.6,
+        223.4,
+        689.8
+      ],
+      "speed_kmh": 18.8,
+      "direction": "E"
+    }
+  ],
+  "19.0": [
+    {
+      "id": "Person-76",
+      "class": "person",
+      "confidence": 0.9,
+      "box": [
+        18.0,
+        419.2,
+        145.6,
+        679.3
+      ],
+      "speed_kmh": 3.9,
+      "direction": "S"
+    }
+  ],
+  "19.5": [
+    {
+      "id": "Person-76",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        82.1,
+        432.3,
+        203.1,
+        676.8
+      ],
+      "speed_kmh": 22.0,
+      "direction": "E"
+    }
+  ],
+  "20.0": [],
+  "20.5": [],
+  "21.0": [
+    {
+      "id": "Person-76",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        98.0,
+        397.4,
+        217.2,
+        640.2
+      ],
+      "speed_kmh": 4.7,
+      "direction": "NE"
+    }
+  ],
+  "21.5": [
+    {
+      "id": "Person-76",
+      "class": "person",
+      "confidence": 0.83,
+      "box": [
+        146.9,
+        389.1,
+        264.1,
+        633.6
+      ],
+      "speed_kmh": 17.5,
+      "direction": "E"
+    },
+    {
+      "id": "Person-89",
+      "class": "person",
+      "confidence": 0.88,
+      "box": [
+        553.8,
+        544.8,
+        623.1,
+        687.9
+      ],
+      "speed_kmh": 0.6,
+      "direction": "NE"
+    }
+  ],
+  "22.0": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        415.2,
+        470.0,
+        525.5,
+        658.7
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "22.5": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.88,
+      "box": [
+        449.1,
+        465.3,
+        561.5,
+        658.0
+      ],
+      "speed_kmh": 12.6,
+      "direction": "E"
+    }
+  ],
+  "23.0": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        489.0,
+        479.6,
+        593.7,
+        659.3
+      ],
+      "speed_kmh": 13.3,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.8,
+      "box": [
+        307.4,
+        400.4,
+        416.5,
+        626.2
+      ],
+      "speed_kmh": 4.0,
+      "direction": "-"
+    }
+  ],
+  "23.5": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.77,
+      "box": [
+        531.6,
+        486.2,
+        634.1,
+        663.2
+      ],
+      "speed_kmh": 15.1,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        328.9,
+        398.0,
+        443.8,
+        636.3
+      ],
+      "speed_kmh": 8.9,
+      "direction": "E"
+    }
+  ],
+  "24.0": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        570.7,
+        500.2,
+        673.9,
+        680.1
+      ],
+      "speed_kmh": 15.3,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        360.4,
+        405.2,
+        476.7,
+        645.1
+      ],
+      "speed_kmh": 11.9,
+      "direction": "E"
+    }
+  ],
+  "24.5": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        609.3,
+        513.5,
+        714.3,
+        696.9
+      ],
+      "speed_kmh": 15.2,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.82,
+      "box": [
+        387.9,
+        417.3,
+        500.4,
+        650.2
+      ],
+      "speed_kmh": 9.7,
+      "direction": "E"
+    }
+  ],
+  "25.0": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.79,
+      "box": [
+        659.7,
+        530.8,
+        761.4,
+        710.1
+      ],
+      "speed_kmh": 18.4,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.84,
+      "box": [
+        429.9,
+        433.5,
+        539.2,
+        658.5
+      ],
+      "speed_kmh": 15.2,
+      "direction": "E"
+    }
+  ],
+  "25.5": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.74,
+      "box": [
+        720.4,
+        553.3,
+        813.4,
+        719.3
+      ],
+      "speed_kmh": 21.1,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        473.4,
+        447.4,
+        581.2,
+        668.8
+      ],
+      "speed_kmh": 16.0,
+      "direction": "E"
+    }
+  ],
+  "26.0": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.86,
+      "box": [
+        781.4,
+        573.2,
+        864.7,
+        720.0
+      ],
+      "speed_kmh": 20.6,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.88,
+      "box": [
+        522.2,
+        469.0,
+        630.6,
+        691.1
+      ],
+      "speed_kmh": 19.4,
+      "direction": "SE"
+    }
+  ],
+  "26.5": [
+    {
+      "id": "Person-117",
+      "class": "person",
+      "confidence": 0.87,
+      "box": [
+        839.7,
+        589.0,
+        915.3,
+        720.0
+      ],
+      "speed_kmh": 19.8,
+      "direction": "E"
+    },
+    {
+      "id": "Person-124",
+      "class": "person",
+      "confidence": 0.81,
+      "box": [
+        571.1,
+        485.5,
+        680.8,
+        712.3
+      ],
+      "speed_kmh": 19.1,
+      "direction": "E"
+    }
+  ]
+}

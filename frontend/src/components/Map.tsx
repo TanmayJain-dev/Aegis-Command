@@ -12,7 +12,7 @@ import {
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
-delete (L.Icon.Default.prototype as any)._getIconUrl;
+delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 
 const targetIcon = new L.DivIcon({
   className: "custom-target-icon",
@@ -37,6 +37,14 @@ function MapUpdater({
   coordinates: [number, number] | null;
 }) {
   const map = useMap();
+
+  useEffect(() => {
+    map.invalidateSize();
+    const timer = setTimeout(() => {
+      map.invalidateSize();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [map]);
 
   const lastTarget = React.useRef<[number, number] | null>(null);
   const lastCameraUpdate = React.useRef(0);
@@ -106,13 +114,14 @@ export default function Map({
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
-    <div className="relative z-0 h-full w-full overflow-hidden rounded border-none">
+    <div className="relative z-0 h-full w-full min-h-[340px] overflow-hidden rounded border-none">
       <MapContainer
         key="aegis-main-map"
         center={defaultCenter}
         zoom={10}
         style={{
           height: "100%",
+          minHeight: "340px",
           width: "100%",
           background: "#0a0a0a",
         }}

@@ -1,0 +1,19 @@
+{
+  "run_id": "yolov8m_1280px_val_fold4_fixed50",
+  "command": "/kaggle/src/script.py",
+  "git_commit": "15974c7c0fd63bb555b66597064f19991f4f037e",
+  "device": "cuda:0",
+  "torch_version": "2.11.0+cu128",
+  "ultralytics_version": "8.4.175",
+  "imgsz": 1280,
+  "weights": "/kaggle/working/checkpoints/aegis_5fold_fold4_last.pt",
+  "timestamp": "2026-10-16T19:53:32Z",
+  "wall_seconds": 2.39,
+  "labels_sha256": "a7fb1542fdb1e911299bb73971abc3abeea4aed675ef2a172933a4b168f595fc",
+  "num_frames": 31,
+  "split": "val",
+  "fold": 4,
+  "latency_mean_ms": 63.17,
+  "latency_p50_ms": 62.4,
+  "latency_p95_ms": 65.44
+}

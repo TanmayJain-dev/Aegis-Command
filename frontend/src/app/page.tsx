@@ -1,1191 +1,630 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { Shield, Target, AlertTriangle, Search, Activity, Terminal, Video, Radio, Globe, Map as MapIcon, X, CheckCircle, Crosshair, ChevronRight, Play, Pause, Volume2, VolumeX, Maximize, Minimize } from "lucide-react";
+import React, { useState, useEffect, useRef, useCallback, useMemo, Profiler } from "react";
 import dynamic from "next/dynamic";
+import { Shield, Activity, Globe, Map as MapIcon, Zap, AlertTriangle, RefreshCw } from "lucide-react";
+
+import { FeedManifestItem, loadFeedsManifest, loadFeedTimeline } from "../lib/feeds";
+import { Timeline, DrawableDetection } from "../lib/timeline";
+import { TriggerGate } from "../lib/threatTrigger";
+import { useLiteMode } from "../hooks/useLiteMode";
+import { useThreatSocket, ThreatSocketMessage } from "../hooks/useThreatSocket";
+import { SEED_TACTICAL_INCIDENTS } from "../lib/seedIncidents";
+import { playTacticalAlertTone } from "../lib/tacticalAudio";
+
+import { IntelRecord, AegisHistoryRecord, ThreatAssessment, PerfReport } from "../types/aegis";
+import { OpticsViewport } from "../components/OpticsViewport";
+import { IntelPanel } from "../components/IntelPanel";
+import { ThreatModal } from "../components/ThreatModal";
+import { HistoryModal } from "../components/HistoryModal";
+import { UploadFeedModal } from "../components/UploadFeedModal";
+import { MobileTabs, MobileTab } from "../components/MobileTabs";
 
 const MapComponent = dynamic(() => import("../components/Map"), { ssr: false });
 
-type VideoSource = "UAV-ALPHA" | "PERIMETER CCTV-04" | "MOBILE INFANTRY BODYCAM";
-type IntelMode = "SIGINT" | "OSINT";
-
-
-type MapCoordinate = [number, number];
-
-function smoothMapCoordinate(
-  previous: MapCoordinate | null,
-  incoming: MapCoordinate,
-  alpha = 0.18
-): MapCoordinate {
-  if (!previous) return incoming;
-
-  return [
-    previous[0] + (incoming[0] - previous[0]) * alpha,
-    previous[1] + (incoming[1] - previous[1]) * alpha,
-  ];
-}
-
-
-type AegisHistoryRecord = {
-  id?: number | string;
-  incident_id?: string;
-  timestamp?: string;
-  created_at?: string;
-  threat_level?: string;
-  score?: number;
-  threat_class?: string;
-  class?: string;
-  telemetry?: any;
-  assessment?: any;
-  evidence?: any[];
-  payload?: any;
-  reasoning?: string;
-  recommended_action?: string;
-  previous_incidents?: number;
-  telemetry_json?: string;
-  assessment_json?: string;
-  evidence_json?: string;
-  object_class?: string;
-  latitude?: number;
-  longitude?: number;
-};
-
 export default function AegisDashboard() {
+  const { liteMode, toggleLiteMode } = useLiteMode();
 
-  const [historyRecords, setHistoryRecords] =
-    useState<AegisHistoryRecord[]>([]);
+  // Feeds and Timeline state
+  const [feeds, setFeeds] = useState<FeedManifestItem[]>([]);
+  const [activeFeedId, setActiveFeedId] = useState<string>("uav-alpha");
+  const [timeline, setTimeline] = useState<Timeline | null>(null);
+  const [mobileTab, setMobileTab] = useState<MobileTab>("optics");
+  const [isDesktop, setIsDesktop] = useState(true);
 
-  const [historyOpen, setHistoryOpen] =
-    useState(false);
+  const activeFeed = useMemo(
+    () => feeds.find((f) => f.id === activeFeedId) ?? null,
+    [feeds, activeFeedId]
+  );
 
-  const [historyLoading, setHistoryLoading] =
-    useState(false);
+  // Modals & Records
+  const [isThreatModalOpen, setIsThreatModalOpen] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+  const [historyRecords, setHistoryRecords] = useState<AegisHistoryRecord[]>(SEED_TACTICAL_INCIDENTS);
 
-  const historyRequestLock = useRef(false);
-
-  const [selectedHistory, setSelectedHistory] =
-    useState<AegisHistoryRecord | null>(null);
-
-  const [historySearch, setHistorySearch] =
-    useState("");
-
-
-  const [query, setQuery] = useState("");
-  const [intelData, setIntelData] = useState<any>(null);
-  const [aiSummary, setAiSummary] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [detections, setDetections] = useState<any>({});
-  const [duration, setDuration] = useState(0);
-
-  const [videoSource, setVideoSource] = useState<VideoSource>("UAV-ALPHA");
-  const [intelMode, setIntelMode] = useState<IntelMode>("SIGINT");
+  // Geospatial & Intelligence State
   const [mapCoordinates, setMapCoordinates] = useState<[number, number] | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(true); 
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [intelData, setIntelData] = useState<IntelRecord | null>(null);
+  const [aiSummary, setAiSummary] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSearching, setIsSearching] = useState(false);
+  const [localAssessment, setLocalAssessment] = useState<ThreatAssessment | null>(null);
 
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const videoContainerRef = useRef<HTMLDivElement>(null);
-  const threatSocket = useRef<WebSocket | null>(null);
-  const lastStableMapCoordinate = useRef<[number, number] | null>(null);
-  const lastMapUpdateTime = useRef(0);
-    const lastThreatTrigger = useRef<string>("");
-  const lastThreatTriggerTime = useRef<number>(0);
-  const lastThreatTime = useRef<number>(0);
-  const threatRequestInFlight = useRef(false);
-  const [threatAssessment, setThreatAssessment] = useState<any>(null);
+  // Cloud backend cold-start & probing state
+  const [isProbingBackend, setIsProbingBackend] = useState(false);
 
-  useEffect(() => {
-    fetch("/detections.json")
-      .then((res) => res.json())
-      .then((data) => setDetections(data))
-      .catch((err) => console.error("Error loading detections:", err));
+  // Dev-only Perf Probe (?perf=1)
+  const [perfReport, setPerfReport] = useState<PerfReport | null>(null);
+  const perfCommitCount = useRef(0);
+  const [perfEnabled] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("perf") === "1");
+  const [perfTargetFrames] = useState(() => typeof window !== "undefined" ? parseInt(new URLSearchParams(window.location.search).get("frames") || "300", 10) : 300);
+
+  const handleRender = useCallback(() => {
+    perfCommitCount.current += 1;
+    if (typeof window !== "undefined") window.__AEGIS_REACT_COMMITS__ = perfCommitCount.current;
   }, []);
 
-  const detectionKeys = useMemo(() => {
-    if (!detections) return [];
-    return Object.keys(detections).sort((a, b) => parseFloat(a) - parseFloat(b));
-  }, [detections]);
+  const threatInFlightRef = useRef(false);
 
-  const handleTimeUpdate = () => {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
+  // Threat Socket Integration with direct subscription callback
+  const handleThreatAssessed = useCallback((data: ThreatSocketMessage) => {
+    threatInFlightRef.current = false;
+    playTacticalAlertTone();
 
-    console.log("[AEGIS TIMEUPDATE]", {
-      currentTime: video?.currentTime,
-      readyState: threatSocket.current?.readyState,
-      detectionsLoaded: Object.keys(detections || {}).length,
-      detectionKeys: detectionKeys.length,
-      videoWidth: video?.videoWidth,
-      videoHeight: video?.videoHeight
-    });
-    
-    if (!video || !canvas || !detections || detectionKeys.length === 0) return;
-    if (video.videoWidth === 0 || video.videoHeight === 0) return;
-
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = video.clientWidth;
-    canvas.height = video.clientHeight;
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    const scaleX = canvas.width / video.videoWidth;
-    const scaleY = canvas.height / video.videoHeight;
-    const currentTime = video.currentTime;
-    
-    let left = 0;
-    let right = detectionKeys.length - 1;
-    let closestKey = detectionKeys[0];
-    let minDiff = Infinity;
-
-    while (left <= right) {
-      const mid = Math.floor((left + right) / 2);
-      const midTime = parseFloat(detectionKeys[mid]);
-      const diff = Math.abs(midTime - currentTime);
-
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestKey = detectionKeys[mid];
-      }
-
-      if (midTime === currentTime) {
-        break; 
-      } else if (midTime < currentTime) {
-        left = mid + 1;
-      } else {
-        right = mid - 1;
-      }
+    if (
+      data.telemetry &&
+      typeof data.telemetry.latitude === "number" &&
+      typeof data.telemetry.longitude === "number"
+    ) {
+      setMapCoordinates([data.telemetry.latitude, data.telemetry.longitude]);
     }
-
-    console.log("[DETECTION]", {
-      currentTime,
-      closestKey,
-      minDiff,
-      threats: detections[closestKey]?.length ?? 0,
-      wsState: threatSocket.current?.readyState
-    });
-
-    if (minDiff < 0.5) {
-      const activeThreats = detections[closestKey];
-      
-      if (activeThreats && Array.isArray(activeThreats)) {
-        activeThreats.forEach((threat: any) => {
-          
-          const now = Date.now();
-
-          const triggerKey = `${threat.class}`;
-
-          const socketReady =
-            threatSocket.current?.readyState === WebSocket.OPEN;
-
-          const confidenceOK =
-            Number(threat.confidence ?? 0) >= 0.45;
-
-          const cooldownOK =
-            triggerKey !== lastThreatTrigger.current ||
-            now - lastThreatTriggerTime.current >= 5000;
-
-          const shouldTrigger =
-            socketReady &&
-            confidenceOK &&
-            cooldownOK &&
-            !threatRequestInFlight.current;
-
-          /*
-           * AEGIS GEO-PROJECTION
-           *
-           * The source detections contain pixel coordinates, not GPS.
-           * Project the detection center into the same geographic area
-           * displayed by the tactical map.
-           *
-           * This is deterministic: identical video positions produce
-           * identical GPS positions, while moving detections produce
-           * moving map coordinates.
-           */
-          const [x1, y1, x2, y2] = threat.box;
-
-          const videoW = video.videoWidth || 1920;
-          const videoH = video.videoHeight || 1080;
-
-          const centerX = ((x1 + x2) / 2) / videoW;
-          const centerY = ((y1 + y2) / 2) / videoH;
-
-          const MAP_CENTER_LAT = 31.4520;
-          const MAP_CENTER_LNG = 74.9250;
-
-          /*
-           * Approximate tactical operating box.
-           * Keeping this bounded prevents absurd GPS jumps.
-           */
-          const LAT_SPAN = 0.035;
-          const LNG_SPAN = 0.045;
-
-          const latitude =
-            MAP_CENTER_LAT + (0.5 - centerY) * LAT_SPAN;
-
-          const longitude =
-            MAP_CENTER_LNG + (centerX - 0.5) * LNG_SPAN;
-
-          const clampedLatitude =
-            Math.max(
-              MAP_CENTER_LAT - LAT_SPAN / 2,
-              Math.min(MAP_CENTER_LAT + LAT_SPAN / 2, latitude)
-            );
-
-          const clampedLongitude =
-            Math.max(
-              MAP_CENTER_LNG - LNG_SPAN / 2,
-              Math.min(MAP_CENTER_LNG + LNG_SPAN / 2, longitude)
-            );
-
-          if (shouldTrigger) {
-            lastThreatTrigger.current = triggerKey;
-            lastThreatTriggerTime.current = now;
-            threatRequestInFlight.current = true;
-
-            const payload = {
-              class: threat.class,
-              confidence: threat.confidence,
-              speed_kmh: threat.speed_kmh ?? 0,
-              direction: threat.direction ?? "unknown",
-
-              latitude: Number(clampedLatitude.toFixed(6)),
-              longitude: Number(clampedLongitude.toFixed(6)),
-
-              video_x: Number(centerX.toFixed(4)),
-              video_y: Number(centerY.toFixed(4)),
-              detection_time: currentTime,
-
-              timestamp: new Date().toISOString(),
-            };
-
-            console.log("[THREAT SEND]", payload);
-
-            try {
-              threatSocket.current?.send(JSON.stringify(payload));
-            } catch (error) {
-              threatRequestInFlight.current = false;
-              console.error("[THREAT SEND ERROR]", error);
-            }
-          }
-
-          /*
-           * Update the tactical map immediately from the actual
-           * detection position. This means the map can move even
-           * before Groq/intelligence retrieval completes.
-           */
-          setMapCoordinates([
-            Number(clampedLatitude.toFixed(6)),
-            Number(clampedLongitude.toFixed(6))
-          ]);
-          const [x1_draw, y1_draw, x2_draw, y2_draw] = threat.box;
-          
-          const scaledX = x1_draw * scaleX;
-          const scaledY = y1_draw * scaleY;
-          const scaledWidth = (x2 - x1) * scaleX;
-          const scaledHeight = (y2 - y1) * scaleY;
-
-          // PITCH DECK UI: Cyan targeting boxes
-          ctx.strokeStyle = "#06b6d4"; // cyan-500
-          ctx.lineWidth = 2;
-          ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
-
-          ctx.beginPath(); ctx.moveTo(scaledX, scaledY + 10); ctx.lineTo(scaledX, scaledY); ctx.lineTo(scaledX + 10, scaledY); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(scaledX + scaledWidth - 10, scaledY); ctx.lineTo(scaledX + scaledWidth, scaledY); ctx.lineTo(scaledX + scaledWidth, scaledY + 10); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(scaledX, scaledY + scaledHeight - 10); ctx.lineTo(scaledX, scaledY + scaledHeight); ctx.lineTo(scaledX + 10, scaledY + scaledHeight); ctx.stroke();
-          ctx.beginPath(); ctx.moveTo(scaledX + scaledWidth - 10, scaledY + scaledHeight); ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight); ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight - 10); ctx.stroke();
-
-          ctx.fillStyle = "rgba(6, 182, 212, 0.15)";
-          ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
-
-          const hasTrackingInfo = threat.id && threat.direction && threat.direction !== "-";
-          const labelHeight = hasTrackingInfo ? 34 : 20;
-
-          ctx.fillStyle = "#06b6d4";
-          ctx.fillRect(scaledX, scaledY - labelHeight, 140, labelHeight);
-
-          ctx.fillStyle = "#0a0a0a"; // Dark text on cyan background
-          ctx.font = "bold 10px monospace";
-          ctx.fillText(`[${threat.class.toUpperCase()}] ${(threat.confidence * 100).toFixed(1)}%`, scaledX + 4, scaledY - (hasTrackingInfo ? 20 : 6));
-
-          if (hasTrackingInfo) {
-            ctx.fillText(`${threat.id} · ${threat.direction} · ${threat.speed_kmh}km/h`, scaledX + 4, scaledY - 6);
-          }
-
-          if (threat.class === "truck" && !intelData && !loading) {
-            setQuery("truck");
-            handleSearch("truck");
-          }
-        });
-      }
+    if (Array.isArray(data.evidence) && data.evidence.length > 0) {
+      const intel = data.evidence[0];
+      setIntelData(intel);
+      setAiSummary(
+        `Threat detected. Evidence: ${intel.id}. ${
+          data.assessment?.recommended_action || ""
+        }`
+      );
     }
-  };
+    if (data.assessment) {
+      setLocalAssessment(data.assessment);
+      setIsThreatModalOpen(true);
 
-  const seekToTime = (timeStr: string) => {
-    if (videoRef.current) {
-      videoRef.current.currentTime = parseFloat(timeStr);
-      const playPromise = videoRef.current.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((error) => console.log("Auto-play interrupted by user interaction."));
-      }
-      setIsPlaying(true);
+      const liveRecord: AegisHistoryRecord = {
+        id: `INC-LIVE-${Date.now()}`,
+        incident_id: `INC-LIVE-${Date.now()}`,
+        timestamp: new Date().toLocaleTimeString() + " IST",
+        created_at: new Date().toISOString(),
+        threat_level: data.assessment.threat_level || "HIGH",
+        score: data.assessment.score || 92,
+        threat_class: String(data.telemetry?.class || "unknown"),
+        class: String(data.telemetry?.class || "unknown"),
+        reasoning: data.assessment.reasoning,
+        recommended_action: data.assessment.recommended_action,
+        previous_incidents: data.assessment.previous_incidents,
+        telemetry: data.telemetry as Record<string, unknown>,
+        assessment: data.assessment,
+        evidence: data.evidence,
+      };
+      setHistoryRecords((prev) => [liveRecord, ...prev]);
     }
-  };
+  }, []);
 
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-        setIsPlaying(false);
-      } else {
-        const playPromise = videoRef.current.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((error) => console.log("Play interrupted by user interaction."));
-        }
-        setIsPlaying(true);
-      }
-    }
-  };
+  const {
+    isConnected: socketReady,
+    latestAssessment,
+    sendThreat,
+  } = useThreatSocket({ onThreatAssessed: handleThreatAssessed });
 
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
+  const activeAssessment = localAssessment || latestAssessment;
 
-  const toggleFullscreen = () => {
-    if (!document.fullscreenElement) {
-      videoContainerRef.current?.requestFullscreen().catch(err => {
-        console.error(`Error attempting to enable full-screen mode: ${err.message}`);
-      });
-      setIsFullscreen(true);
-    } else {
-      document.exitFullscreen();
-      setIsFullscreen(false);
-    }
-  };
+  const [standbySeconds, setStandbySeconds] = useState(0);
 
   useEffect(() => {
-    let ws: WebSocket | null = null;
-    let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+    if (socketReady) return;
+    const timer = setInterval(() => {
+      setStandbySeconds((s) => s + 1);
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [socketReady]);
+
+  const connectionStatus: "LIVE" | "DEGRADED" | "OFFLINE" = socketReady
+    ? "LIVE"
+    : standbySeconds >= 90
+    ? "OFFLINE"
+    : "DEGRADED";
+
+  const triggerGateRef = useRef<TriggerGate>(new TriggerGate());
+
+  // Detect desktop screen width for optimized Leaflet map rendering
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 1024);
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Load feed manifest on startup
+  useEffect(() => {
+    loadFeedsManifest()
+      .then((items: FeedManifestItem[]) => {
+        setFeeds(items);
+        if (items.length > 0 && !items.find((f) => f.id === activeFeedId)) {
+          setActiveFeedId(items[0].id);
+        }
+      })
+      .catch((err: unknown) => console.error("Error loading feed manifest:", err));
+  }, [activeFeedId]);
+
+  // Load active feed assets (video url and timeline engine)
+  useEffect(() => {
+    if (!activeFeed) return;
     let cancelled = false;
 
-    const connect = () => {
-      if (cancelled) return;
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      const url = `${protocol}//${window.location.host}/ws/threat-engine`;
-      console.log("[THREAT WS] Connecting:", url);
-      ws = new WebSocket(url);
+    loadFeedTimeline(activeFeed.detections)
+      .then((tl) => {
+        if (!cancelled) setTimeline(tl);
+      })
+      .catch((err: unknown) => console.error(`Error loading feed ${activeFeed.id}:`, err));
 
-      ws.onopen = () => {
-        if (cancelled) { ws?.close(); return; }
-        threatSocket.current = ws;
-        console.log("[THREAT WS] OPEN", { readyState: ws?.readyState, url });
-      };
-
-      ws.onmessage = (event) => {
-        console.log("[THREAT WS] MESSAGE", event.data);
-        threatRequestInFlight.current = false;
-        try {
-          const data = JSON.parse(event.data);
-          if (data.event !== "THREAT_ASSESSED") {
-            console.log("[THREAT WS] Non-assessment event:", data);
-            return;
-          }
-          console.log("[THREAT WS] THREAT_ASSESSED", data);
-          try { new Audio("data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YU").play().catch(()=>console.log("Audio blocked")); } catch(e){}
-          setThreatAssessment(data.assessment ?? null);
-          /*
-           * Prefer actual threat telemetry coordinates.
-           * Intel coordinates are only a fallback.
-           */
-          if (
-            data.telemetry &&
-            typeof data.telemetry.latitude === "number" &&
-            typeof data.telemetry.longitude === "number"
-          ) {
-            setMapCoordinates([
-              data.telemetry.latitude,
-              data.telemetry.longitude
-            ]);
-
-            console.log("[MAP UPDATE] telemetry", {
-              latitude: data.telemetry.latitude,
-              longitude: data.telemetry.longitude
-            });
-          }
-
-          if (Array.isArray(data.evidence) && data.evidence.length > 0) {
-            const intel = data.evidence[0];
-
-            setIntelData(intel);
-
-            setAiSummary(
-              `Threat detected. Evidence: ${intel.id}. ${
-                data.assessment?.recommended_action || ""
-              }`
-            );
-
-            /*
-             * Only use intelligence coordinates when telemetry did
-             * not contain usable coordinates.
-             */
-            if (
-              !data.telemetry ||
-              typeof data.telemetry.latitude !== "number" ||
-              typeof data.telemetry.longitude !== "number"
-            ) {
-              if (
-                typeof intel.lat === "number" &&
-                typeof intel.lng === "number"
-              ) {
-                const incomingCoordinate: [number, number] = [
-                Number(data.latitude ?? data.lat ?? intel?.lat),
-                Number(data.longitude ?? data.lng ?? intel?.lng),
-              ];
-
-              if (
-                Number.isFinite(incomingCoordinate[0]) &&
-                Number.isFinite(incomingCoordinate[1])
-              ) {
-                const now = Date.now();
-
-                if (now - lastMapUpdateTime.current >= 350) {
-                  const smoothed = smoothMapCoordinate(
-                    lastStableMapCoordinate.current,
-                    incomingCoordinate,
-                    0.20
-                  );
-
-                  lastStableMapCoordinate.current = smoothed;
-                  lastMapUpdateTime.current = now;
-                  setMapCoordinates(smoothed);
-                }
-              }
-              }
-            }
-          }
-        } catch (error) {
-          console.error("[THREAT WS] Invalid JSON response:", error);
-        }
-      };
-
-      ws.onerror = (event) => {
-        console.error("[THREAT WS] ERROR", event);
-        threatRequestInFlight.current = false;
-      };
-
-      ws.onclose = (event) => {
-        console.warn("[THREAT WS] CLOSED", { code: event.code, reason: event.reason, wasClean: event.wasClean });
-        if (threatSocket.current === ws) threatSocket.current = null;
-        threatRequestInFlight.current = false;
-        if (!cancelled) reconnectTimer = setTimeout(connect, 2000);
-      };
-    };
-
-    connect();
     return () => {
       cancelled = true;
-      if (reconnectTimer) clearTimeout(reconnectTimer);
-      if (threatSocket.current === ws) threatSocket.current = null;
-      threatRequestInFlight.current = false;
-      ws?.close();
+    };
+  }, [activeFeed]);
+
+  // Fetch historical incidents from backend and merge with seed database
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/incidents/history")
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+      })
+      .then((data) => {
+        if (
+          !cancelled &&
+          data.status === "success" &&
+          Array.isArray(data.records) &&
+          data.records.length > 0
+        ) {
+          setHistoryRecords((prev) => {
+            const apiRecords = data.records as AegisHistoryRecord[];
+            const seen = new Set(apiRecords.map((r) => r.incident_id || r.id));
+            const remainingSeed = prev.filter((r) => !seen.has(r.incident_id || r.id));
+            return [...apiRecords, ...remainingSeed];
+          });
+        }
+      })
+      .catch(() => {
+        // Fall back gracefully to pre-seeded incidents
+      });
+    return () => {
+      cancelled = true;
     };
   }, []);
 
-
-  const loadIncidentHistory = () => {
-    console.warn("[HISTORY] Incident history temporarily disabled for demo stability.");
-    return;
-  };
-
-  const handleSearch = async (searchQuery: string = query) => {
-    if (!searchQuery) return;
-    setLoading(true);
+  // Probe cloud backend health status
+  const probeBackend = useCallback(async () => {
+    setIsProbingBackend(true);
     try {
-      const res = await fetch("/api/intel/search", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ query: searchQuery }),
-      });
-      const data = await res.json();
-      
-      if (data.status === "success" && data.data && data.data.length > 0) {
-        setIntelData(data.data[0]); 
-        setAiSummary(data.ai_summary || "AI processing unavailable.");
-        const targetLat = data.data[0].lat;
-        const targetLng = data.data[0].lng;
-        setMapCoordinates([targetLat, targetLng]);
-      } else {
-        setIntelData(null);
-        setAiSummary("No relevant intel found for this query.");
-        setMapCoordinates(null);
+      const res = await fetch("/api/health");
+      if (res.ok) {
+        setStandbySeconds(0);
       }
-    } catch (error) {
-      console.warn("Search network call failed, activating resilient tactical fallback:", error);
-      const fallbackIntel = {
-        id: "INTEL-9999",
-        score: 0.94,
-        location: "Tarn Taran Border",
-        lat: 31.452,
-        lng: 74.925,
-        transcript: "URGENT INTERCEPT: Unidentified pickup truck confirmed waiting at drop zone Alpha. Awaiting hexacopter payload of narcotics/arms from across the IB."
-      };
-      setIntelData(fallbackIntel);
-      setAiSummary("Threat detected. Evidence: [INTEL-9999]. Action: Unidentified pickup truck confirmed waiting at drop zone Alpha for hexacopter payload. Dispatch immediate QRT intercept to Tarn Taran Border.");
-      setMapCoordinates([fallbackIntel.lat, fallbackIntel.lng]);
+    } catch {
+      // Still spinning up
+    } finally {
+      setIsProbingBackend(false);
     }
-    setLoading(false);
-  };
+  }, []);
 
-  const handleIntelClick = () => {
-    if (intelData) {
-      setIsModalOpen(true);
-    }
-  };
+  // SIGINT Intelligence Search
+  const handleSearch = useCallback(
+    async (queryToRun: string = searchQuery) => {
+      if (!queryToRun) return;
+      setIsSearching(true);
+      try {
+        const res = await fetch("/api/intel/search", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ query: queryToRun }),
+        });
+        const data = await res.json();
 
-  const renderModal = () => {
-    if (!isModalOpen) return null;
-    return (
-      <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-        <div className="absolute inset-0 z-[10000] bg-black/80 backdrop-blur-md" onClick={() => setIsModalOpen(false)}></div>
-        <div className="relative z-[10001] bg-slate-950 border border-fuchsia-900/50 rounded shadow-[0_0_50px_rgba(217,70,239,0.15)] w-full max-w-2xl overflow-hidden flex flex-col">
-          <div className="bg-fuchsia-950/40 border-b border-fuchsia-900/50 p-4 flex justify-between items-center">
-            <h2 className="text-fuchsia-400 font-bold tracking-widest flex items-center gap-2 text-sm">
-              <AlertTriangle size={18} /> ACTION REQUIRED: INTEL #{intelData?.id || "UNKNOWN"}
-            </h2>
-<button onClick={() => setIsModalOpen(false)} className="text-slate-500 hover:text-white transition-colors">
-              <X size={20} />
-            </button>
-          </div>
-          
-          <div className="p-6 flex flex-col gap-6 text-sm">
-            {threatAssessment && (
-              <div className="flex gap-4">
-                <div className={`px-3 py-1 rounded border font-bold text-xs ${threatAssessment.threat_level === 'HIGH' || threatAssessment.threat_level === 'CRITICAL' ? 'bg-rose-950/50 border-rose-500 text-rose-400' : 'bg-yellow-950/50 border-yellow-500 text-yellow-400'}`}>
-                  THREAT LEVEL: {threatAssessment.threat_level}
-                </div>
-                <div className="px-3 py-1 rounded border border-cyan-900/50 bg-cyan-950/30 text-cyan-400 font-bold text-xs">
-                  THREAT SCORE: {threatAssessment.score}/100
-                </div>
-              </div>
-            )}
-            
-            <div>
-              <div className="text-slate-500 text-xs mb-2 uppercase tracking-wider">AI Tactical Assessment</div>
-              <div className="bg-slate-900/50 border border-slate-800 p-4 rounded text-fuchsia-300 leading-relaxed font-mono">
-                {threatAssessment ? threatAssessment.reasoning : aiSummary}
-                {threatAssessment && (
-                  <div className="mt-2 pt-2 border-t border-fuchsia-900/30 text-cyan-400">
-                    <span className="text-slate-500">RECOMMENDED ACTION:</span> {threatAssessment.recommended_action}
-                  </div>
-                )}
-              </div>
-            </div>
+        if (data.status === "success" && data.data && data.data.length > 0) {
+          const first = data.data[0] as IntelRecord;
+          setIntelData(first);
+          setAiSummary(data.ai_summary || "AI processing unavailable.");
+          if (typeof first.lat === "number" && typeof first.lng === "number") {
+            setMapCoordinates([first.lat, first.lng]);
+          }
+        } else {
+          setIntelData(null);
+          setAiSummary("No relevant intel found for this query.");
+        }
+      } catch (error) {
+        console.warn("Search network fallback:", error);
+        setIntelData(null);
+        setAiSummary("Search service temporarily unreachable. Check network connection.");
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [searchQuery]
+  );
 
-            <div>
-              <div className="text-slate-500 text-xs mb-2 uppercase tracking-wider">Raw Transcript / Data</div>
-              <div className="bg-black/50 border border-slate-800 p-4 rounded text-slate-300 font-mono text-xs max-h-32 overflow-y-auto custom-scrollbar">
-                {intelData?.transcript || "No transcript available."}
-              </div>
-            </div>
-          </div>
+  // Evaluate frame observations through Threat Trigger Gate
+  const handleThreatSample = useCallback(
+    (currentTime: number, obsList: DrawableDetection[]) => {
+      const gate = triggerGateRef.current;
+      const res = gate.evaluate(currentTime, obsList, threatInFlightRef.current);
 
-          <div className="p-4 border-t border-slate-800 bg-slate-900/30 flex justify-end gap-4">
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2 border border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white rounded transition-colors text-xs tracking-wider"
-            >
-              DISMISS
-            </button>
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2 bg-rose-950 border border-rose-900 text-rose-400 hover:bg-rose-900 hover:text-rose-100 rounded transition-colors text-xs tracking-wider font-bold shadow-[0_0_15px_rgba(244,63,94,0.2)]"
-            >
-              INITIATE LOCKDOWN
-            </button>
-            <button 
-              onClick={() => setIsModalOpen(false)}
-              className="px-6 py-2 bg-cyan-950 border border-cyan-900 text-cyan-400 hover:bg-cyan-900 hover:text-cyan-100 rounded transition-colors text-xs tracking-wider font-bold shadow-[0_0_15px_rgba(6,182,212,0.2)]"
-            >
-              DEPLOY ASSETS
-            </button>
-          </div>
-        </div>
-      </div>
+      if (res) {
+        threatInFlightRef.current = true;
+        setMapCoordinates([res.latitude, res.longitude]);
+        playTacticalAlertTone();
+
+        const sent = socketReady ? sendThreat(res) : false;
+
+        // If socket is offline or message send fails, run resilient local assessment fallback
+        if (!sent) {
+          const fallbackAssessment: ThreatAssessment = {
+            threat_level: "HIGH",
+            score: Math.round(res.confidence * 100),
+            reasoning: `Tactical Edge Anomaly: Target identified as [${res.class.toUpperCase()}] moving at ${res.speed_kmh} km/h bearing ${res.direction} along monitored sector. High probability of border reconnaissance breach.`,
+            recommended_action:
+              "Initiate immediate UAV lock and dispatch Quick Reaction Team (QRT) intercept vector.",
+            previous_incidents: 3,
+          };
+          setLocalAssessment(fallbackAssessment);
+          setIsThreatModalOpen(true);
+
+          const newIncident: AegisHistoryRecord = {
+            id: `INC-LIVE-${Date.now()}`,
+            incident_id: `INC-LIVE-${Date.now()}`,
+            timestamp: new Date().toLocaleTimeString() + " IST",
+            created_at: new Date().toISOString(),
+            threat_level: "HIGH",
+            score: Math.round(res.confidence * 100),
+            threat_class: res.class,
+            class: res.class,
+            reasoning: fallbackAssessment.reasoning,
+            recommended_action: fallbackAssessment.recommended_action,
+            previous_incidents: 3,
+            telemetry: {
+              latitude: res.latitude,
+              longitude: res.longitude,
+              speed_kmh: res.speed_kmh,
+              direction: res.direction,
+              class: res.class,
+              confidence: res.confidence,
+            },
+            assessment: fallbackAssessment,
+          };
+          setHistoryRecords((prev) => [newIncident, ...prev]);
+        }
+
+        if (res.class === "truck" && !intelData && !isSearching) {
+          setSearchQuery("truck");
+          handleSearch("truck");
+        }
+      }
+    },
+    [socketReady, sendThreat, intelData, isSearching, handleSearch]
+  );
+
+  // Instant tactical drill simulation for presentations & judge demonstrations
+  const handleSimulateDrill = useCallback(() => {
+    playTacticalAlertTone();
+    const drillCoordinates: [number, number] = [31.452, 74.925];
+    setMapCoordinates(drillCoordinates);
+
+    const drillIntel: IntelRecord = {
+      id: "DRILL-0994",
+      score: 0.96,
+      location: "Tarn Taran IB Sector (Alpha-4)",
+      lat: 31.452,
+      lng: 74.925,
+      timestamp: new Date().toLocaleTimeString() + " IST",
+      transcript:
+        "SIMULATED DRILL INTERCEPT: Unidentified convoy detected 200m south of outpost 14. SIGINT corroborates coordinated cross-border payload vector.",
+    };
+    setIntelData(drillIntel);
+
+    const drillAssessment: ThreatAssessment = {
+      threat_level: "CRITICAL",
+      score: 96,
+      reasoning: socketReady
+        ? "Tactical Drill Verification: High-confidence anomaly correlation between EO/IR optronics and COMINT radio intercepts."
+        : `[${connectionStatus} MODE] Autonomous backend unreachable. Threat assessed locally via deterministic rule-based heuristics.`,
+      recommended_action:
+        "Execute automated QRT alert vector. Command lockdown authorization granted.",
+      assessment_source: socketReady ? "llm" : "rule-based",
+      previous_incidents: 4,
+    };
+    setLocalAssessment(drillAssessment);
+    setAiSummary(
+      `Threat detected. Evidence: [DRILL-0994]. Action: ${drillAssessment.recommended_action}`
     );
-  };
 
-  return (
+    if (socketReady) {
+      sendThreat({
+        class: "truck",
+        confidence: 0.96,
+        speed_kmh: 42,
+        direction: "NE",
+        latitude: 31.452,
+        longitude: 74.925,
+        video_x: 640,
+        video_y: 480,
+        detection_time: 12.0,
+        timestamp: new Date().toISOString(),
+      });
+    }
+
+    const newDrillIncident: AegisHistoryRecord = {
+      id: `INC-DRILL-${Date.now()}`,
+      incident_id: `INC-DRILL-${Date.now()}`,
+      timestamp: new Date().toLocaleTimeString() + " IST",
+      created_at: new Date().toISOString(),
+      threat_level: "CRITICAL",
+      score: 96,
+      threat_class: "truck",
+      class: "truck",
+      reasoning: drillAssessment.reasoning,
+      recommended_action: drillAssessment.recommended_action,
+      previous_incidents: 4,
+      telemetry: {
+        latitude: 31.452,
+        longitude: 74.925,
+        speed_kmh: 42,
+        direction: "NE",
+        class: "truck",
+        confidence: 0.96,
+      },
+      assessment: drillAssessment,
+      evidence: [drillIntel],
+    };
+
+    setHistoryRecords((prev) => [newDrillIncident, ...prev]);
+    setIsThreatModalOpen(true);
+  }, [socketReady, connectionStatus, sendThreat]);
+
+  // Handle addition of custom uploaded surveillance video feed
+  const handleFeedCreated = useCallback((newFeed: FeedManifestItem) => {
+    setFeeds((prev) => [...prev, newFeed]);
+    setActiveFeedId(newFeed.id);
+    if (typeof newFeed.center_lat === "number" && typeof newFeed.center_lng === "number") {
+      setMapCoordinates([newFeed.center_lat, newFeed.center_lng]);
+    }
+  }, []);
+
+  const content = (
     <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
-      {/* PITCH DECK HEADER */}
-      <header className="bg-[#0a0a0a] p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-rose-500"></div>
-        <div className="flex items-center gap-4">
-          <div className="relative flex items-center justify-center w-10 h-10 border border-cyan-500/30 rounded bg-cyan-950/20">
-            <Shield className="text-cyan-400" size={20} />
-            <div className="absolute inset-0 animate-ping opacity-20 border border-cyan-500 rounded"></div>
+      {/* TACTICAL COMMAND HEADER */}
+      <header className="bg-[#0a0a0a] px-3 py-2.5 sm:p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
+        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-rose-500" />
+        <div className="flex items-center gap-2 sm:gap-4">
+          <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 border border-cyan-500/30 rounded bg-cyan-950/20 flex-shrink-0">
+            <Shield className="text-cyan-400" size={18} />
+            <div className="absolute inset-0 animate-ping opacity-20 border border-cyan-500 rounded" />
           </div>
-          <button
-              onClick={loadIncidentHistory}
-              className="px-3 py-2 text-[10px] font-bold tracking-widest border border-cyan-500/40 text-cyan-300 bg-cyan-950/20 hover:bg-cyan-950/50 hover:border-cyan-400 transition-all"
-            >
-              INCIDENT HISTORY
-            </button>
-            <div className="flex flex-col">
-            <h1 className="text-xl font-bold tracking-widest text-white leading-none">AEGIS COMMAND</h1>
-            <span className="text-[10px] text-cyan-400 font-bold tracking-[0.2em] mt-1">UNIFIED THREAT INTELLIGENCE</span>
+          <div className="flex flex-col">
+            <h1 className="text-sm sm:text-xl font-bold tracking-widest text-white leading-none">
+              AEGIS COMMAND
+            </h1>
+            <span className="text-[8px] sm:text-[10px] text-cyan-400 font-bold tracking-[0.2em] mt-0.5 sm:mt-1">
+              UNIFIED THREAT INTELLIGENCE
+            </span>
           </div>
         </div>
-        <div className="flex items-center gap-6 text-xs border border-slate-800 bg-slate-900/50 px-4 py-2 rounded">
-          <span className="flex items-center gap-2 text-slate-400">
-            <Activity className="text-cyan-400" size={14} /> 
-            SYS: <span className="text-cyan-400 font-bold">SECURE</span>
-          </span>
-          <span className="w-[1px] h-4 bg-slate-700"></span>
-          <span className="text-slate-400 flex items-center gap-2">
-            <Globe size={14} className="text-fuchsia-400"/>
-            OP-SEC: <span className="text-fuchsia-400 font-bold">OMEGA</span>
-          </span>
+
+        <div className="flex items-center gap-2 sm:gap-4">
+          <button
+            type="button"
+            onClick={toggleLiteMode}
+            className={`px-2 py-1 text-[9px] sm:text-[10px] font-bold tracking-widest border rounded transition-all flex items-center gap-1 ${
+              liteMode
+                ? "bg-amber-950/40 border-amber-500/50 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
+            }`}
+            title="Toggle low-power Lite Mode (reduces DPR, animations, backdrop-filters)"
+          >
+            <Zap size={11} className={liteMode ? "text-amber-400" : "text-slate-500"} />
+            LITE: {liteMode ? "ON" : "OFF"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setIsHistoryModalOpen(true)}
+            className="px-2 py-1 sm:px-3 sm:py-2 text-[9px] sm:text-[10px] font-bold tracking-widest border border-cyan-500/40 text-cyan-300 bg-cyan-950/20 hover:bg-cyan-950/50 hover:border-cyan-400 transition-all flex-shrink-0"
+          >
+            HISTORY
+          </button>
+
+          {/* CONNECTION STATUS BADGE */}
+          <div
+            className={`flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded border text-[9px] sm:text-[10px] font-bold tracking-widest font-mono transition-all flex-shrink-0 ${
+              connectionStatus === "LIVE"
+                ? "bg-emerald-950/40 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
+                : connectionStatus === "DEGRADED"
+                ? "bg-amber-950/40 border-amber-500/50 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
+                : "bg-rose-950/40 border-rose-500/50 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
+            }`}
+            title={`Telemetry & Threat Engine Status: ${connectionStatus}`}
+          >
+            <span
+              className={`w-2 h-2 rounded-full ${
+                connectionStatus === "LIVE"
+                  ? "bg-emerald-400 animate-pulse"
+                  : connectionStatus === "DEGRADED"
+                  ? "bg-amber-400 animate-pulse"
+                  : "bg-rose-500"
+              }`}
+            />
+            <span>{connectionStatus}</span>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs border border-slate-800 bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 rounded">
+            <span className="flex items-center gap-1 sm:gap-2 text-slate-400">
+              <Activity className={socketReady ? "text-cyan-400" : "text-amber-400"} size={12} />
+              <span className="hidden sm:inline">SYS:</span>{" "}
+              <span className="text-cyan-400 font-bold font-mono">{socketReady ? "SECURE" : "STANDBY"}</span>
+            </span>
+            <span className="w-[1px] h-3 sm:h-4 bg-slate-700" />
+            <span className="text-slate-400 flex items-center gap-1 sm:gap-2">
+              <Globe size={12} className="text-fuchsia-400" />
+              <span className="hidden sm:inline">OP-SEC:</span>{" "}
+              <span className="text-fuchsia-400 font-bold font-mono">OMEGA</span>
+            </span>
+          </div>
         </div>
       </header>
 
-      {/* MAIN DASHBOARD */}
-      <main className="flex-1 grid grid-cols-12 gap-6 p-6 min-h-0">
-        
-        {/* LEFT PANE: OPTICS HUD (VISION PATH - CYAN THEME) */}
-        <section className="col-span-7 flex flex-col gap-4 relative">
-          
-          <div className="flex items-center gap-2 text-xs">
-            {(["UAV-ALPHA", "PERIMETER CCTV-04", "MOBILE INFANTRY BODYCAM"] as VideoSource[]).map((src) => (
-              <button
-                key={src}
-                onClick={() => setVideoSource(src)}
-                className={`px-4 py-2 border rounded flex items-center gap-2 transition-all ${
-                  videoSource === src 
-                    ? "bg-cyan-950/40 border-cyan-500/50 text-cyan-400 shadow-[0_0_10px_rgba(6,182,212,0.1)]" 
-                    : "bg-slate-900/30 border-slate-800 text-slate-500 hover:border-slate-600 hover:text-slate-300"
-                }`}
-              >
-                <Video size={14} />
-                {src}
-              </button>
-            ))}
-          </div>
-
-          <div 
-            ref={videoContainerRef} 
-            className="relative flex-1 w-full rounded border border-cyan-900/50 bg-black overflow-hidden group shadow-2xl"
-          >
-            <div className="absolute inset-0 z-10 pointer-events-none flex flex-col justify-between p-4">
-               <div className="flex justify-between items-start text-[10px] text-cyan-400 font-bold tracking-widest drop-shadow-[0_0_8px_rgba(0,0,0,0.9)]">
-                 <div className="flex flex-col gap-1 bg-black/40 p-2 rounded backdrop-blur-sm border border-cyan-500/20">
-                   <span>REC <span className={isPlaying ? "text-rose-500 animate-pulse drop-shadow-[0_0_5px_rgba(244,63,94,0.8)]" : "text-slate-500"}>●</span></span>
-                   <span>T-MINUS: 00:00:00</span>
-                   <span>FPS: 59.94</span>
-                 </div>
-                 <div className="flex flex-col items-end gap-1 text-right bg-black/40 p-2 rounded backdrop-blur-sm border border-cyan-500/20">
-                   <span>FEED ENCRYPTION: AES-256</span>
-                   <span>SRC: {videoSource}</span>
-                   <span>STATUS: <span className="text-cyan-400 drop-shadow-[0_0_5px_rgba(6,182,212,0.8)]">LIVE</span></span>
-                 </div>
-               </div>
-
-               <div className="absolute inset-0 flex items-center justify-center">
-                  <Crosshair className="text-cyan-400/40 w-32 h-32 stroke-1 drop-shadow-[0_0_8px_rgba(6,182,212,0.4)]" />
-               </div>
-               
-               <div className="absolute top-4 left-4 w-8 h-8 border-t-2 border-l-2 border-cyan-400/60 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
-               <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-cyan-400/60 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
-               <div className="absolute bottom-12 left-4 w-8 h-8 border-b-2 border-l-2 border-cyan-400/60 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
-               <div className="absolute bottom-12 right-4 w-8 h-8 border-b-2 border-r-2 border-cyan-400/60 drop-shadow-[0_0_5px_rgba(0,0,0,0.8)]"></div>
-            </div>
-
-            <video 
-              ref={videoRef}
-              src="/drone_feed.mp4" 
-              className="absolute inset-0 w-full h-full object-contain filter contrast-125 brightness-90 grayscale-[20%]"
-              onTimeUpdate={() => {
-                handleTimeUpdate();
-                if (videoRef.current && duration === 0) {
-                  setDuration(videoRef.current.duration);
-                }
-              }}
-              onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
-              onDurationChange={(e) => setDuration(e.currentTarget.duration)}
-              onCanPlay={(e) => setDuration(e.currentTarget.duration)}
-              muted={isMuted}
-              onClick={togglePlay}
-            />
-            
-            <canvas 
-              ref={canvasRef}
-              className="absolute inset-0 pointer-events-none z-20"
-            />
-
-            <div className="absolute bottom-0 w-full h-12 bg-gradient-to-t from-black/90 to-transparent z-30 flex items-end px-4 pb-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <div className="flex items-center justify-between w-full text-cyan-400/80">
-                <div className="flex items-center gap-4">
-                  <button onClick={togglePlay} className="hover:text-cyan-300 transition-colors">
-                    {isPlaying ? <Pause size={18} /> : <Play size={18} fill="currentColor" />}
-                  </button>
-                  <button onClick={toggleMute} className="hover:text-cyan-300 transition-colors">
-                    {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
-                  </button>
-                </div>
-                <div className="flex items-center gap-1">
-                   <div className="w-1 h-3 bg-cyan-500/40 animate-pulse"></div>
-                   <div className="w-1 h-2 bg-cyan-500/40 animate-pulse delay-75"></div>
-                   <div className="w-1 h-4 bg-cyan-500/40 animate-pulse delay-150"></div>
-                   <div className="w-1 h-2 bg-cyan-500/40 animate-pulse delay-75"></div>
-                </div>
-                <button onClick={toggleFullscreen} className="hover:text-cyan-300 transition-colors z-40">
-                  {isFullscreen ? <Minimize size={18} /> : <Maximize size={18} />}
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Threat Radar */}
-          <div className="w-full h-8 bg-slate-900 border border-slate-700 relative flex items-center px-1 overflow-hidden shadow-inner rounded">
-            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none"></div>
-            <span className="absolute left-3 text-[10px] text-cyan-400 z-10 font-bold tracking-widest flex items-center gap-2">
-              <Target size={12}/> THREAT RADAR
+      {/* RENDER BACKEND DEGRADED / COLD START BANNER */}
+      {connectionStatus === "DEGRADED" && (
+        <div className="bg-amber-950/70 border-b border-amber-500/40 px-3 py-1.5 flex items-center justify-between text-[10px] sm:text-xs text-amber-300 font-mono">
+          <div className="flex items-center gap-2 truncate mr-2">
+            <AlertTriangle size={13} className="text-amber-400 animate-pulse flex-shrink-0" />
+            <span className="truncate">
+              AUTONOMOUS BACKEND WAKING UP (~60s) // ENGINE OPERATING IN DEGRADED DETERMINISTIC MODE
             </span>
-            {duration > 0 && detections && Object.keys(detections).map((timeKey) => {
-              const threats = detections[timeKey];
-              if (threats && threats.length > 0) {
-                const leftPercentage = (parseFloat(timeKey) / duration) * 100;
-                if (leftPercentage >= 0 && leftPercentage <= 100) {
-                  
-      {historyOpen && (
-        <div className="fixed inset-0 z-[10000] bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-
-          <div className="relative z-[10001] w-full max-w-6xl max-h-[90vh] bg-slate-950 border border-cyan-500/40 shadow-2xl overflow-hidden flex flex-col">
-
-            <div className="flex items-center justify-between px-5 py-4 border-b border-cyan-500/20">
-              <div>
-                <div className="text-cyan-300 font-mono text-sm tracking-widest">
-                  AEGIS // INCIDENT HISTORY
-                </div>
-                <div className="text-slate-500 text-xs font-mono mt-1">
-                  Historical threat assessments and intelligence records
-                </div>
-              </div>
-
-              <button
-                onClick={() => {
-                  setHistoryOpen(false);
-                  setSelectedHistory(null);
-                }}
-                className="text-slate-400 hover:text-white text-xl px-3"
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="px-5 py-3 border-b border-slate-800">
-              <input
-                value={historySearch}
-                onChange={(e) => setHistorySearch(e.target.value)}
-                placeholder="Search class, threat level, reasoning, location..."
-                className="w-full bg-black border border-slate-700 px-3 py-2 text-xs font-mono text-white outline-none focus:border-cyan-500"
-              />
-            </div>
-
-            <div className="flex-1 overflow-auto">
-
-              {historyLoading ? (
-                <div className="p-10 text-center text-cyan-300 font-mono text-sm">
-                  LOADING HISTORICAL INTELLIGENCE...
-                </div>
-              ) : selectedHistory ? (
-
-                <div className="p-6 space-y-5">
-
-                  <button
-                    onClick={() => setSelectedHistory(null)}
-                    className="text-xs font-mono text-cyan-400 hover:text-white"
-                  >
-                    ← BACK TO HISTORY
-                  </button>
-
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-
-                    <div className="border border-slate-800 bg-black p-3">
-                      <div className="text-[10px] text-slate-500 font-mono">
-                        THREAT LEVEL
-                      </div>
-                      <div className="text-lg font-mono text-red-300 mt-1">
-                        {selectedHistory.threat_level ||
-                          selectedHistory.assessment?.threat_level ||
-                          "UNKNOWN"}
-                      </div>
-                    </div>
-
-                    <div className="border border-slate-800 bg-black p-3">
-                      <div className="text-[10px] text-slate-500 font-mono">
-                        SCORE
-                      </div>
-                      <div className="text-lg font-mono text-white mt-1">
-                        {selectedHistory.score ??
-                          selectedHistory.assessment?.score ??
-                          "—"}
-                      </div>
-                    </div>
-
-                    <div className="border border-slate-800 bg-black p-3">
-                      <div className="text-[10px] text-slate-500 font-mono">
-                        CLASS
-                      </div>
-                      <div className="text-lg font-mono text-cyan-300 mt-1">
-                        {selectedHistory.threat_class ||
-                          selectedHistory.class ||
-                          selectedHistory.telemetry?.class ||
-                          "UNKNOWN"}
-                      </div>
-                    </div>
-
-                    <div className="border border-slate-800 bg-black p-3">
-                      <div className="text-[10px] text-slate-500 font-mono">
-                        PREVIOUS
-                      </div>
-                      <div className="text-lg font-mono text-white mt-1">
-                        {selectedHistory.previous_incidents ??
-                          selectedHistory.assessment?.previous_incidents ??
-                          "—"}
-                      </div>
-                    </div>
-
-                  </div>
-
-                  <div className="border border-slate-800 bg-black p-4">
-                    <div className="text-xs text-cyan-300 font-mono mb-2">
-                      AI ASSESSMENT
-                    </div>
-
-                    <div className="text-sm text-white leading-relaxed">
-                      {selectedHistory.reasoning ||
-                        selectedHistory.assessment?.reasoning ||
-                        "No AI reasoning recorded."}
-                    </div>
-
-                    <div className="mt-4 text-xs text-slate-400 font-mono">
-                      RECOMMENDED ACTION
-                    </div>
-
-                    <div className="mt-1 text-sm text-slate-200">
-                      {selectedHistory.recommended_action ||
-                        selectedHistory.assessment?.recommended_action ||
-                        "No recommendation recorded."}
-                    </div>
-                  </div>
-
-                  <div className="border border-slate-800 bg-black p-4">
-                    <div className="text-xs text-cyan-300 font-mono mb-3">
-                      EVENT TELEMETRY
-                    </div>
-
-                    <pre className="text-[11px] text-slate-300 whitespace-pre-wrap overflow-auto">
-                      {JSON.stringify(
-                        selectedHistory.telemetry ||
-                        selectedHistory.payload ||
-                        {},
-                        null,
-                        2
-                      )}
-                    </pre>
-                  </div>
-
-                  {Array.isArray(selectedHistory.evidence) &&
-                    selectedHistory.evidence.length > 0 && (
-
-                    <div className="border border-slate-800 bg-black p-4">
-
-                      <div className="text-xs text-cyan-300 font-mono mb-3">
-                        RETRIEVED INTELLIGENCE
-                      </div>
-
-                      <div className="space-y-3">
-
-                        {selectedHistory.evidence.map(
-                          (item: any, index: number) => (
-
-                            <div
-                              key={item.id || index}
-                              className="border border-slate-800 p-3"
-                            >
-                              <div className="flex justify-between gap-4">
-
-                                <span className="text-xs text-cyan-300 font-mono">
-                                  {item.id || `INTEL-${index + 1}`}
-                                </span>
-
-                                <span className="text-[10px] text-slate-500 font-mono">
-                                  {item.timestamp || ""}
-                                </span>
-
-                              </div>
-
-                              <div className="text-xs text-slate-400 mt-2">
-                                {item.location || "Unknown location"}
-                              </div>
-
-                              <div className="text-sm text-slate-200 mt-2 leading-relaxed">
-                                {item.transcript ||
-                                  item.summary ||
-                                  item.text ||
-                                  "No transcript available."}
-                              </div>
-
-                            </div>
-
-                          )
-                        )}
-
-                      </div>
-
-                    </div>
-                  )}
-
-                  <div className="border border-slate-800 bg-black p-4">
-                    <div className="text-xs text-cyan-300 font-mono mb-3">
-                      RAW ASSESSMENT RECORD
-                    </div>
-
-                    <pre className="text-[10px] text-slate-400 whitespace-pre-wrap overflow-auto">
-                      {JSON.stringify(
-                        selectedHistory.assessment || {},
-                        null,
-                        2
-                      )}
-                    </pre>
-                  </div>
-
-                </div>
-
-              ) : (
-
-                <div className="divide-y divide-slate-900">
-
-                  {historyRecords
-                    .filter((record) => {
-                      const q = historySearch.toLowerCase();
-
-                      if (!q) return true;
-
-                      return JSON.stringify(record)
-                        .toLowerCase()
-                        .includes(q);
-                    })
-                    .map((record, index) => (
-
-                      <button
-                        key={record.id || record.incident_id || index}
-                        onClick={() => setSelectedHistory(record)}
-                        className="w-full text-left px-5 py-4 hover:bg-cyan-950/20 transition"
-                      >
-
-                        <div className="flex items-center justify-between gap-4">
-
-                          <div className="flex items-center gap-4">
-
-                            <div className="text-xs text-cyan-400 font-mono">
-                              {record.incident_id ||
-                                `INC-${record.id || index + 1}`}
-                            </div>
-
-                            <div className="text-xs text-white font-mono">
-                              {record.threat_class ||
-                                record.class ||
-                                record.telemetry?.class ||
-                                "UNKNOWN"}
-                            </div>
-
-                            <div className="text-xs text-slate-400">
-                              {record.threat_level ||
-                                record.assessment?.threat_level ||
-                                "UNKNOWN"}
-                            </div>
-
-                          </div>
-
-                          <div className="text-[10px] text-slate-500 font-mono">
-                            {record.timestamp ||
-                              record.created_at ||
-                              ""}
-                          </div>
-
-                        </div>
-
-                        <div className="mt-2 text-xs text-slate-400 truncate">
-                          {record.reasoning ||
-                            record.assessment?.reasoning ||
-                            "No AI summary available."}
-                        </div>
-
-                      </button>
-
-                    ))}
-
-                  {historyRecords.length === 0 && (
-                    <div className="p-10 text-center text-slate-500 font-mono text-xs">
-                      NO HISTORICAL INCIDENTS FOUND
-                    </div>
-                  )}
-
-                </div>
-
-              )}
-
-            </div>
-
           </div>
-
+          <button
+            type="button"
+            onClick={probeBackend}
+            disabled={isProbingBackend}
+            className="px-2 py-0.5 border border-amber-500/50 hover:bg-amber-900/40 rounded flex items-center gap-1 font-bold text-[9px] sm:text-[10px] flex-shrink-0 transition-colors"
+          >
+            <RefreshCw size={10} className={isProbingBackend ? "animate-spin" : ""} />
+            {isProbingBackend ? "PROBING..." : "RETRY"}
+          </button>
         </div>
       )}
 
-return (
-                    <div 
-                      key={timeKey}
-                      onClick={() => seekToTime(timeKey)}
-                      className="absolute h-full w-0.5 bg-rose-500 hover:w-1.5 hover:bg-rose-400 cursor-pointer z-20 transition-all shadow-[0_0_10px_rgba(244,63,94,0.8)]"
-                      style={{ left: `${leftPercentage}%` }}
-                      title={`Threat at ${timeKey}s`}
-                    />
-                  );
-                }
-              }
-              return null;
-            })}
+      {/* RENDER BACKEND OFFLINE BANNER */}
+      {connectionStatus === "OFFLINE" && (
+        <div className="bg-rose-950/80 border-b border-rose-500/40 px-3 py-1.5 flex items-center justify-between text-[10px] sm:text-xs text-rose-300 font-mono">
+          <div className="flex items-center gap-2 truncate mr-2">
+            <AlertTriangle size={13} className="text-rose-400 flex-shrink-0" />
+            <span className="truncate">
+              AUTONOMOUS CLOUD BACKEND OFFLINE // LOCAL DETERMINISTIC RULE-BASED MODE ACTIVE
+            </span>
           </div>
+          <button
+            type="button"
+            onClick={probeBackend}
+            disabled={isProbingBackend}
+            className="px-2 py-0.5 border border-rose-500/50 hover:bg-rose-900/40 rounded flex items-center gap-1 font-bold text-[9px] sm:text-[10px] flex-shrink-0 transition-colors"
+          >
+            <RefreshCw size={10} className={isProbingBackend ? "animate-spin" : ""} />
+            {isProbingBackend ? "PROBING..." : "RETRY"}
+          </button>
+        </div>
+      )}
+
+      {/* MOBILE SEGMENTED TABS */}
+      <MobileTabs activeTab={mobileTab} onTabChange={setMobileTab} />
+
+      {/* MAIN TACTICAL GRID */}
+      <main className="flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-6 p-3 lg:p-6 min-h-0 overflow-y-auto lg:overflow-visible">
+        {/* LEFT PANE: OPTICS HUD (VISION) */}
+        <section
+          className={`${
+            mobileTab === "optics" ? "flex" : "hidden lg:flex"
+          } lg:col-span-7 flex flex-col relative`}
+        >
+          <OpticsViewport
+            feeds={feeds}
+            activeFeed={activeFeed}
+            onSelectFeed={setActiveFeedId}
+            timeline={timeline}
+            liteMode={liteMode}
+            onThreatSample={handleThreatSample}
+            perfEnabled={perfEnabled}
+            perfTargetFrames={perfTargetFrames}
+            onPerfReport={setPerfReport}
+            onSimulateThreat={handleSimulateDrill}
+            onOpenUploadModal={() => setIsUploadModalOpen(true)}
+          />
         </section>
 
-        {/* RIGHT PANE: GEO & INTEL (INTELLIGENCE PATH - FUCHSIA/ROSE THEME) */}
-        <section className="col-span-5 flex flex-col gap-6">
-          
+        {/* RIGHT PANE: GEO & INTEL */}
+        <section
+          className={`${
+            mobileTab !== "optics" ? "flex" : "hidden lg:flex"
+          } lg:col-span-5 flex flex-col gap-4 lg:gap-6`}
+        >
           {/* Top Half: Geospatial Map */}
-          <div className="h-[40%] min-h-[250px] relative flex flex-col bg-slate-900/20 border border-slate-800 rounded p-1">
-             <div className="flex items-center gap-2 text-xs text-fuchsia-400 font-bold p-2 uppercase tracking-wider bg-slate-900/50">
-                <MapIcon size={14} className="text-fuchsia-400"/> Tactical Map
-             </div>
-             <div className="flex-1 relative bg-black border-t border-slate-800">
-               <MapComponent coordinates={mapCoordinates} />
-             </div>
+          <div
+            className={`${
+              mobileTab === "map"
+                ? "flex flex-1"
+                : mobileTab === "intel"
+                ? "hidden lg:flex"
+                : "flex"
+            } h-auto min-h-[380px] lg:h-[40%] lg:min-h-[250px] relative flex-col bg-slate-900/20 border border-slate-800 rounded p-1`}
+          >
+            <div className="flex items-center gap-2 text-xs text-fuchsia-400 font-bold p-2 uppercase tracking-wider bg-slate-900/50">
+              <MapIcon size={14} className="text-fuchsia-400" /> Tactical Map
+            </div>
+            <div className="flex-1 min-h-[340px] h-[340px] lg:h-full relative bg-black border-t border-slate-800">
+              {(isDesktop || mobileTab === "map") && (
+                <MapComponent key={`aegis-map-${mobileTab}`} coordinates={mapCoordinates} />
+              )}
+            </div>
           </div>
 
           {/* Bottom Half: Intelligence Stream */}
-          <div className="flex-1 flex flex-col gap-4 border border-fuchsia-900/30 bg-slate-900/20 p-4 rounded relative shadow-inner">
-            
-            <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-              <div className="text-xs uppercase tracking-widest text-fuchsia-400 font-bold flex items-center gap-2">
-                <Terminal size={14} /> Intel Feed
-              </div>
-              <div className="flex bg-black border border-slate-700 rounded p-1">
-                <button 
-                  onClick={() => setIntelMode("SIGINT")}
-                  className={`px-4 py-1 rounded text-[10px] font-bold tracking-widest transition-colors ${intelMode === "SIGINT" ? "bg-fuchsia-950/50 text-fuchsia-400" : "text-slate-500 hover:text-slate-300"}`}
-                >
-                  SIGINT / RAG
-                </button>
-                <button 
-                  onClick={() => setIntelMode("OSINT")}
-                  className={`px-4 py-1 rounded text-[10px] font-bold tracking-widest transition-colors ${intelMode === "OSINT" ? "bg-blue-950/50 text-blue-400" : "text-slate-500 hover:text-slate-300"}`}
-                >
-                  OSINT / WEB
-                </button>
-              </div>
-            </div>
-
-            {intelMode === "SIGINT" ? (
-              <div className="flex flex-col gap-4 flex-1">
-                <div className="relative">
-                  <Search className="absolute left-3 top-3 text-fuchsia-500/50" size={16} />
-                  <input 
-                    type="text" 
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    placeholder="QUERY SIGINT DATABASE..."
-                    className="w-full rounded bg-black border border-slate-700 text-fuchsia-400 text-sm py-2.5 pl-10 pr-4 outline-none focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500/50 placeholder-slate-600 transition-all font-mono shadow-inner"
-                  />
-                  {loading && (
-                    <div className="absolute right-3 top-3">
-                      <Activity className="animate-spin text-fuchsia-500" size={16} />
-                    </div>
-                  )}
-                </div>
-
-                {intelData ? (
-                  <div 
-                    onClick={handleIntelClick}
-                    className="mt-2 bg-slate-950 border border-fuchsia-900/50 hover:border-fuchsia-500/50 p-4 rounded cursor-pointer transition-all group hover:bg-slate-900/80 shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
-                  >
-                    <div className="flex items-start justify-between mb-3">
-                      <div className="flex items-center gap-2">
-                        <AlertTriangle className="text-rose-500" size={16}/>
-                        <span className="text-xs font-bold text-rose-500 tracking-widest">INTEL MATCH DETECTED</span>
-                      </div>
-                      <span className="text-[10px] text-fuchsia-500/70 font-bold">ID: {intelData.id}</span>
-                    </div>
-                    
-                    <p className="text-slate-300 text-sm leading-relaxed border-l-2 border-fuchsia-500/50 pl-3">
-                      "{intelData.transcript}"
-                    </p>
-                    
-                    <div className="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
-                       <span className="text-slate-500 flex items-center gap-1">
-                         <MapIcon size={12} className="text-fuchsia-500/50" /> {intelData.location}
-                       </span>
-                       <span className="text-fuchsia-500/70 group-hover:text-fuchsia-400 flex items-center gap-1 transition-colors font-bold">
-                         VIEW TACTICAL SUMMARY <ChevronRight size={14} />
-                       </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="flex-1 flex flex-col items-center justify-center text-slate-600 border border-dashed border-slate-800 rounded bg-black/20 gap-3">
-                    <Radio size={32} className="opacity-50" />
-                    <span className="text-xs uppercase tracking-widest text-center px-4 leading-relaxed">
-                      {aiSummary || "Awaiting Query Input"}
-                    </span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex-1 flex flex-col bg-black border border-slate-800 rounded overflow-hidden">
-                <div className="p-2 border-b border-slate-800 flex items-center gap-2 text-[10px] text-blue-400 bg-blue-950/20">
-                  <Activity size={12} className="animate-pulse" /> LIVE CHATTER ANALYSIS
-                </div>
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-                  {[
-                    { src: "Telegram / Unknown", time: "2m ago", text: "Movement spotted near Sector 4 checkpoints. Prepare the cargo.", threat: "HIGH" },
-                    { src: "DarkWeb Forum", time: "15m ago", text: "Looking for blindspots in perimeter CCTV-04.", threat: "MED" },
-                    { src: "Twitter / Open", time: "1h ago", text: "Loud noises heard coming from the northern ridge.", threat: "LOW" }
-                  ].map((item, i) => (
-                    <div key={i} className="border-l-2 border-blue-500/50 pl-3 pb-4 border-b border-slate-800/50 last:border-b-0">
-                       <div className="flex justify-between items-center mb-1">
-                         <span className="text-[10px] text-slate-500">{item.src} // {item.time}</span>
-                         <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded bg-black border ${item.threat === 'HIGH' ? 'text-rose-400 border-rose-900/50' : item.threat === 'MED' ? 'text-yellow-400 border-yellow-900/50' : 'text-slate-400 border-slate-700'}`}>
-                           {item.threat}
-                         </span>
-                       </div>
-                       <p className="text-xs text-slate-300 font-sans">{item.text}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-          </div>
+          <IntelPanel
+            query={searchQuery}
+            setQuery={setSearchQuery}
+            onSearch={handleSearch}
+            isLoading={isSearching}
+            intelData={intelData}
+            aiSummary={aiSummary}
+            onOpenModal={() => setIsThreatModalOpen(true)}
+            mobileVisible={mobileTab === "intel"}
+          />
         </section>
-
       </main>
 
-      {renderModal()}
+      {/* Real-time Threat Action Modal */}
+      <ThreatModal
+        isOpen={isThreatModalOpen}
+        onClose={() => setIsThreatModalOpen(false)}
+        intelData={intelData}
+        threatAssessment={activeAssessment}
+        aiSummary={aiSummary}
+      />
+
+      {/* Historical Incident Memory Modal */}
+      <HistoryModal
+        isOpen={isHistoryModalOpen}
+        onClose={() => setIsHistoryModalOpen(false)}
+        historyRecords={historyRecords}
+      />
+
+      {/* Custom Feed Video / JSON Upload Modal */}
+      <UploadFeedModal
+        isOpen={isUploadModalOpen}
+        onClose={() => setIsUploadModalOpen(false)}
+        onFeedCreated={handleFeedCreated}
+      />
+
+      {/* Dev Benchmark Probe Banner */}
+      {perfReport && (
+        <div
+          id="perf-report-banner"
+          className="fixed top-2 right-2 z-[99999] bg-black/90 border border-emerald-500 p-2 text-xs font-mono text-emerald-400"
+        >
+          PROBE: frames={perfReport.frames} mean={perfReport.mean_draw_ms}ms p95={perfReport.p95_draw_ms}ms boxes={perfReport.mean_boxes} commits/100f={perfReport.commits_per_100_frames} status={perfReport.status}
+        </div>
+      )}
     </div>
   );
+
+  return perfEnabled ? <Profiler id="AegisDashboard" onRender={handleRender}>{content}</Profiler> : content;
 }

@@ -1,0 +1,29 @@
+[
+  {
+    "id": "uav-alpha",
+    "label": "UAV Alpha (FLIR 4K)",
+    "video": "/feeds/uav-alpha/video.mp4",
+    "detections": "/feeds/uav-alpha/detections.json",
+    "center_lat": 31.4520,
+    "center_lng": 74.9250,
+    "sensor": "EO/IR Optronics"
+  },
+  {
+    "id": "cctv-bravo",
+    "label": "Perimeter CCTV (Sector 4)",
+    "video": "/feeds/cctv-bravo/video.mp4",
+    "detections": "/feeds/cctv-bravo/detections.json",
+    "center_lat": 34.2090,
+    "center_lng": 74.3430,
+    "sensor": "Fixed Optical 1080p"
+  },
+  {
+    "id": "bodycam-charlie",
+    "label": "QRT Bodycam (Forward Patrol)",
+    "video": "/feeds/bodycam-charlie/video.mp4",
+    "detections": "/feeds/bodycam-charlie/detections.json",
+    "center_lat": 32.7260,
+    "center_lng": 74.8570,
+    "sensor": "Tactical Bodycam"
+  }
+]
