@@ -72,6 +72,8 @@ export function OpticsViewport({
     onPerfReportRef.current = onPerfReport;
   });
 
+  const videoSrc = activeFeed?.video || "/feeds/uav-alpha/video.mp4";
+
   useEffect(() => {
     setVideoError(false);
   }, [videoSrc]);
@@ -267,8 +269,6 @@ export function OpticsViewport({
     const secs = Math.floor(seconds % 60);
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
-
-  const videoSrc = activeFeed?.video || "/feeds/uav-alpha/video.mp4";
 
   return (
     <div className="flex flex-col gap-3 lg:gap-4 relative w-full">
