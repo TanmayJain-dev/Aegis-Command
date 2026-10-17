@@ -100,13 +100,13 @@ Schema v2 organizes detection data by **track trajectory** rather than per-frame
 
 ---
 
-## Schema v1 Compatibility & 10 Hz Intermediate Pipeline
+## Schema v1 Compatibility & Client-Side Bridging Pipeline
 
 The frontend maintains backward compatibility for legacy and intermediate `detections.json` files formatted under Schema v1.
 
-### Interim 10 Hz Sampling
+### Keyframe Sampling & Client-Side Bridging
 
-All active surveillance feeds (`uav-alpha`, `cctv-bravo`, and `bodycam-charlie`) currently ship under Schema v1 sampled at approximately **10 Hz** (`sample-interval=0.1s`, `imgsz=1280`, conf=0.35, ByteTrack) as an intermediate step toward full Schema v2 adoption. Compact JSON serialization is enforced to maintain lean bundle footprints (< 500 KB per feed timeline).
+All active surveillance feeds (`uav-alpha`, `cctv-bravo`, and `bodycam-charlie`) currently ship under Schema v1 with keyframes every 0.5s, bridged client-side by class+IoU matching with linear interpolation (`imgsz=1280`, conf=0.35, ByteTrack). Compact JSON serialization is enforced to maintain lean bundle footprints (< 500 KB per feed timeline).
 
 ### Structure
 ```json
@@ -115,8 +115,7 @@ All active surveillance feeds (`uav-alpha`, `cctv-bravo`, and `bodycam-charlie`)
     "feed_id": "uav-alpha",
     "evaluated": true,
     "model": "aegis_demo_full_last.pt",
-    "sample_interval_s": 0.1,
-    "generator_commit": "562e147",
+    "generator_commit": "be1308e...",
     "weights_sha256": "93761a11...",
     "detections_sha256": "..."
   },
@@ -152,6 +151,7 @@ To eliminate optical overlay stutter and flicker between discrete keyframes with
 ### Secondary Feeds Status (`cctv-bravo`, `bodycam-charlie`)
 
 - **Video Assets**: Standardized 720p 30fps web video copies (`frontend/public/feeds/*/video.mp4`) ship directly in the repository (< 8 MB each).
-- **Inference & Evaluation**: Detection timelines for secondary feeds are generated using zero-shot inference (`yolov8m.pt` @ 1280px) and sampled at 10 Hz.
+- **Inference & Evaluation**: Detection timelines for secondary feeds are generated using zero-shot inference (`yolov8m.pt` @ 1280px with keyframes every 0.5s, bridged client-side by class+IoU matching with linear interpolation).
 - **Evaluation Status**: Both secondary feeds are explicitly configured in metadata with `"evaluated": false`. Human-verified ground-truth bounding box annotations and cross-validation benchmark statistics exist exclusively for `uav-alpha`. Secondary feeds render a visible operational warning badge in the dashboard.
+
 
