@@ -135,7 +135,7 @@ describe("Schema v1 Legacy Adapter & Tolerance Window", () => {
         direction: "NW",
       },
     ],
-    "2.00": [
+    "3.00": [
       {
         id: "Vehicle-1",
         class: "truck",
@@ -168,13 +168,129 @@ describe("Schema v1 Legacy Adapter & Tolerance Window", () => {
     expect(inside[0].id).toBe("Vehicle-1");
   });
 
-  it("suppresses stale detections outside tolerance window (> 0.05s)", () => {
+  it("suppresses stale detections outside tolerance window (> 0.05s) when gap > MAX_BRIDGE_S", () => {
+    // Gap = 2.00s > MAX_BRIDGE_S (1.00s)
     // Outside tolerance: 1.06 (diff = 0.06 > 0.05) -> must be empty (prevents stale boxes)
     const outside = timeline.sampleAt(1.06);
     expect(outside).toEqual([]);
 
-    // Halfway at 1.50 -> must be empty
-    expect(timeline.sampleAt(1.50)).toEqual([]);
+    // Halfway at 2.00 -> must be empty
+    expect(timeline.sampleAt(2.00)).toEqual([]);
+  });
+});
+
+describe("Schema v1 Gap Bridging and Linear Interpolation", () => {
+  const bridgingData = {
+    "1.00": [
+      {
+        id: "Car-A",
+        class: "car",
+        confidence: 0.8,
+        box: [100, 100, 200, 200] as [number, number, number, number],
+        speed_kmh: 30,
+        direction: "N",
+      },
+      {
+        id: "Solo-Person",
+        class: "person",
+        confidence: 0.9,
+        box: [10, 10, 40, 70] as [number, number, number, number],
+        speed_kmh: 5,
+        direction: "E",
+      },
+    ],
+    "1.50": [
+      {
+        id: "Car-B", // Different ID (ID churn)
+        class: "car",
+        confidence: 0.9,
+        box: [150, 120, 250, 220] as [number, number, number, number],
+        speed_kmh: 32,
+        direction: "NE",
+      },
+    ],
+  };
+
+  const timeline = parseTimeline(bridgingData);
+
+  it("(a) returns matched interpolated boxes at mid-gap, never an empty frame", () => {
+    const mid = timeline.sampleAt(1.25);
+    expect(mid.length).toBeGreaterThan(0);
+    const car = mid.find((d) => d.class === "car");
+    expect(car).toBeDefined();
+    expect(car?.interpolated).toBe(true);
+  });
+
+  it("(b) calculates exact midpoint interpolation values", () => {
+    // Exactly halfway between 1.00 and 1.50 (alpha = 0.5)
+    const mid = timeline.sampleAt(1.25);
+    const car = mid.find((d) => d.class === "car")!;
+    // Box coords: [ (100+150)/2, (100+120)/2, (200+250)/2, (200+220)/2 ] = [125, 110, 225, 210]
+    expect(car.box[0]).toBeCloseTo(125);
+    expect(car.box[1]).toBeCloseTo(110);
+    expect(car.box[2]).toBeCloseTo(225);
+    expect(car.box[3]).toBeCloseTo(210);
+    // Confidence and kinematics from nearer sample (at alpha=0.5, nearer is sample A: conf 0.8, speed 30, dir N)
+    expect(car.confidence).toBeCloseTo(0.8);
+    expect(car.speed_kmh).toBeCloseTo(30);
+    expect(car.direction).toBe("N");
+    expect(car.interpolated).toBe(true);
+  });
+
+  it("(c) bridges across ID churn (same object, different IDs)", () => {
+    // Car-A at 1.00 and Car-B at 1.50 have different IDs but same class and high IoU
+    const mid = timeline.sampleAt(1.25);
+    const car = mid.find((d) => d.class === "car");
+    expect(car).toBeDefined();
+    // Nearer to sample A at alpha=0.5 -> "Car-A"
+    expect(car?.id).toBe("Car-A");
+
+    // Closer to sample B at t=1.40 (alpha = 0.8 > 0.5) -> "Car-B"
+    const late = timeline.sampleAt(1.40);
+    const carLate = late.find((d) => d.class === "car");
+    expect(carLate?.id).toBe("Car-B");
+    expect(carLate?.confidence).toBeCloseTo(0.9);
+    expect(carLate?.direction).toBe("NE");
+  });
+
+  it("(d) prevents ghosting of unmatched detections beyond 0.15s tolerance", () => {
+    // Solo-Person only exists at t=1.00.
+    // Within +0.15s (e.g. t=1.10): visible as unmatched
+    const inside = timeline.sampleAt(1.10);
+    expect(inside.some((d) => d.id === "Solo-Person")).toBe(true);
+
+    // Beyond +0.15s (e.g. t=1.20): suppressed, no ghosting
+    const outside = timeline.sampleAt(1.20);
+    expect(outside.some((d) => d.id === "Solo-Person")).toBe(false);
+  });
+
+  it("(e) falls back to tolerance behavior when gap > MAX_BRIDGE_S (no ghost beyond 1.0s)", () => {
+    const largeGapData = {
+      "1.00": [
+        {
+          id: "Person-1",
+          class: "person",
+          confidence: 0.9,
+          box: [100, 100, 200, 200] as [number, number, number, number],
+        },
+      ],
+      "3.00": [
+        {
+          id: "Person-1",
+          class: "person",
+          confidence: 0.9,
+          box: [100, 100, 200, 200] as [number, number, number, number],
+        },
+      ],
+    };
+    const largeTimeline = parseTimeline(largeGapData);
+    // Gap = 2.0s > MAX_BRIDGE_S (1.0s) -> no bridging
+    // Mid-gap at 2.00 is > 0.05s from both 1.00 and 3.00
+    expect(largeTimeline.sampleAt(2.00)).toEqual([]);
+    // At 1.04 (within 0.05s tolerance) -> returns detection
+    expect(largeTimeline.sampleAt(1.04)).toHaveLength(1);
+    // At 1.06 (outside tolerance) -> returns empty
+    expect(largeTimeline.sampleAt(1.06)).toEqual([]);
   });
 });
 
