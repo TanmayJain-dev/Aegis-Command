@@ -83,9 +83,31 @@ export function computeOverlayScale(
   };
 }
 
+function getSemanticColor(cls: string, fallback?: string): string {
+  if (fallback) return fallback;
+  const c = (cls || "").toLowerCase();
+  if (c === "person" || c === "human" || c === "pedestrian") {
+    return "#10b981"; // restrained green
+  }
+  if (c === "drone" || c === "uav" || c === "threat") {
+    return "#ef4444"; // restrained red
+  }
+  if (["truck", "car", "vehicle", "bus", "motorcycle"].includes(c)) {
+    return "#3b82f6"; // restrained blue
+  }
+  return "#3b82f6";
+}
+
+function getSemanticFill(color: string, alpha = 0.08): string {
+  if (color === "#10b981") return `rgba(16, 185, 129, ${alpha})`;
+  if (color === "#ef4444") return `rgba(239, 68, 68, ${alpha})`;
+  if (color === "#3b82f6") return `rgba(59, 130, 246, ${alpha})`;
+  return `rgba(59, 130, 246, ${alpha})`;
+}
+
 /**
  * Pure canvas rendering routine for bounding boxes and telemetry tags.
- * Preserves the exact visual style, colors, fonts, and corner brackets of Aegis HUD.
+ * Restrained semantic styling: green for personnel, blue for vehicles, red for critical threats.
  */
 export function drawDetections(
   ctx: CanvasRenderingContext2D,
@@ -93,8 +115,7 @@ export function drawDetections(
   scale: OverlayScale,
   opts: DrawDetectionsOptions = {}
 ): void {
-  const primaryColor = opts.primaryColor ?? "#06b6d4"; // cyan-500
-  const fillAlpha = opts.fillAlpha ?? 0.15;
+  const fillAlpha = opts.fillAlpha ?? 0.08;
   const offX = scale.offsetX ?? 0;
   const offY = scale.offsetY ?? 0;
 
@@ -107,61 +128,42 @@ export function drawDetections(
     const scaledWidth = (x2 - x1) * scale.scaleX;
     const scaledHeight = (y2 - y1) * scale.scaleY;
 
-    // Tactical cyan bounding box
-    ctx.strokeStyle = primaryColor;
-    ctx.lineWidth = 2;
+    const color = getSemanticColor(det.class, opts.primaryColor);
+
+    // Clean semantic bounding box
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 1.5;
     ctx.strokeRect(scaledX, scaledY, scaledWidth, scaledHeight);
 
-    // Corner targeting brackets
-    ctx.beginPath();
-    ctx.moveTo(scaledX, scaledY + 10);
-    ctx.lineTo(scaledX, scaledY);
-    ctx.lineTo(scaledX + 10, scaledY);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(scaledX + scaledWidth - 10, scaledY);
-    ctx.lineTo(scaledX + scaledWidth, scaledY);
-    ctx.lineTo(scaledX + scaledWidth, scaledY + 10);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(scaledX, scaledY + scaledHeight - 10);
-    ctx.lineTo(scaledX, scaledY + scaledHeight);
-    ctx.lineTo(scaledX + 10, scaledY + scaledHeight);
-    ctx.stroke();
-
-    ctx.beginPath();
-    ctx.moveTo(scaledX + scaledWidth - 10, scaledY + scaledHeight);
-    ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight);
-    ctx.lineTo(scaledX + scaledWidth, scaledY + scaledHeight - 10);
-    ctx.stroke();
-
-    // Box tint fill
-    ctx.fillStyle = `rgba(6, 182, 212, ${fillAlpha})`;
+    // Subtle box tint fill
+    ctx.fillStyle = getSemanticFill(color, fillAlpha);
     ctx.fillRect(scaledX, scaledY, scaledWidth, scaledHeight);
 
-    // Header telemetry label
-    const hasTrackingInfo = Boolean(det.id && det.direction && det.direction !== "-");
-    const labelHeight = hasTrackingInfo ? 34 : 20;
+    // Header telemetry label: clean solid label
+    const hasTrackingInfo = Boolean(det.id && det.direction && det.direction !== '-');
+    const labelText = det.class.toLowerCase() + ' ' + Math.round(det.confidence * 100) + '%';
+    const trackText = hasTrackingInfo ? (det.direction + ' · ' + det.speed_kmh + 'km/h') : '';
 
-    ctx.fillStyle = primaryColor;
-    ctx.fillRect(scaledX, scaledY - labelHeight, 140, labelHeight);
+    const labelHeight = hasTrackingInfo ? 26 : 15;
+    const labelY = scaledY >= labelHeight ? scaledY - labelHeight : scaledY;
 
-    ctx.fillStyle = "#0a0a0a"; // Dark text on cyan background
-    ctx.font = "bold 10px monospace";
-    ctx.fillText(
-      `[${det.class.toUpperCase()}] ${(det.confidence * 100).toFixed(1)}%`,
-      scaledX + 4,
-      scaledY - (hasTrackingInfo ? 20 : 6)
-    );
+    ctx.font = '600 10px monospace';
+    const textWidth = Math.max(ctx.measureText(labelText).width + 8, hasTrackingInfo ? ctx.measureText(trackText).width + 8 : 0);
+    const labelWidth = Math.min(Math.max(textWidth, 64), Math.max(scaledWidth, 64));
+
+    // Solid label badge
+    ctx.fillStyle = color;
+    ctx.fillRect(scaledX, labelY, labelWidth, labelHeight);
+
+    // Dark text on solid badge for high contrast
+    ctx.fillStyle = '#070d17';
+    ctx.font = '600 9px monospace';
+    ctx.fillText(labelText, scaledX + 4, labelY + 11);
 
     if (hasTrackingInfo) {
-      ctx.fillText(
-        `${det.id} · ${det.direction} · ${det.speed_kmh}km/h`,
-        scaledX + 4,
-        scaledY - 6
-      );
+      ctx.fillStyle = '#070d17';
+      ctx.font = '500 8px monospace';
+      ctx.fillText(trackText, scaledX + 4, labelY + 22);
     }
   }
 }

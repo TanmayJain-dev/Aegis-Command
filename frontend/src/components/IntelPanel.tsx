@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import {
-  Terminal,
   Search,
-  Activity,
-  AlertTriangle,
-  ChevronRight,
+  Loader2,
+  FileText,
+  MapPin,
   Radio,
-  Map as MapIcon,
+  ExternalLink,
+  ShieldAlert,
+  Compass,
 } from "lucide-react";
 import { IntelRecord, ChatterItem } from "../types/aegis";
 
@@ -25,26 +26,116 @@ export interface IntelPanelProps {
   mobileVisible?: boolean;
 }
 
+interface ParsedBullet {
+  type: "SITUATION" | "EVIDENCE" | "DIRECTIVE" | "GENERAL";
+  title: string;
+  text: string;
+}
+
 const OSINT_MOCK_FEED: ChatterItem[] = [
   {
-    src: "Telegram / Unknown",
+    src: "Border Telecom Monitor / Cell Tower S-4",
     time: "2m ago",
-    text: "Movement spotted near Sector 4 checkpoints. Prepare the cargo.",
+    text: "Anomalous burst of unencrypted roaming SIM connections recorded near forward culvert milestone 114.",
     threat: "HIGH",
   },
   {
-    src: "DarkWeb Forum",
-    time: "15m ago",
-    text: "Looking for blindspots in perimeter CCTV-04.",
+    src: "VHF Tactical Intercept / 142.85 MHz",
+    time: "11m ago",
+    text: "Directional hop transmission: Repeated logistics inquiries regarding blindspots along perimeter CCTV-04.",
     threat: "MED",
   },
   {
-    src: "Twitter / Open",
+    src: "ADS-B / Drone Beacon Sentry",
+    time: "24m ago",
+    text: "Low-altitude transponder drop registered at 120m AGL along Chenab riverine bend. Radar tracking handoff initiated.",
+    threat: "HIGH",
+  },
+  {
+    src: "Acoustic Ground Sentry Array",
+    time: "48m ago",
+    text: "Dual-rotor low-frequency resonance (180 Hz) registered by passive acoustic array at Samba sector perimeter fence.",
+    threat: "MED",
+  },
+  {
+    src: "BSF Sector Operations Log",
     time: "1h ago",
-    text: "Loud noises heard coming from the northern ridge.",
+    text: "Joint Army-BSF QRT completed scheduled night relief. Optronic FLIR barriers verified operational across all outposts.",
     threat: "LOW",
   },
 ];
+
+const QUICK_SUGGESTIONS = [
+  "Drop Zone Alpha",
+  "Hexacopter",
+  "Samba Sector",
+  "Seismic Trigger",
+  "Micro-Doppler",
+  "Chenab Riverine",
+  "Akhnoor Post",
+];
+
+function extractDiscipline(transcript?: string): { tag: string; cleanText: string; color: string } {
+  if (!transcript) return { tag: "INTEL", cleanText: "", color: "bg-[#3b82f6]/10 text-[#3b82f6] border-[#3b82f6]/30" };
+  const match = transcript.match(/^\[(.*?)\]\s*(.*)$/);
+  if (match) {
+    const rawTag = match[1].toUpperCase();
+    const cleanText = match[2];
+    let color = "bg-[#3b82f6]/10 text-[#3b82f6] border-[#3b82f6]/30";
+    if (rawTag.includes("FLASH") || rawTag.includes("ALERT") || rawTag.includes("CRITICAL")) {
+      color = "bg-[#ef4444]/10 text-[#ef4444] border-[#ef4444]/30";
+    } else if (rawTag.includes("ELINT") || rawTag.includes("RADAR") || rawTag.includes("EW")) {
+      color = "bg-[#06b6d4]/10 text-[#06b6d4] border-[#06b6d4]/30";
+    } else if (rawTag.includes("SIGINT") || rawTag.includes("COMINT") || rawTag.includes("CELLULAR")) {
+      color = "bg-[#8b5cf6]/10 text-[#a78bfa] border-[#8b5cf6]/30";
+    } else if (rawTag.includes("OPTICS") || rawTag.includes("FLIR") || rawTag.includes("THERMAL")) {
+      color = "bg-[#f59e0b]/10 text-[#f59e0b] border-[#f59e0b]/30";
+    } else if (rawTag.includes("SEISMIC") || rawTag.includes("BARRIER")) {
+      color = "bg-[#ec4899]/10 text-[#ec4899] border-[#ec4899]/30";
+    } else if (rawTag.includes("ROUTINE") || rawTag.includes("PATROL")) {
+      color = "bg-[#10b981]/10 text-[#10b981] border-[#10b981]/30";
+    }
+    return { tag: rawTag, cleanText, color };
+  }
+  return { tag: "SIGINT / INTERCEPT", cleanText: transcript, color: "bg-[#3b82f6]/10 text-[#3b82f6] border-[#3b82f6]/30" };
+}
+
+function parseAiBullets(summary: string): ParsedBullet[] {
+  if (!summary) return [];
+  const lines = summary.split("\n").map(l => l.trim()).filter(Boolean);
+  const result: ParsedBullet[] = [];
+
+  for (const line of lines) {
+    const clean = line.replace(/^[•\-*]\s*/, "");
+    if (/^SITUATION\s*[:\-]/i.test(clean)) {
+      result.push({
+        type: "SITUATION",
+        title: "SITUATION",
+        text: clean.replace(/^SITUATION\s*[:\-]\s*/i, ""),
+      });
+    } else if (/^EVIDENCE\s*[:\-]/i.test(clean)) {
+      result.push({
+        type: "EVIDENCE",
+        title: "EVIDENCE",
+        text: clean.replace(/^EVIDENCE\s*[:\-]\s*/i, ""),
+      });
+    } else if (/^(DIRECTIVE|ACTION|RECOMMENDATION)\s*[:\-]/i.test(clean)) {
+      result.push({
+        type: "DIRECTIVE",
+        title: "DIRECTIVE",
+        text: clean.replace(/^(DIRECTIVE|ACTION|RECOMMENDATION)\s*[:\-]\s*/i, ""),
+      });
+    } else {
+      result.push({
+        type: "GENERAL",
+        title: "BRIEF",
+        text: clean,
+      });
+    }
+  }
+
+  return result;
+}
 
 export function IntelPanel({
   query,
@@ -58,24 +149,36 @@ export function IntelPanel({
 }: IntelPanelProps) {
   const [intelMode, setIntelMode] = useState<IntelMode>("SIGINT");
 
+  const discipline = extractDiscipline(intelData?.transcript);
+  const parsedBullets = useMemo(() => parseAiBullets(aiSummary), [aiSummary]);
+
   return (
     <div
       className={`${
-        mobileVisible ? "flex flex-1" : "hidden lg:flex"
-      } flex-1 flex flex-col gap-4 border border-fuchsia-900/30 bg-slate-900/20 p-3 sm:p-4 rounded relative shadow-inner`}
+        mobileVisible ? "flex" : "hidden lg:flex"
+      } flex-col rounded bg-[#0d1724] border border-[#243244] overflow-hidden flex-1`}
     >
-      <div className="flex justify-between items-center border-b border-slate-800 pb-4">
-        <div className="text-xs uppercase tracking-widest text-fuchsia-400 font-bold flex items-center gap-2">
-          <Terminal size={14} /> Intel Feed
+      {/* Header with Mode Tabs */}
+      <div className="px-3.5 py-2.5 bg-[#121e2c] border-b border-[#243244] flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2">
+          <FileText size={14} className="text-[#3b82f6]" />
+          <span className="text-[12px] font-semibold text-[#f2f5f8] tracking-wide">
+            Intelligence Retrieval & Analysis
+          </span>
+          <span className="text-[10px] font-mono text-[#708096] bg-[#09111c] px-1.5 py-0.5 rounded border border-[#182332]">
+            1,250 Reports
+          </span>
         </div>
-        <div className="flex bg-black border border-slate-700 rounded p-1">
+
+        {/* Mode Selector */}
+        <div className="flex items-center p-0.5 rounded bg-[#09111c] border border-[#243244]">
           <button
             type="button"
             onClick={() => setIntelMode("SIGINT")}
-            className={`px-4 py-1 rounded text-[10px] font-bold tracking-widest transition-colors ${
+            className={`px-2.5 py-1 rounded text-[10px] font-semibold tracking-wider transition-colors ${
               intelMode === "SIGINT"
-                ? "bg-fuchsia-950/50 text-fuchsia-400"
-                : "text-slate-500 hover:text-slate-300"
+                ? "bg-[#172333] text-[#f2f5f8] shadow-sm"
+                : "text-[#708096] hover:text-[#a7b2c2]"
             }`}
           >
             SIGINT / RAG
@@ -83,108 +186,220 @@ export function IntelPanel({
           <button
             type="button"
             onClick={() => setIntelMode("OSINT")}
-            className={`px-4 py-1 rounded text-[10px] font-bold tracking-widest transition-colors ${
+            className={`px-2.5 py-1 rounded text-[10px] font-semibold tracking-wider transition-colors ${
               intelMode === "OSINT"
-                ? "bg-blue-950/50 text-blue-400"
-                : "text-slate-500 hover:text-slate-300"
+                ? "bg-[#172333] text-[#f2f5f8] shadow-sm"
+                : "text-[#708096] hover:text-[#a7b2c2]"
             }`}
           >
-            OSINT / WEB
+            OSINT CHATTER
           </button>
         </div>
       </div>
 
-      {intelMode === "SIGINT" ? (
-        <div className="flex flex-col gap-4 flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 text-fuchsia-500/50" size={16} />
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && onSearch()}
-              placeholder="QUERY SIGINT DATABASE..."
-              className="w-full rounded bg-black border border-slate-700 text-fuchsia-400 text-sm py-2.5 pl-10 pr-4 outline-none focus:border-fuchsia-500 focus:ring-1 focus:ring-fuchsia-500/50 placeholder-slate-600 transition-all font-mono shadow-inner"
-            />
-            {isLoading && (
-              <div className="absolute right-3 top-3">
-                <Activity className="animate-spin text-fuchsia-500" size={16} />
+      <div className="p-3.5 flex flex-col gap-3 flex-1 overflow-y-auto custom-scrollbar">
+        {intelMode === "SIGINT" ? (
+          <>
+            {/* Search Input Box */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                onSearch();
+              }}
+              className="relative flex items-center"
+            >
+              <Search
+                size={14}
+                className="absolute left-3 text-[#708096] pointer-events-none"
+              />
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search across 1,250 SIGINT, ELINT, and tactical border reports..."
+                className="w-full pl-9 pr-20 py-2 rounded bg-[#09111c] border border-[#243244] text-[#f2f5f8] placeholder-[#708096] text-[12px] outline-none focus:border-[#3b82f6] transition-colors font-mono"
+              />
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="absolute right-1.5 px-2.5 py-1 rounded bg-[#172333] hover:bg-[#243244] text-[#a7b2c2] hover:text-[#f2f5f8] text-[11px] font-medium transition-colors flex items-center gap-1 border border-[#243244]"
+              >
+                {isLoading ? (
+                  <Loader2 size={12} className="animate-spin text-[#3b82f6]" />
+                ) : (
+                  <span>Query</span>
+                )}
+              </button>
+            </form>
+
+            {/* Quick Suggestions Chips */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] text-[#708096] font-mono uppercase tracking-wider">
+                Explore:
+              </span>
+              {QUICK_SUGGESTIONS.map((sug) => (
+                <button
+                  key={sug}
+                  type="button"
+                  onClick={() => {
+                    setQuery(sug);
+                    onSearch(sug);
+                  }}
+                  className="px-2 py-0.5 rounded bg-[#09111c] hover:bg-[#172333] border border-[#1f2d3d] hover:border-[#3b82f6]/40 text-[#a7b2c2] hover:text-[#f2f5f8] text-[10px] font-mono transition-colors"
+                >
+                  {sug}
+                </button>
+              ))}
+            </div>
+
+            {/* Retrieved Intelligence Result */}
+            {intelData ? (
+              <div className="flex flex-col gap-2.5 p-3 rounded bg-[#09111c] border border-[#182332] text-xs">
+                {/* Top Badges */}
+                <div className="flex items-center justify-between flex-wrap gap-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="font-mono font-semibold text-[11px] text-[#3b82f6] bg-[#3b82f6]/10 px-2 py-0.5 rounded border border-[#3b82f6]/30">
+                      {intelData.id}
+                    </span>
+                    <span
+                      className={`font-mono font-medium text-[10px] px-2 py-0.5 rounded border ${discipline.color}`}
+                    >
+                      {discipline.tag}
+                    </span>
+                    {intelData.score !== undefined && (
+                      <span className="text-[10px] font-mono text-[#708096]">
+                        Relevance: {Math.round(intelData.score * 100)}%
+                      </span>
+                    )}
+                  </div>
+
+                  {intelData.location && (
+                    <div className="flex items-center gap-1 text-[11px] text-[#a7b2c2] font-mono">
+                      <MapPin size={12} className="text-[#3b82f6]" />
+                      <span>{intelData.location}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Raw Transcript Content */}
+                <div className="p-2.5 rounded bg-[#0d1724] border border-[#243244] text-[#f2f5f8] text-[12px] leading-relaxed">
+                  &ldquo;{intelData.transcript}&rdquo;
+                </div>
+
+                {/* AI Military Intelligence Synthesis (Bulleted Single-Look Output) */}
+                {parsedBullets.length > 0 && (
+                  <div className="p-3 rounded bg-[#111927] border border-[#8b5cf6]/35 flex flex-col gap-2">
+                    <div className="flex items-center justify-between border-b border-[#243244]/60 pb-1.5">
+                      <span className="text-[10px] uppercase font-semibold text-[#a78bfa] font-mono tracking-wider flex items-center gap-1.5">
+                        <ShieldAlert size={12} className="text-[#a78bfa]" />
+                        <span>AI Tactical Intelligence Synthesis</span>
+                      </span>
+                      <span className="text-[9px] font-mono text-[#708096] px-1.5 py-0.2 rounded bg-[#09111c] border border-[#1f2d3d]">
+                        Groq qwen/qwen3.8-27b
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-2 pt-0.5">
+                      {parsedBullets.map((bullet, idx) => {
+                        const badgeStyle =
+                          bullet.type === "SITUATION"
+                            ? "bg-[#3b82f6]/20 text-[#60a5fa] border-[#3b82f6]/50"
+                            : bullet.type === "EVIDENCE"
+                            ? "bg-[#8b5cf6]/20 text-[#c084fc] border-[#8b5cf6]/50"
+                            : bullet.type === "DIRECTIVE"
+                            ? "bg-[#10b981]/20 text-[#34d399] border-[#10b981]/50"
+                            : "bg-[#1f2d3d] text-[#a7b2c2] border-[#243244]";
+
+                        return (
+                          <div
+                            key={idx}
+                            className="flex items-start gap-2.5 text-[12px] leading-relaxed"
+                          >
+                            <span
+                              className={`px-2 py-0.5 rounded border text-[9px] font-mono font-bold tracking-wider shrink-0 mt-0.5 ${badgeStyle}`}
+                            >
+                              {bullet.title}
+                            </span>
+                            <span className="text-[#e2e8f0] flex-1">
+                              {bullet.text}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Modal View Button */}
+                <button
+                  type="button"
+                  onClick={onOpenModal}
+                  className="mt-1 w-full py-1.5 px-2.5 rounded bg-[#121e2c] hover:bg-[#172333] border border-[#243244] text-[#a7b2c2] hover:text-[#f2f5f8] text-[11px] font-medium flex items-center justify-center gap-1 transition-colors"
+                >
+                  <span>Inspect Full Evidence Chain</span>
+                  <ExternalLink size={12} />
+                </button>
+              </div>
+            ) : (
+              <div className="flex-1 flex flex-col items-center justify-center p-6 text-center text-[#708096] text-[12px] border border-dashed border-[#182332] rounded">
+                <Radio size={24} className="text-[#334358] mb-2" />
+                <p className="font-medium text-[#a7b2c2] mb-1">
+                  {aiSummary || "Awaiting Sector Query"}
+                </p>
+                <p className="text-[11px] text-[#708096] max-w-xs">
+                  Search across 1,250 vectorized intercepts including FLIR thermals, micro-Doppler radar, geophone seismic sensors, and encrypted VHF comms.
+                </p>
               </div>
             )}
-          </div>
-
-          {intelData ? (
-            <div
-              onClick={onOpenModal}
-              className="mt-2 bg-slate-950 border border-fuchsia-900/50 hover:border-fuchsia-500/50 p-4 rounded cursor-pointer transition-all group hover:bg-slate-900/80 shadow-[0_4px_20px_rgba(0,0,0,0.5)]"
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-2">
-                  <AlertTriangle className="text-rose-500" size={16} />
-                  <span className="text-xs font-bold text-rose-500 tracking-widest">
-                    INTEL MATCH DETECTED
-                  </span>
-                </div>
-                <span className="text-[10px] text-fuchsia-500/70 font-bold">
-                  ID: {intelData.id}
-                </span>
-              </div>
-
-              <p className="text-slate-300 text-sm leading-relaxed border-l-2 border-fuchsia-500/50 pl-3">
-                &quot;{intelData.transcript}&quot;
-              </p>
-
-              <div className="mt-4 pt-3 border-t border-slate-800 flex justify-between items-center text-xs">
-                <span className="text-slate-500 flex items-center gap-1">
-                  <MapIcon size={12} className="text-fuchsia-500/50" /> {intelData.location}
-                </span>
-                <span className="text-fuchsia-500/70 group-hover:text-fuchsia-400 flex items-center gap-1 transition-colors font-bold">
-                  VIEW TACTICAL SUMMARY <ChevronRight size={14} />
-                </span>
-              </div>
-            </div>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-slate-600 border border-dashed border-slate-800 rounded bg-black/20 gap-3">
-              <Radio size={32} className="opacity-50" />
-              <span className="text-xs uppercase tracking-widest text-center px-4 leading-relaxed">
-                {aiSummary || "Awaiting Query Input"}
+          </>
+        ) : (
+          /* OSINT Chatter Mode */
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center justify-between text-[10px] font-semibold text-[#708096] uppercase tracking-wider mb-0.5">
+              <span>Monitored Signals & Open-Source Chatter</span>
+              <span className="font-mono text-[#10b981] flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#10b981] animate-pulse" />
+                SCANNING
               </span>
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex-1 flex flex-col bg-black border border-slate-800 rounded overflow-hidden">
-          <div className="p-2 border-b border-slate-800 flex items-center gap-2 text-[10px] text-blue-400 bg-blue-950/20">
-            <Activity size={12} className="animate-pulse" /> LIVE CHATTER ANALYSIS
-          </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-4 custom-scrollbar">
-            {OSINT_MOCK_FEED.map((item, i) => (
-              <div
-                key={i}
-                className="border-l-2 border-blue-500/50 pl-3 pb-4 border-b border-slate-800/50 last:border-b-0"
-              >
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-[10px] text-slate-500">
-                    {item.src} &middot; {item.time}
-                  </span>
-                  <span
-                    className={`text-[10px] font-bold px-1.5 py-0.5 rounded bg-black border ${
-                      item.threat === "HIGH"
-                        ? "text-rose-400 border-rose-900/50"
-                        : item.threat === "MED"
-                        ? "text-yellow-400 border-yellow-900/50"
-                        : "text-slate-400 border-slate-700"
-                    }`}
+            <div className="flex flex-col gap-2">
+              {OSINT_MOCK_FEED.map((item, idx) => {
+                const badgeColor =
+                  item.threat === "HIGH"
+                    ? "text-[#ef4444] bg-[#ef4444]/10 border-[#ef4444]/30"
+                    : item.threat === "MED"
+                    ? "text-[#f59e0b] bg-[#f59e0b]/10 border-[#f59e0b]/30"
+                    : "text-[#708096] bg-[#708096]/10 border-[#708096]/30";
+
+                return (
+                  <div
+                    key={idx}
+                    className="p-2.5 rounded bg-[#09111c] border border-[#182332] flex flex-col gap-1 text-[11px]"
                   >
-                    {item.threat}
-                  </span>
-                </div>
-                <p className="text-xs text-slate-300 font-sans">{item.text}</p>
-              </div>
-            ))}
+                    <div className="flex items-center justify-between">
+                      <span className="text-[#a7b2c2] font-medium flex items-center gap-1.5">
+                        <Compass size={12} className="text-[#3b82f6]" />
+                        <span>{item.src}</span>
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] text-[#708096] font-mono">
+                          {item.time}
+                        </span>
+                        <span className={`px-1.5 py-0.2 rounded border text-[9px] font-semibold ${badgeColor}`}>
+                          {item.threat}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="text-[#f2f5f8] text-[11px] leading-relaxed">
+                      {item.text}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

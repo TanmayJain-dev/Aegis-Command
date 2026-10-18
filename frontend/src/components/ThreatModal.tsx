@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { AlertTriangle, X } from "lucide-react";
+import React, { useState } from "react";
+import { X, ShieldAlert, Bot, CheckCircle } from "lucide-react";
 import { ThreatAssessment, IntelRecord } from "../types/aegis";
 
 export interface ThreatModalProps {
@@ -19,7 +19,7 @@ export function ThreatModal({
   threatAssessment,
   aiSummary,
 }: ThreatModalProps) {
-  const [actionFeedback, setActionFeedback] = React.useState<string | null>(null);
+  const [actionFeedback, setActionFeedback] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -29,9 +29,21 @@ export function ThreatModal({
       ? Math.round(rawScore * 100)
       : Math.round(rawScore);
 
-  const isHighOrCritical =
-    threatAssessment?.threat_level === "HIGH" ||
-    threatAssessment?.threat_level === "CRITICAL";
+  const level = (threatAssessment?.threat_level || "UNKNOWN").toUpperCase();
+  const isHighOrCritical = level === "HIGH" || level === "CRITICAL";
+  const isMed = level === "MED" || level === "MEDIUM";
+
+  const levelClass = isHighOrCritical
+    ? "bg-[#ef4444]/15 border-[#ef4444]/40 text-[#ef4444]"
+    : isMed
+    ? "bg-[#f59e0b]/15 border-[#f59e0b]/40 text-[#f59e0b]"
+    : "bg-[#10b981]/15 border-[#10b981]/40 text-[#10b981]";
+
+  const isRuleBased =
+    threatAssessment?.assessment_source === "rule-based" ||
+    threatAssessment?.reasoning?.includes("[Rule-based]") ||
+    threatAssessment?.reasoning?.includes("[DEGRADED") ||
+    threatAssessment?.reasoning?.includes("[OFFLINE");
 
   const handleAction = (message: string) => {
     setActionFeedback(message);
@@ -43,102 +55,115 @@ export function ThreatModal({
 
   return (
     <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center p-0 sm:p-4">
+      {/* Backdrop */}
       <div
-        className="absolute inset-0 z-[10000] bg-black/80 backdrop-blur-md"
+        className="absolute inset-0 bg-[#08111d]/85 backdrop-blur-sm"
         onClick={onClose}
       />
-      <div className="relative z-[10001] bg-slate-950 border border-fuchsia-900/50 rounded-t-xl sm:rounded shadow-[0_0_50px_rgba(217,70,239,0.15)] w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden flex flex-col font-mono">
-        <div className="bg-fuchsia-950/40 border-b border-fuchsia-900/50 p-4 flex justify-between items-center">
-          <h2 className="text-fuchsia-400 font-bold tracking-widest flex items-center gap-2 text-sm">
-            <AlertTriangle size={18} /> ACTION REQUIRED: INTEL #{intelData?.id || "UNKNOWN"}
-          </h2>
+
+      {/* Modal Dialog */}
+      <div className="relative z-[10001] bg-[#0d1724] border border-[#243244] rounded-t-xl sm:rounded-lg shadow-2xl w-full max-w-2xl max-h-[85vh] sm:max-h-[90vh] overflow-hidden flex flex-col font-sans">
+        {/* Header */}
+        <div className="bg-[#121e2c] border-b border-[#243244] px-5 py-3.5 flex justify-between items-center">
+          <div className="flex items-center gap-2.5">
+            <ShieldAlert size={18} className="text-[#3b82f6]" />
+            <h2 className="text-[#f2f5f8] font-semibold text-sm tracking-wide">
+              Action Protocol · Incident #{intelData?.id || "UNKNOWN"}
+            </h2>
+          </div>
           <button
+            type="button"
             onClick={onClose}
-            className="text-slate-500 hover:text-white transition-colors"
+            className="text-[#708096] hover:text-[#f2f5f8] transition-colors p-1"
+            aria-label="Close modal"
           >
-            <X size={20} />
+            <X size={18} />
           </button>
         </div>
 
+        {/* Feedback Banner */}
         {actionFeedback && (
-          <div className="bg-emerald-950/80 border-b border-emerald-500/50 px-4 py-2.5 text-xs text-emerald-300 font-bold tracking-widest animate-pulse text-center">
-            ✓ {actionFeedback}
+          <div className="bg-[#10b981]/15 border-b border-[#10b981]/30 px-4 py-2 text-xs text-[#10b981] font-medium flex items-center justify-center gap-2">
+            <CheckCircle size={14} />
+            <span>{actionFeedback}</span>
           </div>
         )}
 
-        <div className="p-6 flex flex-col gap-6 text-sm">
+        {/* Content Body */}
+        <div className="p-5 flex flex-col gap-4 text-xs overflow-y-auto custom-scrollbar">
+          {/* Status Metrics */}
           {threatAssessment && (
-            <div className="flex flex-wrap gap-2 sm:gap-4">
+            <div className="flex flex-wrap gap-2.5">
               <div
-                className={`px-3 py-1 rounded border font-bold text-xs ${
-                  isHighOrCritical
-                    ? "bg-rose-950/50 border-rose-500 text-rose-400"
-                    : "bg-yellow-950/50 border-yellow-500 text-yellow-400"
-                }`}
+                className={`px-3 py-1 rounded border font-semibold text-xs ${levelClass}`}
               >
-                THREAT LEVEL: {threatAssessment.threat_level || "UNKNOWN"}
+                THREAT LEVEL: {level}
               </div>
-              <div className="px-3 py-1 rounded border border-cyan-900/50 bg-cyan-950/30 text-cyan-400 font-bold text-xs">
-                THREAT SCORE: {scoreDisplay}/100
+              <div className="px-3 py-1 rounded border border-[#243244] bg-[#121e2c] text-[#f2f5f8] font-semibold text-xs font-mono">
+                SCORE: {scoreDisplay}/100
               </div>
-              {threatAssessment.assessment_source === "rule-based" ||
-              threatAssessment.reasoning?.includes("[Rule-based]") ||
-              threatAssessment.reasoning?.includes("[DEGRADED") ||
-              threatAssessment.reasoning?.includes("[OFFLINE") ? (
-                <div className="px-3 py-1 rounded border border-amber-900/50 bg-amber-950/30 text-amber-400 font-bold text-xs flex items-center gap-1">
-                  SOURCE: RULE-BASED (FALLBACK)
-                </div>
-              ) : (
-                <div className="px-3 py-1 rounded border border-emerald-900/50 bg-emerald-950/30 text-emerald-400 font-bold text-xs flex items-center gap-1">
-                  SOURCE: NEURAL LLM
-                </div>
-              )}
+              <div className="px-3 py-1 rounded border border-[#8b5cf6]/40 bg-[#8b5cf6]/10 text-[#a78bfa] font-medium text-xs font-mono flex items-center gap-1.5">
+                <Bot size={12} />
+                <span>SOURCE: {isRuleBased ? "DETERMINISTIC RULE" : "NEURAL LLM"}</span>
+              </div>
             </div>
           )}
 
-          <div>
-            <div className="text-slate-500 text-xs mb-2 uppercase tracking-wider">
-              AI Tactical Assessment
+          {/* AI Assessment */}
+          <div className="flex flex-col gap-1.5">
+            <div className="flex items-center gap-2 text-[#708096] text-[11px] font-semibold uppercase tracking-wider">
+              <span>AI Tactical Assessment</span>
+              <span className="text-[#8b5cf6] text-[10px] font-mono lowercase">(model-generated)</span>
             </div>
-            <div className="bg-slate-900/50 border border-slate-800 p-4 rounded text-fuchsia-300 leading-relaxed font-mono">
-              {threatAssessment?.reasoning || aiSummary}
+            <div className="bg-[#09111c] border border-[#182332] p-3.5 rounded text-[#f2f5f8] text-[13px] leading-relaxed">
+              <p>{threatAssessment?.reasoning || aiSummary}</p>
+
               {threatAssessment?.recommended_action && (
-                <div className="mt-2 pt-2 border-t border-fuchsia-900/30 text-cyan-400">
-                  <span className="text-slate-500">RECOMMENDED ACTION:</span>{" "}
-                  {threatAssessment.recommended_action}
+                <div className="mt-3 pt-2.5 border-t border-[#182332] text-[#3b82f6] text-[12px]">
+                  <span className="text-[#708096] font-semibold uppercase text-[10px] block mb-1">
+                    Recommended Operational Action:
+                  </span>
+                  <p className="text-[#f2f5f8] font-medium">
+                    {threatAssessment.recommended_action}
+                  </p>
                 </div>
               )}
             </div>
           </div>
 
-          <div>
-            <div className="text-slate-500 text-xs mb-2 uppercase tracking-wider">
-              Raw Transcript / Data
+          {/* Observed Sensor Data / Raw Transcript */}
+          <div className="flex flex-col gap-1.5">
+            <div className="text-[#708096] text-[11px] font-semibold uppercase tracking-wider">
+              Intercepted Intel / Raw Transcript
             </div>
-            <div className="bg-black/50 border border-slate-800 p-4 rounded text-slate-300 font-mono text-xs max-h-32 overflow-y-auto custom-scrollbar">
-              {intelData?.transcript || "No transcript available."}
+            <div className="bg-[#09111c] border border-[#182332] p-3 rounded text-[#a7b2c2] text-[12px] leading-relaxed max-h-32 overflow-y-auto custom-scrollbar font-mono">
+              {intelData?.transcript || "No transcript evidence associated with this incident."}
             </div>
           </div>
         </div>
 
-        <div className="p-4 border-t border-slate-800 bg-slate-900/30 flex justify-end gap-3 sm:gap-4 flex-wrap">
+        {/* Footer Actions */}
+        <div className="p-4 border-t border-[#243244] bg-[#121e2c] flex justify-end gap-2.5 flex-wrap">
           <button
+            type="button"
             onClick={onClose}
-            className="px-5 py-2 border border-slate-700 text-slate-400 hover:bg-slate-800 hover:text-white rounded transition-colors text-xs tracking-wider"
+            className="px-4 py-2 border border-[#243244] text-[#a7b2c2] hover:bg-[#172333] hover:text-[#f2f5f8] rounded text-xs transition-colors"
           >
-            DISMISS
+            Dismiss
           </button>
           <button
-            onClick={() => handleAction("LOCKDOWN PROTOCOL ENFORCED // PERIMETER ACCESS TERMINATED")}
-            className="px-5 py-2 bg-rose-950 border border-rose-900 text-rose-400 hover:bg-rose-900 hover:text-rose-100 rounded transition-colors text-xs tracking-wider font-bold shadow-[0_0_15px_rgba(244,63,94,0.2)]"
+            type="button"
+            onClick={() => handleAction("Lockdown protocol recorded (demonstration mode)")}
+            className="px-4 py-2 bg-[#ef4444]/15 border border-[#ef4444]/40 text-[#ef4444] hover:bg-[#ef4444]/25 rounded text-xs font-semibold transition-colors"
           >
-            INITIATE LOCKDOWN
+            Simulate Lockdown
           </button>
           <button
-            onClick={() => handleAction("COMMAND CONFIRMED // QRT DISPATCH VECTOR INITIATED")}
-            className="px-5 py-2 bg-cyan-950 border border-cyan-900 text-cyan-400 hover:bg-cyan-900 hover:text-cyan-100 rounded transition-colors text-xs tracking-wider font-bold shadow-[0_0_15px_rgba(6,182,212,0.2)]"
+            type="button"
+            onClick={() => handleAction("Asset dispatch protocol recorded (demonstration mode)")}
+            className="px-4 py-2 bg-[#3b82f6] hover:bg-[#2563eb] text-white rounded text-xs font-semibold transition-colors"
           >
-            DEPLOY ASSETS
+            Deploy Assets (Demo)
           </button>
         </div>
       </div>

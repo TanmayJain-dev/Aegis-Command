@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback, useMemo, Profiler } from "react";
 import dynamic from "next/dynamic";
-import { Shield, Activity, Globe, Map as MapIcon, Zap, AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, RefreshCw, Compass } from "lucide-react";
 
 import { FeedManifestItem, loadFeedsManifest, loadFeedTimeline } from "../lib/feeds";
 import { Timeline, DrawableDetection } from "../lib/timeline";
@@ -13,7 +13,11 @@ import { SEED_TACTICAL_INCIDENTS } from "../lib/seedIncidents";
 import { playTacticalAlertTone } from "../lib/tacticalAudio";
 
 import { IntelRecord, AegisHistoryRecord, ThreatAssessment, PerfReport } from "../types/aegis";
-import { OpticsViewport } from "../components/OpticsViewport";
+import { AppSidebar, NavSection } from "../components/aegis/AppSidebar";
+import { TopBar } from "../components/aegis/TopBar";
+import { LiveFeedPanel } from "../components/aegis/LiveFeedPanel";
+import { ThreatAssessmentPanel } from "../components/aegis/ThreatAssessmentPanel";
+import { DetectionTimeline } from "../components/aegis/DetectionTimeline";
 import { IntelPanel } from "../components/IntelPanel";
 import { ThreatModal } from "../components/ThreatModal";
 import { HistoryModal } from "../components/HistoryModal";
@@ -31,6 +35,8 @@ export default function AegisDashboard() {
   const [timeline, setTimeline] = useState<Timeline | null>(null);
   const [mobileTab, setMobileTab] = useState<MobileTab>("optics");
   const [isDesktop, setIsDesktop] = useState(true);
+  const [isSidebarOpenMobile, setIsSidebarOpenMobile] = useState(false);
+  const [activeSection, setActiveSection] = useState<NavSection>("overview");
 
   const activeFeed = useMemo(
     () => feeds.find((f) => f.id === activeFeedId) ?? null,
@@ -51,14 +57,26 @@ export default function AegisDashboard() {
   const [isSearching, setIsSearching] = useState(false);
   const [localAssessment, setLocalAssessment] = useState<ThreatAssessment | null>(null);
 
+  // Live and recent detections list for DetectionTimeline table
+  const [recentDetections, setRecentDetections] = useState<
+    Array<{ time: number; detection: DrawableDetection; source: string }>
+  >([]);
+
   // Cloud backend cold-start & probing state
   const [isProbingBackend, setIsProbingBackend] = useState(false);
 
   // Dev-only Perf Probe (?perf=1)
   const [perfReport, setPerfReport] = useState<PerfReport | null>(null);
   const perfCommitCount = useRef(0);
-  const [perfEnabled] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("perf") === "1");
-  const [perfTargetFrames] = useState(() => typeof window !== "undefined" ? parseInt(new URLSearchParams(window.location.search).get("frames") || "300", 10) : 300);
+  const [perfEnabled] = useState(
+    () => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("perf") === "1"
+  );
+  const [perfTargetFrames] = useState(
+    () =>
+      typeof window !== "undefined"
+        ? parseInt(new URLSearchParams(window.location.search).get("frames") || "300", 10)
+        : 300
+  );
 
   const handleRender = useCallback(() => {
     perfCommitCount.current += 1;
@@ -95,7 +113,7 @@ export default function AegisDashboard() {
       const liveRecord: AegisHistoryRecord = {
         id: `INC-LIVE-${Date.now()}`,
         incident_id: `INC-LIVE-${Date.now()}`,
-        timestamp: new Date().toLocaleTimeString() + " IST",
+        timestamp: new Date().toLocaleTimeString() + " UTC",
         created_at: new Date().toISOString(),
         threat_level: data.assessment.threat_level || "HIGH",
         score: data.assessment.score || 92,
@@ -266,6 +284,23 @@ export default function AegisDashboard() {
         setMapCoordinates([res.latitude, res.longitude]);
         playTacticalAlertTone();
 
+        // Also record in recent detections
+        setRecentDetections((prev) => [
+          {
+            time: currentTime,
+            detection: {
+              id: "Trigger-Threat",
+              class: res.class,
+              confidence: res.confidence,
+              box: [0, 0, 0, 0],
+              speed_kmh: res.speed_kmh,
+              direction: res.direction,
+            },
+            source: activeFeed?.label || "UAV Alpha",
+          },
+          ...prev.slice(0, 19),
+        ]);
+
         const sent = socketReady ? sendThreat(res) : false;
 
         // If socket is offline or message send fails, run resilient local assessment fallback
@@ -273,10 +308,11 @@ export default function AegisDashboard() {
           const fallbackAssessment: ThreatAssessment = {
             threat_level: "HIGH",
             score: Math.round(res.confidence * 100),
-            reasoning: `Tactical Edge Anomaly: Target identified as [${res.class.toUpperCase()}] moving at ${res.speed_kmh} km/h bearing ${res.direction} along monitored sector. High probability of border reconnaissance breach.`,
+            reasoning: `Tactical Edge Anomaly: Target identified as [${res.class}] moving at ${res.speed_kmh} km/h bearing ${res.direction} along monitored sector. High probability of border reconnaissance breach.`,
             recommended_action:
               "Initiate immediate UAV lock and dispatch Quick Reaction Team (QRT) intercept vector.",
             previous_incidents: 3,
+            assessment_source: "rule-based",
           };
           setLocalAssessment(fallbackAssessment);
           setIsThreatModalOpen(true);
@@ -284,7 +320,7 @@ export default function AegisDashboard() {
           const newIncident: AegisHistoryRecord = {
             id: `INC-LIVE-${Date.now()}`,
             incident_id: `INC-LIVE-${Date.now()}`,
-            timestamp: new Date().toLocaleTimeString() + " IST",
+            timestamp: new Date().toLocaleTimeString() + " UTC",
             created_at: new Date().toISOString(),
             threat_level: "HIGH",
             score: Math.round(res.confidence * 100),
@@ -312,10 +348,10 @@ export default function AegisDashboard() {
         }
       }
     },
-    [socketReady, sendThreat, intelData, isSearching, handleSearch]
+    [socketReady, sendThreat, intelData, isSearching, handleSearch, activeFeed]
   );
 
-  // Instant tactical drill simulation for presentations & judge demonstrations
+  // Instant tactical drill simulation for presentations & demonstrations
   const handleSimulateDrill = useCallback(() => {
     playTacticalAlertTone();
     const drillCoordinates: [number, number] = [31.452, 74.925];
@@ -327,7 +363,7 @@ export default function AegisDashboard() {
       location: "Tarn Taran IB Sector (Alpha-4)",
       lat: 31.452,
       lng: 74.925,
-      timestamp: new Date().toLocaleTimeString() + " IST",
+      timestamp: new Date().toLocaleTimeString() + " UTC",
       transcript:
         "SIMULATED DRILL INTERCEPT: Unidentified convoy detected 200m south of outpost 14. SIGINT corroborates coordinated cross-border payload vector.",
     };
@@ -367,7 +403,7 @@ export default function AegisDashboard() {
     const newDrillIncident: AegisHistoryRecord = {
       id: `INC-DRILL-${Date.now()}`,
       incident_id: `INC-DRILL-${Date.now()}`,
-      timestamp: new Date().toLocaleTimeString() + " IST",
+      timestamp: new Date().toLocaleTimeString() + " UTC",
       created_at: new Date().toISOString(),
       threat_level: "CRITICAL",
       score: 96,
@@ -401,197 +437,292 @@ export default function AegisDashboard() {
     }
   }, []);
 
+  // Update active detections list from frame updates
+  const handleActiveDetectionsChange = useCallback(
+    (obsList: DrawableDetection[], time: number) => {
+      if (obsList.length === 0) return;
+      setRecentDetections((prev) => {
+        const sourceName = activeFeed?.label || "UAV Alpha";
+        const newItems = obsList.map((d) => ({
+          time,
+          detection: d,
+          source: sourceName,
+        }));
+        const combined = [...newItems, ...prev];
+        const seen = new Set<string>();
+        const deduped: typeof combined = [];
+        for (const item of combined) {
+          const key = `${Math.floor(item.time * 2)}-${item.detection.id || item.detection.class}`;
+          if (!seen.has(key)) {
+            seen.add(key);
+            deduped.push(item);
+          }
+          if (deduped.length >= 20) break;
+        }
+        return deduped;
+      });
+    },
+    [activeFeed]
+  );
+
+  const systemInfo = useMemo(() => {
+    return {
+      fps: liteMode ? "30.00" : "59.94",
+      model: timeline?.meta?.model || "yolov8m.pt",
+      encryption: "AES-256",
+      coordinates: mapCoordinates,
+    };
+  }, [liteMode, timeline, mapCoordinates]);
+
+  const handleSelectSection = useCallback((section: NavSection) => {
+    setActiveSection(section);
+    if (section === "map") {
+      setMobileTab("map");
+    } else if (section === "intel") {
+      setMobileTab("intel");
+    } else if (section === "live") {
+      setMobileTab("optics");
+    } else if (section === "incidents") {
+      setIsThreatModalOpen(true);
+    } else if (section === "evidence") {
+      setMobileTab("intel");
+    }
+    setIsSidebarOpenMobile(false);
+  }, []);
+
   const content = (
-    <div className="min-h-screen bg-[#0a0a0a] text-slate-200 font-mono flex flex-col overflow-hidden select-none">
-      {/* TACTICAL COMMAND HEADER */}
-      <header className="bg-[#0a0a0a] px-3 py-2.5 sm:p-4 flex justify-between items-center z-10 relative border-b border-slate-800/50">
-        <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-rose-500" />
-        <div className="flex items-center gap-2 sm:gap-4">
-          <div className="relative flex items-center justify-center w-8 h-8 sm:w-10 sm:h-10 border border-cyan-500/30 rounded bg-cyan-950/20 flex-shrink-0">
-            <Shield className="text-cyan-400" size={18} />
-            <div className="absolute inset-0 animate-ping opacity-20 border border-cyan-500 rounded" />
-          </div>
-          <div className="flex flex-col">
-            <h1 className="text-sm sm:text-xl font-bold tracking-widest text-white leading-none">
-              AEGIS COMMAND
-            </h1>
-            <span className="text-[8px] sm:text-[10px] text-cyan-400 font-bold tracking-[0.2em] mt-0.5 sm:mt-1">
-              UNIFIED THREAT INTELLIGENCE
-            </span>
-          </div>
-        </div>
+    <div className="min-h-screen bg-[#08111d] text-[#f2f5f8] flex flex-col font-sans">
+      {/* Top Header Bar */}
+      <TopBar
+        connectionStatus={connectionStatus}
+        socketReady={socketReady}
+        isProbingBackend={isProbingBackend}
+        onProbeBackend={probeBackend}
+        liteMode={liteMode}
+        onToggleLiteMode={toggleLiteMode}
+        onOpenHistory={() => setIsHistoryModalOpen(true)}
+        activeFeedLabel={activeFeed?.label}
+        onToggleSidebarMobile={() => setIsSidebarOpenMobile(!isSidebarOpenMobile)}
+      />
 
-        <div className="flex items-center gap-2 sm:gap-4">
-          <button
-            type="button"
-            onClick={toggleLiteMode}
-            className={`px-2 py-1 text-[9px] sm:text-[10px] font-bold tracking-widest border rounded transition-all flex items-center gap-1 ${
-              liteMode
-                ? "bg-amber-950/40 border-amber-500/50 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
-                : "bg-slate-900 border-slate-700 text-slate-400 hover:text-white"
-            }`}
-            title="Toggle low-power Lite Mode (reduces DPR, animations, backdrop-filters)"
-          >
-            <Zap size={11} className={liteMode ? "text-amber-400" : "text-slate-500"} />
-            LITE: {liteMode ? "ON" : "OFF"}
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsHistoryModalOpen(true)}
-            className="px-2 py-1 sm:px-3 sm:py-2 text-[9px] sm:text-[10px] font-bold tracking-widest border border-cyan-500/40 text-cyan-300 bg-cyan-950/20 hover:bg-cyan-950/50 hover:border-cyan-400 transition-all flex-shrink-0"
-          >
-            HISTORY
-          </button>
-
-          {/* CONNECTION STATUS BADGE */}
-          <div
-            className={`flex items-center gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded border text-[9px] sm:text-[10px] font-bold tracking-widest font-mono transition-all flex-shrink-0 ${
-              connectionStatus === "LIVE"
-                ? "bg-emerald-950/40 border-emerald-500/50 text-emerald-400 shadow-[0_0_10px_rgba(16,185,129,0.15)]"
-                : connectionStatus === "DEGRADED"
-                ? "bg-amber-950/40 border-amber-500/50 text-amber-400 shadow-[0_0_10px_rgba(245,158,11,0.15)]"
-                : "bg-rose-950/40 border-rose-500/50 text-rose-400 shadow-[0_0_10px_rgba(244,63,94,0.15)]"
-            }`}
-            title={`Telemetry & Threat Engine Status: ${connectionStatus}`}
-          >
-            <span
-              className={`w-2 h-2 rounded-full ${
-                connectionStatus === "LIVE"
-                  ? "bg-emerald-400 animate-pulse"
-                  : connectionStatus === "DEGRADED"
-                  ? "bg-amber-400 animate-pulse"
-                  : "bg-rose-500"
-              }`}
-            />
-            <span>{connectionStatus}</span>
-          </div>
-
-          <div className="hidden sm:flex items-center gap-2 sm:gap-6 text-[10px] sm:text-xs border border-slate-800 bg-slate-900/50 px-2 sm:px-4 py-1 sm:py-2 rounded">
-            <span className="flex items-center gap-1 sm:gap-2 text-slate-400">
-              <Activity className={socketReady ? "text-cyan-400" : "text-amber-400"} size={12} />
-              <span className="hidden sm:inline">SYS:</span>{" "}
-              <span className="text-cyan-400 font-bold font-mono">{socketReady ? "SECURE" : "STANDBY"}</span>
-            </span>
-            <span className="w-[1px] h-3 sm:h-4 bg-slate-700" />
-            <span className="text-slate-400 flex items-center gap-1 sm:gap-2">
-              <Globe size={12} className="text-fuchsia-400" />
-              <span className="hidden sm:inline">OP-SEC:</span>{" "}
-              <span className="text-fuchsia-400 font-bold font-mono">OMEGA</span>
-            </span>
-          </div>
-        </div>
-      </header>
-
-      {/* RENDER BACKEND DEGRADED / COLD START BANNER */}
+      {/* Backend Degraded / Cold-Start Banner */}
       {connectionStatus === "DEGRADED" && (
-        <div className="bg-amber-950/70 border-b border-amber-500/40 px-3 py-1.5 flex items-center justify-between text-[10px] sm:text-xs text-amber-300 font-mono">
+        <div className="bg-[#f59e0b]/10 border-b border-[#f59e0b]/30 px-4 py-1.5 flex items-center justify-between text-xs text-[#f59e0b] font-mono">
           <div className="flex items-center gap-2 truncate mr-2">
-            <AlertTriangle size={13} className="text-amber-400 animate-pulse flex-shrink-0" />
+            <AlertTriangle size={13} className="text-[#f59e0b] flex-shrink-0" />
             <span className="truncate">
-              AUTONOMOUS BACKEND WAKING UP (~60s) // ENGINE OPERATING IN DEGRADED DETERMINISTIC MODE
+              Autonomous backend warming up (~60s) · Operating in resilient local deterministic mode
             </span>
           </div>
           <button
             type="button"
             onClick={probeBackend}
             disabled={isProbingBackend}
-            className="px-2 py-0.5 border border-amber-500/50 hover:bg-amber-900/40 rounded flex items-center gap-1 font-bold text-[9px] sm:text-[10px] flex-shrink-0 transition-colors"
+            className="px-2 py-0.5 border border-[#f59e0b]/40 hover:bg-[#f59e0b]/20 rounded flex items-center gap-1 font-semibold text-[10px] flex-shrink-0 transition-colors"
           >
             <RefreshCw size={10} className={isProbingBackend ? "animate-spin" : ""} />
-            {isProbingBackend ? "PROBING..." : "RETRY"}
+            {isProbingBackend ? "Probing..." : "Retry"}
           </button>
         </div>
       )}
 
-      {/* RENDER BACKEND OFFLINE BANNER */}
+      {/* Backend Offline Banner */}
       {connectionStatus === "OFFLINE" && (
-        <div className="bg-rose-950/80 border-b border-rose-500/40 px-3 py-1.5 flex items-center justify-between text-[10px] sm:text-xs text-rose-300 font-mono">
+        <div className="bg-[#ef4444]/10 border-b border-[#ef4444]/30 px-4 py-1.5 flex items-center justify-between text-xs text-[#ef4444] font-mono">
           <div className="flex items-center gap-2 truncate mr-2">
-            <AlertTriangle size={13} className="text-rose-400 flex-shrink-0" />
+            <AlertTriangle size={13} className="text-[#ef4444] flex-shrink-0" />
             <span className="truncate">
-              AUTONOMOUS CLOUD BACKEND OFFLINE // LOCAL DETERMINISTIC RULE-BASED MODE ACTIVE
+              Autonomous cloud backend offline · Local deterministic rule-based mode active
             </span>
           </div>
           <button
             type="button"
             onClick={probeBackend}
             disabled={isProbingBackend}
-            className="px-2 py-0.5 border border-rose-500/50 hover:bg-rose-900/40 rounded flex items-center gap-1 font-bold text-[9px] sm:text-[10px] flex-shrink-0 transition-colors"
+            className="px-2 py-0.5 border border-[#ef4444]/40 hover:bg-[#ef4444]/20 rounded flex items-center gap-1 font-semibold text-[10px] flex-shrink-0 transition-colors"
           >
             <RefreshCw size={10} className={isProbingBackend ? "animate-spin" : ""} />
-            {isProbingBackend ? "PROBING..." : "RETRY"}
+            {isProbingBackend ? "Probing..." : "Retry"}
           </button>
         </div>
       )}
 
-      {/* MOBILE SEGMENTED TABS */}
-      <MobileTabs activeTab={mobileTab} onTabChange={setMobileTab} />
-
-      {/* MAIN TACTICAL GRID */}
-      <main className="flex-1 flex flex-col lg:grid lg:grid-cols-12 gap-3 lg:gap-6 p-3 lg:p-6 min-h-0 overflow-y-auto lg:overflow-visible">
-        {/* LEFT PANE: OPTICS HUD (VISION) */}
-        <section
-          className={`${
-            mobileTab === "optics" ? "flex" : "hidden lg:flex"
-          } lg:col-span-7 flex flex-col relative`}
-        >
-          <OpticsViewport
+      {/* Main Container: Sidebar + Workspace */}
+      <div className="flex-1 flex overflow-hidden relative">
+        {/* Desktop Sidebar */}
+        <div className="hidden md:flex">
+          <AppSidebar
+            activeSection={activeSection}
+            onSelectSection={handleSelectSection}
             feeds={feeds}
-            activeFeed={activeFeed}
-            onSelectFeed={setActiveFeedId}
-            timeline={timeline}
-            liteMode={liteMode}
-            onThreatSample={handleThreatSample}
-            perfEnabled={perfEnabled}
-            perfTargetFrames={perfTargetFrames}
-            onPerfReport={setPerfReport}
-            onSimulateThreat={handleSimulateDrill}
+            activeFeedId={activeFeedId}
+            onSelectFeed={(feedId) => {
+              setActiveFeedId(feedId);
+              const f = feeds.find((item) => item.id === feedId);
+              if (f?.center_lat && f?.center_lng) {
+                setMapCoordinates([f.center_lat, f.center_lng]);
+              }
+            }}
             onOpenUploadModal={() => setIsUploadModalOpen(true)}
+            onSimulateDrill={handleSimulateDrill}
+            onOpenHistoryModal={() => setIsHistoryModalOpen(true)}
+            systemInfo={systemInfo}
           />
-        </section>
+        </div>
 
-        {/* RIGHT PANE: GEO & INTEL */}
-        <section
-          className={`${
-            mobileTab !== "optics" ? "flex" : "hidden lg:flex"
-          } lg:col-span-5 flex flex-col gap-4 lg:gap-6`}
-        >
-          {/* Top Half: Geospatial Map */}
-          <div
-            className={`${
-              mobileTab === "map"
-                ? "flex flex-1"
-                : mobileTab === "intel"
-                ? "hidden lg:flex"
-                : "flex"
-            } h-auto min-h-[380px] lg:h-[40%] lg:min-h-[250px] relative flex-col bg-slate-900/20 border border-slate-800 rounded p-1`}
-          >
-            <div className="flex items-center gap-2 text-xs text-fuchsia-400 font-bold p-2 uppercase tracking-wider bg-slate-900/50">
-              <MapIcon size={14} className="text-fuchsia-400" /> Tactical Map
-            </div>
-            <div className="flex-1 min-h-[340px] h-[340px] lg:h-full relative bg-black border-t border-slate-800">
-              {(isDesktop || mobileTab === "map") && (
-                <MapComponent key={`aegis-map-${mobileTab}`} coordinates={mapCoordinates} />
-              )}
+        {/* Mobile Sidebar Drawer */}
+        {isSidebarOpenMobile && (
+          <div className="md:hidden fixed inset-0 z-50 flex">
+            <div
+              className="fixed inset-0 bg-[#08111d]/80 backdrop-blur-sm"
+              onClick={() => setIsSidebarOpenMobile(false)}
+            />
+            <div className="relative z-50 h-full">
+              <AppSidebar
+                activeSection={activeSection}
+                onSelectSection={handleSelectSection}
+                feeds={feeds}
+                activeFeedId={activeFeedId}
+                onSelectFeed={(feedId) => {
+                  setActiveFeedId(feedId);
+                  const f = feeds.find((item) => item.id === feedId);
+                  if (f?.center_lat && f?.center_lng) {
+                    setMapCoordinates([f.center_lat, f.center_lng]);
+                  }
+                  setIsSidebarOpenMobile(false);
+                }}
+                onOpenUploadModal={() => {
+                  setIsUploadModalOpen(true);
+                  setIsSidebarOpenMobile(false);
+                }}
+                onSimulateDrill={() => {
+                  handleSimulateDrill();
+                  setIsSidebarOpenMobile(false);
+                }}
+                onOpenHistoryModal={() => {
+                  setIsHistoryModalOpen(true);
+                  setIsSidebarOpenMobile(false);
+                }}
+                systemInfo={systemInfo}
+              />
             </div>
           </div>
+        )}
 
-          {/* Bottom Half: Intelligence Stream */}
-          <IntelPanel
-            query={searchQuery}
-            setQuery={setSearchQuery}
-            onSearch={handleSearch}
-            isLoading={isSearching}
-            intelData={intelData}
-            aiSummary={aiSummary}
-            onOpenModal={() => setIsThreatModalOpen(true)}
-            mobileVisible={mobileTab === "intel"}
-          />
-        </section>
-      </main>
+        {/* Workspace Column */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto custom-scrollbar">
+          {/* Mobile Tabs */}
+          <MobileTabs activeTab={mobileTab} onTabChange={setMobileTab} />
 
-      {/* Real-time Threat Action Modal */}
+          {/* Main Dashboard Layout */}
+          <main className="p-3 sm:p-4 lg:p-5 flex flex-col gap-4 max-w-[1920px] w-full mx-auto">
+            {/* UPPER ROW: Hero Video (8 cols) + Threat Assessment (4 cols) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
+              {/* Hero Video Feed */}
+              <section
+                className={`${
+                  mobileTab === "optics" ? "flex" : "hidden lg:flex"
+                } lg:col-span-8 flex flex-col`}
+              >
+                <LiveFeedPanel
+                  activeFeed={activeFeed}
+                  timeline={timeline}
+                  liteMode={liteMode}
+                  onThreatSample={handleThreatSample}
+                  perfEnabled={perfEnabled}
+                  perfTargetFrames={perfTargetFrames}
+                  onPerfReport={setPerfReport}
+                  onActiveDetectionsChange={handleActiveDetectionsChange}
+                />
+              </section>
+
+              {/* Threat Assessment Panel */}
+              <section
+                className={`${
+                  mobileTab === "optics" ? "flex" : "hidden lg:flex"
+                } lg:col-span-4 flex flex-col`}
+              >
+                <ThreatAssessmentPanel
+                  assessment={activeAssessment}
+                  intelData={intelData}
+                  onOpenActionModal={() => setIsThreatModalOpen(true)}
+                  onSimulateDrill={handleSimulateDrill}
+                />
+              </section>
+            </div>
+
+            {/* LOWER ROW: Detection Table (4 cols) + Tactical Map (4 cols) + Intel (4 cols) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-stretch">
+              {/* Detection Timeline Table */}
+              <section
+                className={`${
+                  mobileTab === "optics" ? "flex" : "hidden lg:flex"
+                } lg:col-span-4 flex flex-col`}
+              >
+                <DetectionTimeline
+                  recentDetections={recentDetections}
+                  onSelectDetectionTime={(t) => {
+                    const videoEl = document.querySelector("video");
+                    if (videoEl) {
+                      videoEl.currentTime = t;
+                      videoEl.play().catch(() => {});
+                    }
+                  }}
+                />
+              </section>
+
+              {/* Tactical Map */}
+              <section
+                className={`${
+                  mobileTab === "map" ? "flex" : "hidden lg:flex"
+                } lg:col-span-4 flex flex-col min-h-[300px] h-[320px]`}
+              >
+                <div className="flex flex-col h-full rounded bg-[#0d1724] border border-[#243244] overflow-hidden">
+                  <div className="px-3.5 py-2.5 bg-[#121e2c] border-b border-[#243244] flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Compass size={14} className="text-[#3b82f6]" />
+                      <span className="text-[12px] font-semibold text-[#f2f5f8] tracking-wide">
+                        Tactical Map
+                      </span>
+                    </div>
+                    <span className="text-[10px] font-mono text-[#708096]">
+                      CARTO / OpenStreetMap
+                    </span>
+                  </div>
+                  <div className="flex-1 relative">
+                    {(isDesktop || mobileTab === "map") && (
+                      <MapComponent
+                        key={`aegis-map-${mobileTab}`}
+                        coordinates={mapCoordinates}
+                      />
+                    )}
+                  </div>
+                </div>
+              </section>
+
+              {/* Intelligence Retrieval (RAG / SIGINT / OSINT) */}
+              <section
+                className={`${
+                  mobileTab === "intel" ? "flex" : "hidden lg:flex"
+                } lg:col-span-4 flex flex-col min-h-[300px] h-[320px]`}
+              >
+                <IntelPanel
+                  query={searchQuery}
+                  setQuery={setSearchQuery}
+                  onSearch={handleSearch}
+                  isLoading={isSearching}
+                  intelData={intelData}
+                  aiSummary={aiSummary}
+                  onOpenModal={() => setIsThreatModalOpen(true)}
+                  mobileVisible={mobileTab === "intel"}
+                />
+              </section>
+            </div>
+          </main>
+        </div>
+      </div>
+
+      {/* Action Modals */}
       <ThreatModal
         isOpen={isThreatModalOpen}
         onClose={() => setIsThreatModalOpen(false)}
@@ -600,14 +731,12 @@ export default function AegisDashboard() {
         aiSummary={aiSummary}
       />
 
-      {/* Historical Incident Memory Modal */}
       <HistoryModal
         isOpen={isHistoryModalOpen}
         onClose={() => setIsHistoryModalOpen(false)}
         historyRecords={historyRecords}
       />
 
-      {/* Custom Feed Video / JSON Upload Modal */}
       <UploadFeedModal
         isOpen={isUploadModalOpen}
         onClose={() => setIsUploadModalOpen(false)}
@@ -618,13 +747,21 @@ export default function AegisDashboard() {
       {perfReport && (
         <div
           id="perf-report-banner"
-          className="fixed top-2 right-2 z-[99999] bg-black/90 border border-emerald-500 p-2 text-xs font-mono text-emerald-400"
+          className="fixed top-2 right-2 z-[99999] bg-[#08111d]/95 border border-[#10b981] p-2 text-xs font-mono text-[#10b981] rounded shadow-lg"
         >
-          PROBE: frames={perfReport.frames} mean={perfReport.mean_draw_ms}ms p95={perfReport.p95_draw_ms}ms boxes={perfReport.mean_boxes} commits/100f={perfReport.commits_per_100_frames} status={perfReport.status}
+          PROBE: frames={perfReport.frames} mean={perfReport.mean_draw_ms}ms p95=
+          {perfReport.p95_draw_ms}ms boxes={perfReport.mean_boxes} commits/100f=
+          {perfReport.commits_per_100_frames} status={perfReport.status}
         </div>
       )}
     </div>
   );
 
-  return perfEnabled ? <Profiler id="AegisDashboard" onRender={handleRender}>{content}</Profiler> : content;
+  return perfEnabled ? (
+    <Profiler id="AegisDashboard" onRender={handleRender}>
+      {content}
+    </Profiler>
+  ) : (
+    content
+  );
 }

@@ -34,7 +34,10 @@ export function UploadFeedModal({
     if (file) {
       setVideoFile(file);
       if (!feedLabel) {
-        const cleanName = file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").toUpperCase();
+        const cleanName = file.name
+          .replace(/\.[^/.]+$/, "")
+          .replace(/[-_]/g, " ")
+          .toUpperCase();
         setFeedLabel(cleanName.slice(0, 24));
       }
       setErrorMessage("");
@@ -49,20 +52,22 @@ export function UploadFeedModal({
   };
 
   const generateSyntheticDetections = (durationSec = 10) => {
-    const timelineData: Record<string, Array<{
-      id: string;
-      class: string;
-      confidence: number;
-      box: [number, number, number, number];
-      speed_kmh: number;
-      direction: string;
-    }>> = {};
+    const timelineData: Record<
+      string,
+      Array<{
+        id: string;
+        class: string;
+        confidence: number;
+        box: [number, number, number, number];
+        speed_kmh: number;
+        direction: string;
+      }>
+    > = {};
 
     const steps = Math.min(Math.max(Math.floor(durationSec * 2), 6), 60);
     for (let i = 0; i < steps; i++) {
       const t = (i * 0.5).toFixed(2);
       const progress = i / steps;
-      // Synthesize realistic tracked vehicles along an intersection trajectory
       const x1 = Math.round(600 + progress * 400);
       const y1 = Math.round(500 + Math.sin(progress * Math.PI) * 120);
       timelineData[t] = [
@@ -100,7 +105,9 @@ export function UploadFeedModal({
       }
 
       const videoObjectUrl = URL.createObjectURL(videoFile);
-      const safeId = `feed-${videoFile.name.replace(/[^a-zA-Z0-9]/g, "-").toLowerCase()}-${videoFile.size}`;
+      const safeId = `feed-${videoFile.name
+        .replace(/[^a-zA-Z0-9]/g, "-")
+        .toLowerCase()}-${videoFile.size}`;
       const newFeed: FeedManifestItem = {
         id: safeId,
         label: feedLabel.trim() || videoFile.name.slice(0, 20),
@@ -130,29 +137,30 @@ export function UploadFeedModal({
   };
 
   return (
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-4 bg-black/85 backdrop-blur-sm">
-      <div className="relative z-[10001] bg-slate-950 border border-cyan-500/40 rounded shadow-2xl w-full max-w-lg overflow-hidden flex flex-col font-mono">
+    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-3 sm:p-4 bg-[#08111d]/85 backdrop-blur-sm">
+      <div className="relative z-[10001] bg-[#0d1724] border border-[#243244] rounded-lg shadow-2xl w-full max-w-lg overflow-hidden flex flex-col font-sans">
         {/* Header */}
-        <div className="bg-cyan-950/30 border-b border-cyan-500/30 px-4 py-3 flex justify-between items-center">
+        <div className="bg-[#121e2c] border-b border-[#243244] px-5 py-3.5 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Upload size={16} className="text-cyan-400" />
-            <span className="text-cyan-300 font-bold text-xs tracking-wider">
-              AEGIS // IMPORT TACTICAL FEED
+            <Upload size={16} className="text-[#3b82f6]" />
+            <span className="text-[#f2f5f8] font-semibold text-xs tracking-wide">
+              Import Tactical Video Feed
             </span>
           </div>
           <button
             type="button"
             onClick={handleClose}
-            className="text-slate-400 hover:text-white transition-colors text-lg px-2"
+            className="text-[#708096] hover:text-[#f2f5f8] transition-colors p-1"
+            aria-label="Close modal"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-4 sm:p-5 flex flex-col gap-4 text-xs">
+        <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-4 text-xs">
           {errorMessage && (
-            <div className="p-2.5 bg-rose-950/60 border border-rose-500/50 rounded text-rose-300 flex items-center gap-2 text-[11px]">
+            <div className="p-2.5 bg-[#ef4444]/10 border border-[#ef4444]/30 rounded text-[#ef4444] flex items-center gap-2 text-[11px]">
               <AlertCircle size={14} className="flex-shrink-0" />
               <span>{errorMessage}</span>
             </div>
@@ -160,22 +168,27 @@ export function UploadFeedModal({
 
           {/* Video Selection */}
           <div className="flex flex-col gap-1.5">
-            <label className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+            <label className="text-[#a7b2c2] font-semibold text-[11px]">
               Surveillance Video File (.mp4, .webm) *
             </label>
             <div
               onClick={() => videoInputRef.current?.click()}
               className={`p-3 border border-dashed rounded cursor-pointer transition-colors flex items-center justify-between ${
                 videoFile
-                  ? "border-cyan-500/60 bg-cyan-950/20 text-cyan-300"
-                  : "border-slate-700 bg-slate-900/40 text-slate-400 hover:border-slate-500 hover:bg-slate-900/80"
+                  ? "border-[#3b82f6]/60 bg-[#3b82f6]/10 text-[#f2f5f8]"
+                  : "border-[#243244] bg-[#09111c] text-[#708096] hover:border-[#334358] hover:bg-[#121e2c]"
               }`}
             >
               <div className="flex items-center gap-2 truncate">
-                <Video size={16} className={videoFile ? "text-cyan-400" : "text-slate-500"} />
-                <span className="truncate">{videoFile ? videoFile.name : "Select video file from device..."}</span>
+                <Video
+                  size={16}
+                  className={videoFile ? "text-[#3b82f6]" : "text-[#708096]"}
+                />
+                <span className="truncate">
+                  {videoFile ? videoFile.name : "Select video file from device..."}
+                </span>
               </div>
-              {videoFile && <CheckCircle size={14} className="text-cyan-400 flex-shrink-0" />}
+              {videoFile && <CheckCircle size={14} className="text-[#10b981] flex-shrink-0" />}
             </div>
             <input
               ref={videoInputRef}
@@ -189,26 +202,33 @@ export function UploadFeedModal({
           {/* Optional Detections JSON */}
           <div className="flex flex-col gap-1.5">
             <div className="flex justify-between items-center">
-              <label className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+              <label className="text-[#a7b2c2] font-semibold text-[11px]">
                 Companion Detections JSON (Optional)
               </label>
-              <span className="text-slate-600 text-[9px]">ByteTrack format</span>
+              <span className="text-[#708096] text-[10px] font-mono">
+                ByteTrack / YOLO format
+              </span>
             </div>
             <div
               onClick={() => jsonInputRef.current?.click()}
               className={`p-2.5 border border-dashed rounded cursor-pointer transition-colors flex items-center justify-between ${
                 jsonFile
-                  ? "border-emerald-500/60 bg-emerald-950/20 text-emerald-300"
-                  : "border-slate-800 bg-slate-900/30 text-slate-500 hover:border-slate-600"
+                  ? "border-[#10b981]/60 bg-[#10b981]/10 text-[#f2f5f8]"
+                  : "border-[#243244] bg-[#09111c] text-[#708096] hover:border-[#334358]"
               }`}
             >
               <div className="flex items-center gap-2 truncate text-[11px]">
-                <FileCode size={14} className={jsonFile ? "text-emerald-400" : "text-slate-600"} />
+                <FileCode
+                  size={14}
+                  className={jsonFile ? "text-[#10b981]" : "text-[#708096]"}
+                />
                 <span className="truncate">
-                  {jsonFile ? jsonFile.name : "Upload detections.json (or auto-synthesize)"}
+                  {jsonFile
+                    ? jsonFile.name
+                    : "Upload detections.json (or auto-synthesize on import)"}
                 </span>
               </div>
-              {jsonFile && <CheckCircle size={14} className="text-emerald-400 flex-shrink-0" />}
+              {jsonFile && <CheckCircle size={14} className="text-[#10b981] flex-shrink-0" />}
             </div>
             <input
               ref={jsonInputRef}
@@ -222,7 +242,7 @@ export function UploadFeedModal({
           {/* Feed Label & Sensor */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+              <label className="text-[#a7b2c2] font-semibold text-[11px]">
                 Feed Call-Sign
               </label>
               <input
@@ -230,17 +250,17 @@ export function UploadFeedModal({
                 value={feedLabel}
                 onChange={(e) => setFeedLabel(e.target.value)}
                 placeholder="E.g. UAV DELTA"
-                className="bg-black border border-slate-700 rounded px-2.5 py-1.5 text-white outline-none focus:border-cyan-500 text-xs"
+                className="bg-[#09111c] border border-[#243244] rounded px-3 py-1.5 text-[#f2f5f8] outline-none focus:border-[#3b82f6] text-xs"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+              <label className="text-[#a7b2c2] font-semibold text-[11px]">
                 Sensor Payload
               </label>
               <select
                 value={sensorType}
                 onChange={(e) => setSensorType(e.target.value)}
-                className="bg-black border border-slate-700 rounded px-2.5 py-1.5 text-white outline-none focus:border-cyan-500 text-xs"
+                className="bg-[#09111c] border border-[#243244] rounded px-3 py-1.5 text-[#f2f5f8] outline-none focus:border-[#3b82f6] text-xs"
               >
                 <option value="EO/IR Optronics">EO/IR Optronics</option>
                 <option value="Fixed Optical 1080p">Fixed Optical 1080p</option>
@@ -254,7 +274,7 @@ export function UploadFeedModal({
           {/* Coordinates */}
           <div className="grid grid-cols-2 gap-3">
             <div className="flex flex-col gap-1">
-              <label className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+              <label className="text-[#a7b2c2] font-semibold text-[11px]">
                 Sector Latitude
               </label>
               <input
@@ -262,11 +282,11 @@ export function UploadFeedModal({
                 value={lat}
                 onChange={(e) => setLat(e.target.value)}
                 placeholder="31.4520"
-                className="bg-black border border-slate-700 rounded px-2.5 py-1.5 text-white outline-none focus:border-cyan-500 text-xs"
+                className="bg-[#09111c] border border-[#243244] rounded px-3 py-1.5 text-[#f2f5f8] font-mono outline-none focus:border-[#3b82f6] text-xs"
               />
             </div>
             <div className="flex flex-col gap-1">
-              <label className="text-slate-400 font-bold uppercase tracking-wider text-[10px]">
+              <label className="text-[#a7b2c2] font-semibold text-[11px]">
                 Sector Longitude
               </label>
               <input
@@ -274,31 +294,31 @@ export function UploadFeedModal({
                 value={lng}
                 onChange={(e) => setLng(e.target.value)}
                 placeholder="74.9250"
-                className="bg-black border border-slate-700 rounded px-2.5 py-1.5 text-white outline-none focus:border-cyan-500 text-xs"
+                className="bg-[#09111c] border border-[#243244] rounded px-3 py-1.5 text-[#f2f5f8] font-mono outline-none focus:border-[#3b82f6] text-xs"
               />
             </div>
           </div>
 
           {/* Modal Actions */}
-          <div className="mt-2 pt-3 border-t border-slate-800 flex justify-end gap-3">
+          <div className="mt-2 pt-3 border-t border-[#243244] flex justify-end gap-2.5">
             <button
               type="button"
               onClick={handleClose}
-              className="px-4 py-1.5 border border-slate-700 text-slate-400 hover:bg-slate-900 rounded text-xs transition-colors"
+              className="px-4 py-1.5 border border-[#243244] text-[#a7b2c2] hover:bg-[#121e2c] hover:text-[#f2f5f8] rounded text-xs transition-colors"
             >
-              CANCEL
+              Cancel
             </button>
             <button
               type="submit"
               disabled={isProcessing || !videoFile}
-              className={`px-5 py-1.5 rounded text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-4 py-1.5 rounded text-xs font-semibold transition-all flex items-center gap-1.5 ${
                 isProcessing || !videoFile
-                  ? "bg-slate-800 text-slate-500 cursor-not-allowed"
-                  : "bg-cyan-950 border border-cyan-500/60 text-cyan-300 hover:bg-cyan-900 shadow-[0_0_12px_rgba(6,182,212,0.2)]"
+                  ? "bg-[#172333] text-[#708096] cursor-not-allowed"
+                  : "bg-[#3b82f6] hover:bg-[#2563eb] text-white shadow-sm"
               }`}
             >
               <Upload size={13} />
-              {isProcessing ? "PROCESSING..." : "INGEST FEED"}
+              <span>{isProcessing ? "Processing..." : "Ingest Feed"}</span>
             </button>
           </div>
         </form>
