@@ -5,14 +5,17 @@
 
 <p align="center">
   <a href="https://aegis-command-ui.vercel.app"><img src="https://img.shields.io/badge/Live%20Demo-aegis--command--ui.vercel.app-2563eb?style=for-the-badge&logo=vercel&logoColor=white" alt="Live Demo" /></a>
+  <img src="https://img.shields.io/badge/Dev2Hack-Top%205%20%2F%20180%2B%20Teams-amber?style=for-the-badge&logo=target&logoColor=white" alt="Dev2Hack Top 5" />
+  <img src="https://img.shields.io/badge/HackerRank%20Infinity%20Hacks-Top%2014-gold?style=for-the-badge" alt="Hackathon" />
   <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
   <img src="https://img.shields.io/badge/FastAPI-Python-009688?style=for-the-badge&logo=fastapi&logoColor=white" alt="FastAPI" />
-  <img src="https://img.shields.io/badge/HackerRank%20Infinity%20Hacks-Top%2014-gold?style=for-the-badge" alt="Hackathon" />
 </p>
 
 **Computer Vision · Retrieval-Augmented Intelligence · Real-Time Telemetry · Operator Decision Support**
 
-Built by **Tanmay Jain · Aryan Garg · Rishabh Bansal**
+🏆 **Top 5 Winner @ Dev2Hack (180+ Teams)** · **Top 14 Finalist @ HackerRank Infinity Hacks**
+
+Built by **Tanmay Jain**
 
 🔗 **Live Tactical Web Console:** [https://aegis-command-ui.vercel.app](https://aegis-command-ui.vercel.app)
 
@@ -82,9 +85,9 @@ The dashboard combines replay video, detection telemetry, tactical mapping, inte
   <sub>Semantic evidence surfaced alongside the active event.</sub>
 </td>
 <td width="50%" align="center">
-  <img src="assets/architecture.svg" alt="Aegis Command system architecture" width="100%" />
-  <br/><b>04 · System Architecture</b><br/>
-  <sub>Perception, transport, retrieval, reasoning and operator interaction.</sub>
+  <img src="assets/screenshots/threat-assessment.jpg" alt="Aegis threat assessment feed" width="100%" />
+  <br/><b>04 · Threat Assessment</b><br/>
+  <sub>Structured threat reasoning, confidence metrics, and correlated SIGINT.</sub>
 </td>
 </tr>
 </table>
@@ -382,21 +385,18 @@ For full raw benchmark logs, bootstrap confidence intervals, and evaluation scri
 
 ---
 
-## Project Context
+## Project Context & Recognition
 
-Aegis Command was developed for **HackerRank Infinity Hacks 2026**, placing **#14 out of 6,000+ global participants**.
+- **Dev2Hack Hackathon:** **Top 5 Winner** (out of 180+ participating teams).
+- **HackerRank Infinity Hacks 2026:** **Top 14 Finalist** (out of 6,000+ global participants).
 
 The project addresses the challenge of information fragmentation in time-critical decision environments by exploring how computer vision telemetry, semantic retrieval, and governed language models can be combined into a structured operator workflow.
 
 ---
 
-## Team
+## Author
 
-| Member | Focus |
-|---|---|
-| **Tanmay Jain** | Team Lead · System architecture · Backend · AI/RAG integration |
-| **Aryan Garg** | Computer vision · Detection pipeline |
-| **Rishabh Bansal** | UI/UX · Interface design · Product presentation |
+**Tanmay Jain** — System Architecture, Computer Vision Pipeline, AI/RAG Integration, Full-Stack Engineering
 
 ---
 
