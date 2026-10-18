@@ -55,6 +55,7 @@ export function OpticsViewport({
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  const [failedVideoSrc, setFailedVideoSrc] = useState<string | null>(null);
 
   // Benchmarking refs
   const perfDrawTimes = useRef<number[]>([]);
@@ -70,6 +71,9 @@ export function OpticsViewport({
     onThreatSampleRef.current = onThreatSample;
     onPerfReportRef.current = onPerfReport;
   });
+
+  const videoSrc = activeFeed?.video || "/feeds/uav-alpha/video.mp4";
+  const videoError = failedVideoSrc === videoSrc;
 
   const handleFrame = useCallback(
     (mediaTime: number, obs: DrawableDetection[]) => {
@@ -263,8 +267,6 @@ export function OpticsViewport({
     return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
   };
 
-  const videoSrc = activeFeed?.video || "/feeds/uav-alpha/video.mp4";
-
   return (
     <div className="flex flex-col gap-3 lg:gap-4 relative w-full">
       {/* Feeds Switcher & Operational Controls Bar */}
@@ -396,10 +398,23 @@ export function OpticsViewport({
           className="absolute inset-0 w-full h-full object-contain filter contrast-125 brightness-90 grayscale-[20%]"
           muted={isMuted}
           playsInline
+          onError={() => setFailedVideoSrc(videoSrc)}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={(e) => setDuration(e.currentTarget.duration)}
           onClick={handleTogglePlay}
         />
+
+        {/* Video Error Safeguard */}
+        {videoError && (
+          <div className="absolute inset-0 z-25 flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm border border-red-500/30 select-none">
+            <div className="text-red-400 font-mono text-sm tracking-wider uppercase mb-1 drop-shadow-[0_0_8px_rgba(239,68,68,0.5)]">
+              VIDEO UNAVAILABLE FOR THIS FEED
+            </div>
+            <div className="text-slate-400 font-mono text-xs">
+              Source media not found or unsupported format
+            </div>
+          </div>
+        )}
 
         {/* High-Performance Canvas Overlay */}
         <canvas ref={canvasRef} className="absolute inset-0 pointer-events-none z-20" />

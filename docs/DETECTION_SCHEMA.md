@@ -100,13 +100,25 @@ Schema v2 organizes detection data by **track trajectory** rather than per-frame
 
 ---
 
-## Schema v1 Compatibility (Legacy Buckets Adapter)
+## Schema v1 Compatibility & Client-Side Bridging Pipeline
 
-The frontend maintains backward compatibility for legacy `detections.json` files:
+The frontend maintains backward compatibility for legacy and intermediate `detections.json` files formatted under Schema v1.
 
-### Legacy Structure
+### Keyframe Sampling & Client-Side Bridging
+
+All active surveillance feeds (`uav-alpha`, `cctv-bravo`, and `bodycam-charlie`) currently ship under Schema v1 with keyframes every 0.5s, bridged client-side by class+IoU matching with linear interpolation (`imgsz=1280`, conf=0.35, ByteTrack). Compact JSON serialization is enforced to maintain lean bundle footprints (< 500 KB per feed timeline).
+
+### Structure
 ```json
 {
+  "meta": {
+    "feed_id": "uav-alpha",
+    "evaluated": true,
+    "model": "aegis_demo_full_last.pt",
+    "generator_commit": "be1308e...",
+    "weights_sha256": "93761a11...",
+    "detections_sha256": "..."
+  },
   "0.0": [
     {
       "id": "Vehicle-1",
@@ -120,8 +132,26 @@ The frontend maintains backward compatibility for legacy `detections.json` files
 }
 ```
 
-### Adaptation Parameters
-- **`LEGACY_SOURCE_SIZE`**: `{ width: 1920, height: 1080 }`
-- **`LEGACY_FPS`**: `59.94`
-- **Lookup Policy**: Nearest-frame lookup using binary search on sorted timestamps.
-- **Tolerance Window**: $\le 0.05\text{ s}$ (`LEGACY_TOLERANCE_S = 0.05`). Detections beyond $0.05\text{ s}$ are suppressed to prevent rendering stale boxes.
+### Client-Side Bridging & Interpolation
+
+To eliminate optical overlay stutter and flicker between discrete keyframes without inflating tracking errors, `frontend/src/lib/timeline.ts` (`createV1Timeline`) executes client-side bridging at feed load time:
+
+1. **Greedy Matching**:
+   - Consecutive keyframes at $t_i$ and $t_{i+1}$ are matched when the sampling gap $\Delta t = t_{i+1} - t_i \le \text{MAX\_BRIDGE\_S}$ ($1.0\text{ s}$).
+   - Box association uses greedy bipartite matching based on:
+     $$\text{class}_A = \text{class}_B \quad \text{AND} \quad \left(\text{IoU}(A, B) \ge 0.05 \;\lor\; \text{dist}(\text{center}_A, \text{center}_B) \le 1.5 \times \max(w_A, h_A)\right)$$
+   - Box matching operates independent of persistent tracking IDs, guaranteeing continuity despite tracker ID churn across frame gaps.
+
+2. **Playback Sampling (`sampleAt(t)`)**:
+   - For query time $t$ between matched keyframes $t_i \le t \le t_{i+1}$ ($\Delta t \le 1.0\text{ s}$):
+     - **Matched Pairs**: Bounding box coordinates are linearly interpolated with $\alpha = \frac{t - t_i}{t_{i+1} - t_i}$. Kinematics and confidence are inherited from the chronologically nearer sample, and the box is flagged with `interpolated: true`.
+     - **Unmatched Boxes**: Rendered only when $|t - t_{\text{sample}}| \le 0.15\text{ s}$. Unmatched detections are suppressed beyond $0.15\text{ s}$ to prevent stale phantom boxes from lingering in the viewport.
+   - For sampling gaps $\Delta t > 1.0\text{ s}$, the timeline falls back to the legacy tolerance window ($0.05\text{ s}$) around each sample.
+
+### Secondary Feeds Status (`cctv-bravo`, `bodycam-charlie`)
+
+- **Video Assets**: Standardized 720p 30fps web video copies (`frontend/public/feeds/*/video.mp4`) ship directly in the repository (< 8 MB each).
+- **Inference & Evaluation**: Detection timelines for secondary feeds are generated using zero-shot inference (`yolov8m.pt` @ 1280px with keyframes every 0.5s, bridged client-side by class+IoU matching with linear interpolation).
+- **Evaluation Status**: Both secondary feeds are explicitly configured in metadata with `"evaluated": false`. Human-verified ground-truth bounding box annotations and cross-validation benchmark statistics exist exclusively for `uav-alpha`. Secondary feeds render a visible operational warning badge in the dashboard.
+
+

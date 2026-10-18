@@ -346,6 +346,149 @@ interface LegacyRawItem {
   direction?: string;
 }
 
+export const MAX_BRIDGE_S = 1.0;
+export const UNMATCHED_TOLERANCE_S = 0.15;
+export const MIN_IOU_THRESHOLD = 0.05;
+export const MAX_CENTER_DIST_FACTOR = 1.5;
+export const MAX_CENTER_DIST_RATIO = 0.2; // Reject bridging if center distance > 0.2 * meta.width
+
+export function computeBoxIoU(
+  a: [number, number, number, number],
+  b: [number, number, number, number]
+): number {
+  const x1 = Math.max(a[0], b[0]);
+  const y1 = Math.max(a[1], b[1]);
+  const x2 = Math.min(a[2], b[2]);
+  const y2 = Math.min(a[3], b[3]);
+
+  const interW = Math.max(0, x2 - x1);
+  const interH = Math.max(0, y2 - y1);
+  const interArea = interW * interH;
+
+  const areaA = Math.max(0, a[2] - a[0]) * Math.max(0, a[3] - a[1]);
+  const areaB = Math.max(0, b[2] - b[0]) * Math.max(0, b[3] - b[1]);
+
+  const unionArea = areaA + areaB - interArea;
+  if (unionArea <= 0) return 0;
+  return interArea / unionArea;
+}
+
+export function computeBoxCenterDist(
+  a: [number, number, number, number],
+  b: [number, number, number, number]
+): number {
+  const cAx = (a[0] + a[2]) * 0.5;
+  const cAy = (a[1] + a[3]) * 0.5;
+  const cBx = (b[0] + b[2]) * 0.5;
+  const cBy = (b[1] + b[3]) * 0.5;
+  const dx = cAx - cBx;
+  const dy = cAy - cBy;
+  return Math.sqrt(dx * dx + dy * dy);
+}
+
+interface IntervalBridge {
+  matched: Array<{
+    a: DrawableDetection;
+    b: DrawableDetection;
+  }>;
+  unmatchedA: DrawableDetection[];
+  unmatchedB: DrawableDetection[];
+}
+
+export function matchSampleBoxes(
+  detsA: DrawableDetection[],
+  detsB: DrawableDetection[],
+  maxCenterDistCap?: number
+): IntervalBridge {
+  const lenA = detsA.length;
+  const lenB = detsB.length;
+  const matchedA = new Uint8Array(lenA);
+  const matchedB = new Uint8Array(lenB);
+  const matched: Array<{ a: DrawableDetection; b: DrawableDetection }> = [];
+
+  // Pass 1: Greedy match by highest IoU (IoU >= 0.05) among same class, respecting distance cap
+  const iouCandidates: Array<{ j: number; k: number; iou: number }> = [];
+  for (let j = 0; j < lenA; j++) {
+    const clsA = (detsA[j].class || "").toLowerCase();
+    for (let k = 0; k < lenB; k++) {
+      const clsB = (detsB[k].class || "").toLowerCase();
+      if (clsA !== clsB) continue;
+
+      const dist = computeBoxCenterDist(detsA[j].box, detsB[k].box);
+      if (maxCenterDistCap !== undefined && dist > maxCenterDistCap) continue;
+
+      const iou = computeBoxIoU(detsA[j].box, detsB[k].box);
+      if (iou >= MIN_IOU_THRESHOLD) {
+        iouCandidates.push({ j, k, iou });
+      }
+    }
+  }
+
+  iouCandidates.sort((p1, p2) => p2.iou - p1.iou);
+  for (let i = 0; i < iouCandidates.length; i++) {
+    const { j, k } = iouCandidates[i];
+    if (matchedA[j] === 0 && matchedB[k] === 0) {
+      matchedA[j] = 1;
+      matchedB[k] = 1;
+      matched.push({ a: detsA[j], b: detsB[k] });
+    }
+  }
+
+  // Pass 2: Fallback to nearest center distance <= min(1.5 * max(box w, h), maxCenterDistCap) among remaining unmatched of same class
+  const distCandidates: Array<{ j: number; k: number; dist: number }> = [];
+  for (let j = 0; j < lenA; j++) {
+    if (matchedA[j] === 1) continue;
+    const boxA = detsA[j].box;
+    const wA = boxA[2] - boxA[0];
+    const hA = boxA[3] - boxA[1];
+    const clsA = (detsA[j].class || "").toLowerCase();
+
+    for (let k = 0; k < lenB; k++) {
+      if (matchedB[k] === 1) continue;
+      const clsB = (detsB[k].class || "").toLowerCase();
+      if (clsA !== clsB) continue;
+
+      const boxB = detsB[k].box;
+      const dist = computeBoxCenterDist(boxA, boxB);
+      if (maxCenterDistCap !== undefined && dist > maxCenterDistCap) continue;
+
+      const wB = boxB[2] - boxB[0];
+      const hB = boxB[3] - boxB[1];
+      const maxDim = Math.max(wA, hA, wB, hB);
+
+      if (dist <= MAX_CENTER_DIST_FACTOR * maxDim) {
+        distCandidates.push({ j, k, dist });
+      }
+    }
+  }
+
+  distCandidates.sort((p1, p2) => p1.dist - p2.dist);
+  for (let i = 0; i < distCandidates.length; i++) {
+    const { j, k } = distCandidates[i];
+    if (matchedA[j] === 0 && matchedB[k] === 0) {
+      matchedA[j] = 1;
+      matchedB[k] = 1;
+      matched.push({ a: detsA[j], b: detsB[k] });
+    }
+  }
+
+  const unmatchedA: DrawableDetection[] = [];
+  for (let j = 0; j < lenA; j++) {
+    if (matchedA[j] === 0) {
+      unmatchedA.push(detsA[j]);
+    }
+  }
+
+  const unmatchedB: DrawableDetection[] = [];
+  for (let k = 0; k < lenB; k++) {
+    if (matchedB[k] === 0) {
+      unmatchedB.push(detsB[k]);
+    }
+  }
+
+  return { matched, unmatchedA, unmatchedB };
+}
+
 export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline {
   const rawKeys = Object.keys(raw);
   const parsedTimes: number[] = [];
@@ -378,7 +521,6 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
   }
 
   const duration_s = timesArray.length > 0 ? timesArray[timesArray.length - 1] : 0;
-
   const rawMeta = (raw as Record<string, unknown>).meta as Partial<TimelineMeta> | undefined;
 
   const meta: TimelineMeta = {
@@ -408,6 +550,23 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
     heading_frame: rawMeta?.heading_frame || "image",
   };
 
+  const maxCenterDistCap = MAX_CENTER_DIST_RATIO * meta.width;
+
+  // Precompute bridges between consecutive samples i and i+1 at load time
+  const intervalBridges: IntervalBridge[] = new Array(Math.max(0, parsedTimes.length - 1));
+  for (let i = 0; i < parsedTimes.length - 1; i++) {
+    const gap = timesArray[i + 1] - timesArray[i];
+    if (gap <= MAX_BRIDGE_S && gap > 0) {
+      intervalBridges[i] = matchSampleBoxes(frameDetections[i], frameDetections[i + 1], maxCenterDistCap);
+    } else {
+      intervalBridges[i] = {
+        matched: [],
+        unmatchedA: frameDetections[i],
+        unmatchedB: frameDetections[i + 1],
+      };
+    }
+  }
+
   const getScale = (targetWidth: number, targetHeight: number): ScaleFactors => ({
     scaleX: targetWidth / meta.width,
     scaleY: targetHeight / meta.height,
@@ -428,18 +587,94 @@ export function createV1Timeline(raw: Record<string, LegacyRawItem[]>): Timeline
   };
 
   const sampleAt = (t: number): DrawableDetection[] => {
-    if (timesArray.length === 0) return [];
+    const len = timesArray.length;
+    if (len === 0) return [];
 
-    const closestIdx = binarySearchClosest(timesArray, t);
-    if (closestIdx === -1) return [];
-
-    const closestTime = timesArray[closestIdx];
-    // Enforce 0.05s tolerance window to prevent rendering stale detections
-    if (Math.abs(closestTime - t) <= LEGACY_TOLERANCE_S) {
-      return frameDetections[closestIdx];
+    if (len === 1) {
+      if (Math.abs(timesArray[0] - t) <= LEGACY_TOLERANCE_S) {
+        return frameDetections[0];
+      }
+      return [];
     }
 
-    return [];
+    // Boundary checks before first and after last
+    if (t < timesArray[0]) {
+      if (timesArray[0] - t <= LEGACY_TOLERANCE_S) {
+        return frameDetections[0];
+      }
+      return [];
+    }
+    if (t > timesArray[len - 1]) {
+      if (t - timesArray[len - 1] <= LEGACY_TOLERANCE_S) {
+        return frameDetections[len - 1];
+      }
+      return [];
+    }
+
+    const idx = binarySearchInterval(timesArray, t);
+    if (idx === -1) return [];
+
+    const t0 = timesArray[idx];
+    const t1 = timesArray[idx + 1];
+
+    if (t === t0) {
+      return frameDetections[idx];
+    }
+    if (t === t1) {
+      return frameDetections[idx + 1];
+    }
+
+    const gap = t1 - t0;
+    // Beyond MAX_BRIDGE_S: fall back to old tolerance behaviour (0.05s)
+    if (gap > MAX_BRIDGE_S) {
+      if (t - t0 <= LEGACY_TOLERANCE_S) {
+        return frameDetections[idx];
+      }
+      if (t1 - t <= LEGACY_TOLERANCE_S) {
+        return frameDetections[idx + 1];
+      }
+      return [];
+    }
+
+    const bridge = intervalBridges[idx];
+    const alpha = (t - t0) / gap;
+    const results: DrawableDetection[] = [];
+
+    // Matched pairs: linearly interpolate
+    for (let m = 0; m < bridge.matched.length; m++) {
+      const { a, b } = bridge.matched[m];
+      const nearer = alpha <= 0.5 ? a : b;
+      results.push({
+        id: nearer.id,
+        class: a.class,
+        confidence: nearer.confidence,
+        box: [
+          a.box[0] + alpha * (b.box[0] - a.box[0]),
+          a.box[1] + alpha * (b.box[1] - a.box[1]),
+          a.box[2] + alpha * (b.box[2] - a.box[2]),
+          a.box[3] + alpha * (b.box[3] - a.box[3]),
+        ],
+        speed_kmh: nearer.speed_kmh,
+        direction: nearer.direction,
+        interpolated: true,
+      });
+    }
+
+    // Unmatched from sample i: visible within +/-0.15s (forward: t - t0 <= 0.15)
+    if (t - t0 <= UNMATCHED_TOLERANCE_S) {
+      for (let u = 0; u < bridge.unmatchedA.length; u++) {
+        results.push(bridge.unmatchedA[u]);
+      }
+    }
+
+    // Unmatched from sample i+1: visible within +/-0.15s (backward: t1 - t <= 0.15)
+    if (t1 - t <= UNMATCHED_TOLERANCE_S) {
+      for (let u = 0; u < bridge.unmatchedB.length; u++) {
+        results.push(bridge.unmatchedB[u]);
+      }
+    }
+
+    return results;
   };
 
   return {

@@ -91,68 +91,158 @@ def find_dataset_files(input_root: Path):
     }
 
 
-def generate_demo_feed_detections(repo_dir: Path, work_dir: Path):
+def locate_feed_video(feed_name: str, input_root: Path, repo_dir: Path, extract_dir: Path) -> Path:
+    log(f"Locating video for feed '{feed_name}'...")
+    import zipfile
+    # Search /kaggle/input for direct mp4 or zip files
+    for root, dirs, files in os.walk(input_root):
+        r_path = Path(root)
+        if "video.mp4" in files and (r_path.name == feed_name or feed_name in str(r_path)):
+            log(f"Found {feed_name} video directly at: {r_path / 'video.mp4'}")
+            return r_path / "video.mp4"
+        if f"{feed_name}.zip" in files:
+            zip_path = r_path / f"{feed_name}.zip"
+            dst_feed_dir = extract_dir / feed_name
+            if not dst_feed_dir.exists():
+                log(f"Extracting {zip_path} -> {dst_feed_dir}...")
+                dst_feed_dir.mkdir(parents=True, exist_ok=True)
+                with zipfile.ZipFile(zip_path, "r") as z:
+                    z.extractall(dst_feed_dir)
+            for extracted in dst_feed_dir.rglob("*.mp4"):
+                log(f"Found extracted video for {feed_name}: {extracted}")
+                return extracted
+
+    # Fallback to repo copy if present
+    repo_copy = repo_dir / "frontend" / "public" / "feeds" / feed_name / "video.mp4"
+    if repo_copy.exists():
+        log(f"Using repo copy for {feed_name}: {repo_copy}")
+        return repo_copy
+
+    raise FileNotFoundError(f"Could not locate video file for feed: {feed_name}")
+
+
+def generate_all_feed_detections(repo_dir: Path, work_dir: Path, input_root: Path):
     """
     Kaggle GPU step:
-    1. Download v0.4.0 release asset 'aegis_demo_full_last.pt'
-    2. Verify SHA-256 checksum against checkpoints_manifest.json
-    3. Run scripts/generate_feed_detections.py on frontend/public/feeds/uav-alpha/video.mp4
-       with imgsz=1280, conf=0.35, tracker=bytetrack.yaml, sample_interval=0.5, device=cuda:0
-    4. Save to /kaggle/working/uav-alpha/detections.json and /kaggle/working/detections.json
+    Generates 10 Hz detections (sample-interval=0.1) for all three surveillance feeds:
+    1. uav-alpha: aegis_demo_full_last.pt (v0.4.0 asset, sha256 93761a11...), imgsz=1280, conf=0.35, evaluated=True
+    2. cctv-bravo: yolov8m.pt (sha256 5d4a90cd...), imgsz=1280, conf=0.35, evaluated=False
+    3. bodycam-charlie: yolov8m.pt (sha256 5d4a90cd...), imgsz=1280, conf=0.35, evaluated=False
     """
-    log("\n=================== GENERATING DEMO FEED DETECTIONS ON GPU ===================")
+    log("\n=================== GENERATING ALL 3 FEED DETECTIONS ON GPU (10 HZ) ===================")
     checkpoints_dir = work_dir / "checkpoints"
     checkpoints_dir.mkdir(parents=True, exist_ok=True)
-    weights_path = checkpoints_dir / "aegis_demo_full_last.pt"
+    extract_dir = work_dir / "extracted_feeds"
+    extract_dir.mkdir(parents=True, exist_ok=True)
 
+    # 1. Prepare demo weights (aegis_demo_full_last.pt)
+    demo_weights_path = checkpoints_dir / "aegis_demo_full_last.pt"
     manifest_path = repo_dir / "docs" / "results" / "raw" / "checkpoints_manifest.json"
     assert manifest_path.exists(), f"checkpoints_manifest.json missing at {manifest_path}"
     with open(manifest_path, "r", encoding="utf-8") as f:
         manifest = json.load(f)
-    expected_sha256 = manifest.get("aegis_demo_full_last")
-    assert expected_sha256, "aegis_demo_full_last key missing in checkpoints_manifest.json"
+    expected_demo_sha256 = manifest.get("aegis_demo_full_last")
+    assert expected_demo_sha256, "aegis_demo_full_last key missing in checkpoints_manifest.json"
 
-    # Download from v0.4.0 release asset if not present or corrupt
-    if not weights_path.exists() or compute_sha256(weights_path) != expected_sha256:
+    if not demo_weights_path.exists() or compute_sha256(demo_weights_path) != expected_demo_sha256:
         asset_url = "https://github.com/TanmayJain-dev/Aegis-Command/releases/download/v0.4.0/aegis_demo_full_last.pt"
-        log(f"Downloading release asset: {asset_url} -> {weights_path}...")
-        run_cmd(["curl", "-fsSL", "-o", str(weights_path), asset_url])
+        log(f"Downloading release asset: {asset_url} -> {demo_weights_path}...")
+        run_cmd(["curl", "-fsSL", "-o", str(demo_weights_path), asset_url])
 
-    actual_sha256 = compute_sha256(weights_path)
-    log(f"Verified weights SHA-256: {actual_sha256}")
-    assert actual_sha256 == expected_sha256, (
-        f"Checksum mismatch: expected {expected_sha256}, got {actual_sha256}"
+    actual_demo_sha256 = compute_sha256(demo_weights_path)
+    log(f"Verified demo weights SHA-256: {actual_demo_sha256}")
+    assert actual_demo_sha256 == expected_demo_sha256, (
+        f"Checksum mismatch: expected {expected_demo_sha256}, got {actual_demo_sha256}"
     )
 
-    video_path = repo_dir / "frontend" / "public" / "feeds" / "uav-alpha" / "video.mp4"
-    assert video_path.exists(), f"Video file missing: {video_path}"
+    # 2. Prepare baseline weights (yolov8m.pt)
+    EXPECTED_YOLOV8M_SHA256 = "5d4a90cdc7a21786cc59cd19778e9eafff836df9e2da32524737c7ee6efe4fe5"
+    yolov8m_path = checkpoints_dir / "yolov8m.pt"
 
-    out_dir = work_dir / "uav-alpha"
-    out_dir.mkdir(parents=True, exist_ok=True)
-    out_json = out_dir / "detections.json"
-    root_out_json = work_dir / "detections.json"
+    found_yolo = None
+    for root, dirs, files in os.walk(input_root):
+        if "yolov8m.pt" in files:
+            candidate = Path(root) / "yolov8m.pt"
+            if compute_sha256(candidate) == EXPECTED_YOLOV8M_SHA256:
+                found_yolo = candidate
+                break
+
+    if found_yolo:
+        log(f"Found verified yolov8m.pt in input: {found_yolo}")
+        safe_link_or_copy(found_yolo, yolov8m_path)
+    elif not yolov8m_path.exists() or compute_sha256(yolov8m_path) != EXPECTED_YOLOV8M_SHA256:
+        log("Downloading yolov8m.pt from official ultralytics release...")
+        yolo_url = "https://github.com/ultralytics/assets/releases/download/v8.2.0/yolov8m.pt"
+        run_cmd(["curl", "-fsSL", "-o", str(yolov8m_path), yolo_url])
+
+    actual_yolov8m_sha = compute_sha256(yolov8m_path)
+    log(f"Verified yolov8m.pt SHA-256: {actual_yolov8m_sha}")
+    assert actual_yolov8m_sha == EXPECTED_YOLOV8M_SHA256, (
+        f"yolov8m.pt SHA mismatch: expected {EXPECTED_YOLOV8M_SHA256}, got {actual_yolov8m_sha}"
+    )
 
     gen_script = repo_dir / "scripts" / "generate_feed_detections.py"
-    cmd = [
-        sys.executable,
-        str(gen_script),
-        "--video", str(video_path),
-        "--weights", str(weights_path),
-        "--out", str(out_json),
-        "--imgsz", "1280",
-        "--conf", "0.35",
-        "--tracker", "bytetrack.yaml",
-        "--sample-interval", "0.5",
-        "--device", "cuda:0",
-        "--feed", "uav-alpha",
-        "--evaluated",
+    feeds_spec = [
+        {
+            "feed": "uav-alpha",
+            "weights": demo_weights_path,
+            "evaluated": True,
+        },
+        {
+            "feed": "cctv-bravo",
+            "weights": yolov8m_path,
+            "evaluated": False,
+        },
+        {
+            "feed": "bodycam-charlie",
+            "weights": yolov8m_path,
+            "evaluated": False,
+        },
     ]
-    log(f"Executing: {' '.join(cmd)}")
-    run_cmd(cmd, cwd=str(repo_dir))
 
-    # Also copy to root of working directory so it's readily accessible in kernel output
-    shutil.copy2(out_json, root_out_json)
-    log(f"Generated uav-alpha detections exported to {out_json} and {root_out_json}")
+    for spec in feeds_spec:
+        feed_name = spec["feed"]
+        weights = spec["weights"]
+        evaluated = spec["evaluated"]
+
+        log(f"\n--- Generating feed: {feed_name} ---")
+        video_file = locate_feed_video(feed_name, input_root, repo_dir, extract_dir)
+
+        out_feed_dir = work_dir / feed_name
+        out_feed_dir.mkdir(parents=True, exist_ok=True)
+        out_json = out_feed_dir / "detections.json"
+
+        cmd = [
+            sys.executable,
+            str(gen_script),
+            "--video", str(video_file),
+            "--weights", str(weights),
+            "--out", str(out_json),
+            "--imgsz", "1280",
+            "--conf", "0.35",
+            "--tracker", "bytetrack.yaml",
+            "--sample-interval", "0.1",
+            "--device", "cuda:0",
+            "--feed", feed_name,
+        ]
+        if evaluated:
+            cmd.append("--evaluated")
+
+        log(f"Executing: {' '.join(cmd)}")
+        run_cmd(cmd, cwd=str(repo_dir))
+
+        size_kb = out_json.stat().st_size / 1024.0
+        log(f"Successfully generated {out_json} ({size_kb:.1f} KB)")
+        assert size_kb <= 600, f"{out_json} exceeded size limit ({size_kb:.1f} KB > 600 KB)"
+
+        # Package in /kaggle/working/feeds/<feed>/detections.json
+        pkg_feed_dir = work_dir / "feeds" / feed_name
+        pkg_feed_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(out_json, pkg_feed_dir / "detections.json")
+
+    # uav-alpha backward compatibility at root of /kaggle/working
+    shutil.copy2(work_dir / "uav-alpha" / "detections.json", work_dir / "detections.json")
+    log("\nAll 3 feeds generated and verified successfully at 10 Hz.")
 
 
 def main():
@@ -179,15 +269,18 @@ def main():
 
     # 4. Clone repo
     repo_dir = Path("/tmp/repo")
-    branch = os.environ.get("GIT_BRANCH", "feat/detection-v4")
+    branch = os.environ.get("GIT_BRANCH", "fix/overlay-blink-and-feeds")
     if not repo_dir.exists():
         log(f"Cloning repo into {repo_dir} (branch: {branch})...")
         run_cmd(["git", "clone", "-b", branch, "https://github.com/TanmayJain-dev/Aegis-Command.git", str(repo_dir)])
     else:
         log(f"Repo already exists at {repo_dir}")
 
-    # 5. Generate Demo Feed Detections on GPU
-    generate_demo_feed_detections(repo_dir=repo_dir, work_dir=work_dir)
+    input_root = Path("/kaggle/input")
+    assert input_root.exists(), "Missing /kaggle/input"
+
+    # 5. Generate Denser Detections on GPU for all feeds
+    generate_all_feed_detections(repo_dir=repo_dir, work_dir=work_dir, input_root=input_root)
 
     runner_mode = os.environ.get("RUNNER_MODE", "feed_only")
     if runner_mode != "full_cv":

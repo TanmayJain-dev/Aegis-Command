@@ -90,13 +90,46 @@ def package_dataset(out_dir: Path, username: str = "tanmayjain"):
     print(f"\nDataset package ready at {out_dir}.")
 
 
+def package_feeds_dataset(out_dir: Path, username: str = "tanmayjaindev"):
+    print(f"Packaging Aegis Surveillance Feeds dataset to: {out_dir}")
+    out_dir.mkdir(parents=True, exist_ok=True)
+    feeds = ["uav-alpha", "cctv-bravo", "bodycam-charlie"]
+    for feed in feeds:
+        v_path = REPO_ROOT / "frontend" / "public" / "feeds" / feed / "video.mp4"
+        if not v_path.exists():
+            raise FileNotFoundError(f"Missing video file for {feed}: {v_path}")
+        feed_dir = out_dir / feed
+        feed_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copy2(v_path, feed_dir / "video.mp4")
+        print(f"  ✓ Copied {feed}/video.mp4 ({v_path.stat().st_size / 1e6:.1f} MB)")
+
+    meta = {
+        "title": "Aegis Command Surveillance Feeds",
+        "id": f"{username}/aegis-surveillance-feeds",
+        "licenses": [{"name": "CC0-1.0"}],
+        "isPrivate": True
+    }
+    with open(out_dir / "dataset-metadata.json", "w", encoding="utf-8") as f:
+        json.dump(meta, f, indent=2)
+    print(f"  ✓ Created dataset-metadata.json (isPrivate: True, id: {meta['id']})")
+    print(f"\nFeeds dataset package ready at {out_dir}.")
+
+
 def main():
     parser = argparse.ArgumentParser(description="Package Kaggle dataset for Aegis Command")
-    parser.add_argument("--out-dir", default="/tmp/aegis_kaggle_dataset", help="Output directory")
-    parser.add_argument("--username", default="tanmayjain", help="Kaggle username for dataset slug")
+    parser.add_argument("--out-dir", default=None, help="Output directory")
+    parser.add_argument("--username", default="tanmayjaindev", help="Kaggle username for dataset slug")
+    parser.add_argument("--feeds-only", action="store_true", help="Package secondary and primary video feeds dataset")
     args = parser.parse_args()
-    package_dataset(Path(args.out_dir), username=args.username)
+
+    if args.feeds_only:
+        target_dir = Path(args.out_dir or "/tmp/aegis_feeds_dataset")
+        package_feeds_dataset(target_dir, username=args.username)
+    else:
+        target_dir = Path(args.out_dir or "/tmp/aegis_kaggle_dataset")
+        package_dataset(target_dir, username=args.username)
 
 
 if __name__ == "__main__":
     main()
+
