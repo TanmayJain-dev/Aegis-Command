@@ -15,20 +15,34 @@ import "leaflet/dist/leaflet.css";
 delete (L.Icon.Default.prototype as unknown as { _getIconUrl?: unknown })._getIconUrl;
 
 const targetIcon = new L.DivIcon({
-  className: "custom-target-icon",
+  className: "tactical-target-icon",
   html: `
     <div style="
-      width:24px;
-      height:24px;
-      background-color:rgba(244,63,94,.8);
-      border-radius:50%;
-      border:2px solid #fff;
-      box-shadow:0 0 15px #f43f5e;
-      animation:ping 1.5s cubic-bezier(0,0,.2,1) infinite;
-    "></div>
+      position:relative;
+      width:18px;
+      height:18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    ">
+      <div style="
+        position:absolute;
+        width:18px;
+        height:18px;
+        border-radius:50%;
+        border:2px solid #ef4444;
+        background-color:rgba(239,68,68,0.25);
+      "></div>
+      <div style="
+        width:6px;
+        height:6px;
+        border-radius:50%;
+        background-color:#ef4444;
+      "></div>
+    </div>
   `,
-  iconSize: [24, 24],
-  iconAnchor: [12, 12],
+  iconSize: [18, 18],
+  iconAnchor: [9, 9],
 });
 
 function MapUpdater({
@@ -114,16 +128,16 @@ export default function Map({
     : '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
 
   return (
-    <div className="relative z-0 h-full w-full min-h-[340px] overflow-hidden rounded border-none">
+    <div className="relative z-0 h-full w-full min-h-[300px] overflow-hidden rounded bg-[#08111d] border border-[#243244]">
       <MapContainer
         key="aegis-main-map"
         center={defaultCenter}
         zoom={10}
         style={{
           height: "100%",
-          minHeight: "340px",
+          minHeight: "300px",
           width: "100%",
-          background: "#0a0a0a",
+          background: "#08111d",
         }}
         zoomControl={false}
       >
@@ -132,9 +146,14 @@ export default function Map({
         {coordinates && (
           <>
             <Marker position={coordinates} icon={targetIcon}>
-              <Popup className="font-mono text-xs">
-                <div className="bg-slate-900 p-1 font-mono font-bold text-rose-400 border border-rose-900/50">
-                  TARGET LOCK CONFIRMED
+              <Popup className="tactical-map-popup">
+                <div className="bg-[#0d1724] text-[#f2f5f8] p-2 text-xs border border-[#243244] rounded">
+                  <div className="text-[10px] text-[#ef4444] font-semibold uppercase tracking-wider mb-1">
+                    Incident Sector
+                  </div>
+                  <div className="font-mono text-[11px] text-[#a7b2c2]">
+                    {coordinates[0].toFixed(4)}° N, {coordinates[1].toFixed(4)}° E
+                  </div>
                 </div>
               </Popup>
             </Marker>
@@ -142,10 +161,11 @@ export default function Map({
             <Circle
               center={coordinates}
               pathOptions={{
-                color: "#f43f5e",
-                fillColor: "#f43f5e",
-                fillOpacity: 0.1,
-                weight: 1,
+                color: "#ef4444",
+                fillColor: "#ef4444",
+                fillOpacity: 0.12,
+                weight: 1.5,
+                dashArray: "4 4",
               }}
               radius={1500}
             />
@@ -155,15 +175,14 @@ export default function Map({
         <MapUpdater coordinates={coordinates} />
       </MapContainer>
 
-      <div className="pointer-events-none absolute left-2 top-2 z-[401] rounded border border-cyan-500/30 bg-black/80 px-2 py-1 font-mono text-[10px] tracking-widest text-cyan-400/90 backdrop-blur-sm">
-        SAT-LINK: SECURE // LAT:{" "}
-        {coordinates
-          ? coordinates[0].toFixed(4)
-          : defaultCenter[0].toFixed(4)}{" "}
-        LNG:{" "}
-        {coordinates
-          ? coordinates[1].toFixed(4)
-          : defaultCenter[1].toFixed(4)}
+      <div className="pointer-events-none absolute left-3 top-3 z-[401] rounded border border-[#243244] bg-[#0d1724]/90 px-2.5 py-1 text-[11px] font-mono text-[#f2f5f8] shadow-sm backdrop-blur-sm flex items-center gap-2">
+        <span className="w-1.5 h-1.5 rounded-full bg-[#10b981]" />
+        <span className="text-[#a7b2c2]">COORDINATES:</span>
+        <span>
+          {coordinates
+            ? `${coordinates[0].toFixed(4)}° N  ${coordinates[1].toFixed(4)}° E`
+            : `${defaultCenter[0].toFixed(4)}° N  ${defaultCenter[1].toFixed(4)}° E`}
+        </span>
       </div>
     </div>
   );
